@@ -1,0 +1,19 @@
+{
+  "name": "quartz",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "devDependencies": {
+    "@pinia/nuxt": "^0.5.1",
+    "@unocss/nuxt": "^0.58.4",
+    "nuxt": "^3.9.3",
+    "vue": "^3.4.14",
+    "vue-router": "^4.2.5"
+  }
+}
