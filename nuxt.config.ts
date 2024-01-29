@@ -9,5 +9,14 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  modules: ["@pinia/nuxt", "@unocss/nuxt"],
+  modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt"],
+  supabase: {
+    redirectOptions: {
+      login: "/",
+      callback: "/atelier",
+    },
+  },
+  pinia: {
+    storesDirs: ["./stores/**"],
+  },
 });
