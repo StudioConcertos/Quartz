@@ -5,7 +5,8 @@
 </template>
 
 <script setup lang="ts">
-definePageMeta({
-  middleware: ["auth"],
+onMounted(() => {
+  // Temporary workaround for https://github.com/supabase/gotrue-js/issues/455
+  useRouter().replace({ hash: "" });
 });
 </script>
