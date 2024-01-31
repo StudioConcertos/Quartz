@@ -2,20 +2,16 @@ export const useAuth = () => {
   const client = useSupabaseClient();
 
   async function signIn() {
-    const { error } = await client.auth.signInWithOAuth({
+    await client.auth.signInWithOAuth({
       provider: "github",
       options: {
         redirectTo: `${window.location.origin}/atelier`,
       },
     });
-
-    if (error) return console.log(error);
   }
 
   async function signOut() {
-    const { error } = await client.auth.signOut();
-
-    if (error) return console.log(error);
+    await client.auth.signOut();
 
     navigateTo("/", { replace: true });
   }
