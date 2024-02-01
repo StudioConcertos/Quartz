@@ -26,18 +26,29 @@ export interface Database {
           created_at: string
           id: string
           lapidary: string
+          title: string
         }
         Insert: {
           created_at?: string
           id?: string
-          lapidary?: string
+          lapidary: string
+          title?: string
         }
         Update: {
           created_at?: string
           id?: string
           lapidary?: string
+          title?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "slides_lapidary_fkey"
+            columns: ["lapidary"]
+            isOneToOne: false
+            referencedRelation: "lapidaries"
+            referencedColumns: ["id"]
+          }
+        ]
       }
     }
     Views: {

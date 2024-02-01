@@ -1,8 +1,10 @@
 <template>
-  <p v-if="!slide">
-    This slides does not exist or you do not have the access to it.
-  </p>
-  <p>{{ slide }}</p>
+  <Title>{{ slide?.title }} | Quartz</Title>
+  <div v-if="!slide">
+    <p>Either the slides does not exist or you do not have access.</p>
+    <NuxtLink to="/atelier">Return</NuxtLink>
+  </div>
+  <p v-else>{{ slide }}</p>
 </template>
 
 <script setup lang="ts">

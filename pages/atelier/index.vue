@@ -2,38 +2,72 @@
   <p>Currently signed in as: {{ useAuthStore().user?.email }}</p>
   <p v-if="slides?.length">Slides:</p>
   <div v-for="slide in slides" :key="slide.id">
-    <NuxtLink :to="`/atelier/${slide.id}`">{{ slide.id }}</NuxtLink>
+    <NuxtLink target="_blank" :to="`/atelier/${slide.id}`">{{
+      slide.title
+    }}</NuxtLink>
   </div>
-  <button @click="newSlides()">Create new Slides</button>
+  <button @click="insertNewSlides()">Create new Slides</button>
   <button @click="useAuth().signOut()">Sign Out</button>
 </template>
 
 <script setup lang="ts">
+import { RealtimeChannel } from "@supabase/supabase-js";
+
 import type { Database } from "~/types/database";
 
 const client = useSupabaseClient<Database>();
 
-const { data: slides } = await useAsyncData(async () => {
+let realtimeChannel: RealtimeChannel;
+
+const { data: slides, refresh: refreshSlides } = await useAsyncData(
+  "slides",
+  async () => {
+    const { data, error } = await client
+      .from("slides")
+      .select("*")
+      .match({ lapidary: useAuthStore().user?.id });
+
+    if (error) console.log(error);
+
+    return data;
+  }
+);
+
+async function insertNewSlides() {
   const { data, error } = await client
     .from("slides")
-    .select("*")
-    .match({ lapidary: useAuthStore().user?.id });
+    .insert({
+      lapidary: `${useAuthStore().user?.id}`,
+    })
+    .select()
+    .single();
 
   if (error) console.log(error);
 
-  return data;
-});
-
-const newSlides = async () => {
-  const { error } = await client.from("slides").insert({
-    lapidary: useAuthStore().user?.id,
+  navigateTo(`/atelier/${data?.id}`, {
+    external: true,
+    open: {
+      target: "_blank",
+    },
   });
-
-  if (error) console.log(error);
-};
+}
 
 onMounted(() => {
   // Temporary workaround for https://github.com/supabase/gotrue-js/issues/455
   useRouter().replace({ hash: "" });
+
+  realtimeChannel = client
+    .channel("public:slides")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "slides" },
+      () => refreshSlides()
+    );
+
+  realtimeChannel.subscribe();
+});
+
+onUnmounted(() => {
+  client.removeChannel(realtimeChannel);
 });
 </script>
