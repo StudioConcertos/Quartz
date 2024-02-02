@@ -4,7 +4,7 @@
     <p>Either the slides does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
-  <p v-else>{{ slide }}</p>
+  <Atelier v-else />
 </template>
 
 <script setup lang="ts">
