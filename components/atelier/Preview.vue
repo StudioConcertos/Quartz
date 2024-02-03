@@ -4,7 +4,7 @@
 
 <style scoped lang="postcss">
 .preview {
-  @apply bg-white w-xl h-xl;
+  @apply w-xl h-xl;
 }
 </style>
 

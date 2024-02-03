@@ -1,5 +1,6 @@
 import {
   defineConfig,
+  presetIcons,
   presetUno,
   presetWebFonts,
   transformerDirectives,
@@ -7,6 +8,7 @@ import {
 
 export default defineConfig({
   presets: [
+    presetIcons(),
     presetUno(),
     presetWebFonts({
       provider: "fontshare",
