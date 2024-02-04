@@ -1,10 +1,14 @@
 <template>
   <div class="atelier">
-    <AtelierToolbar />
+    <AtelierToolbar :title="$props.data?.title" />
     <AtelierPreview />
   </div>
 </template>
 
 <style scoped lang="postcss"></style>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+defineProps({
+  data: Object,
+});
+</script>

@@ -5,6 +5,10 @@
 </template>
 
 <style lang="postcss">
+::selection {
+  @apply bg-light-200 text-dark-800;
+}
+
 * {
   @apply m-0 p-0 box-border;
   @apply font-sans outline-none;
