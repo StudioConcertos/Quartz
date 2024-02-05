@@ -1,16 +1,17 @@
 <template>
   <div class="toolbar">
     <NuxtLink to="/atelier">
-      <div class="i-carbon-workspace"></div>
+      <div class="i-carbon-switcher"></div>
     </NuxtLink>
     <input
       type="text"
       maxlength="30"
+      v-model="titleInput"
       @change="updateSlidesTItle($event)"
-      :value="$props.title"
+      :style="{ width: `${titleInput.length + 4}ch` }"
     />
     <NuxtLink to="/atelier">
-      <div class="i-carbon-play"></div>
+      <div class="i-carbon-run"></div>
     </NuxtLink>
   </div>
 </template>
@@ -23,7 +24,7 @@
 
   a {
     @apply h-full px-6 flex items-center transition-colors;
-    @apply hover:bg-light-200 hover:text-dark-500;
+    @apply hover-bg-light-200 hover-text-dark-500;
 
     [class*="i-"] {
       @apply text-2xl;
@@ -31,8 +32,9 @@
   }
 
   input {
-    @apply bg-dark-500 border-none text-center;
-    @apply text-light-200 text-4;
+    @apply bg-transparent border-none text-center;
+    @apply text-light-200 text-4 py-4;
+    @apply hover-underline focus-underline;
   }
 }
 </style>
@@ -49,14 +51,21 @@ const props = defineProps({
   },
 });
 
+const titleInput = ref(props.title);
+
+watch(titleInput, () => {
+  if (titleInput.value.length > 0) return;
+
+  titleInput.value = props.title[0];
+});
+
 async function updateSlidesTItle(event: Event) {
   const title = event.target as HTMLInputElement;
 
-  if (!title.value) {
-    title.value = props.title.toString();
+  if (!title.value) return;
 
-    return;
-  }
+  title.value = title.value.trimStart();
+  title.value = title.value.trimEnd();
 
   await client
     .from("slides")

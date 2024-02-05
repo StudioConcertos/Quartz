@@ -1,6 +1,6 @@
 <template>
   <div class="dashboard">
-    <p>Currently signed in as: {{ useAuthStore().user?.email }}</p>
+    <p>Currently signed in as: {{ useAuthStore().user?.id }}</p>
     <p v-if="slides?.length">Slides:</p>
     <div v-for="slide in slides" :key="slide.id">
       <NuxtLink target="_blank" :to="`/atelier/${slide.id}`">{{

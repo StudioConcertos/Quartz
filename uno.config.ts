@@ -13,7 +13,7 @@ export default defineConfig({
     presetWebFonts({
       provider: "fontshare",
       fonts: {
-        sans: "Satoshi",
+        sans: "Azeret Mono",
       },
     }),
   ],

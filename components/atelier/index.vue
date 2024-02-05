@@ -9,6 +9,9 @@
 
 <script setup lang="ts">
 defineProps({
-  data: Object,
+  data: {
+    type: Object,
+    required: true,
+  },
 });
 </script>

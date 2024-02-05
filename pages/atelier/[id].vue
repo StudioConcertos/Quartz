@@ -1,5 +1,6 @@
 <template>
   <Title v-if="slides">{{ slides?.title }} | Quartz</Title>
+  <Title v-else>Slides not found | Quartz</Title>
   <div v-if="!slides">
     <p>Either the slides does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
