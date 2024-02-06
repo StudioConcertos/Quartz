@@ -1,5 +1,5 @@
 <template>
-  <div class="toolbar">
+  <header class="toolbar">
     <NuxtLink to="/atelier">
       <div class="i-carbon-switcher"></div>
     </NuxtLink>
@@ -13,7 +13,7 @@
     <NuxtLink to="/atelier">
       <div class="i-carbon-run"></div>
     </NuxtLink>
-  </div>
+  </header>
 </template>
 
 <style scoped lang="postcss">

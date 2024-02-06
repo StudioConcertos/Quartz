@@ -14,11 +14,17 @@
   @apply font-sans outline-none;
 }
 
-a {
-  @apply decoration-none text-light-200;
+a,
+button {
+  @apply bg-transparent decoration-none border-none;
+  @apply text-light-200 cursor-pointer;
 }
 
 main {
   @apply bg-dark-800 text-light-200 h-screen;
+}
+
+.whitespace {
+  @apply my-6;
 }
 </style>

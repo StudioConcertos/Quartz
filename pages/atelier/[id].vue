@@ -1,12 +1,21 @@
 <template>
-  <Title v-if="slides">{{ slides?.title }} | Quartz</Title>
-  <Title v-else>Slides not found | Quartz</Title>
+  <Title v-if="slides"
+    >{{ slides?.title ?? "Slides not found" }} | Quartz</Title
+  >
   <div v-if="!slides">
     <p>Either the slides does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
-  <Atelier :data="slides" v-else />
+  <div v-else class="flex flex-col h-screen">
+    <AtelierToolbar :title="slides.title" />
+    <div class="flex flex-1">
+      <AtelierInspector />
+      <AtelierPreview />
+    </div>
+  </div>
 </template>
+
+<style scoped lang="postcss"></style>
 
 <script setup lang="ts">
 import { RealtimeChannel } from "@supabase/supabase-js";
