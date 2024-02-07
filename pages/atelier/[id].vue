@@ -27,17 +27,7 @@ const client = useSupabaseClient<Database>();
 let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
-  async () => {
-    const { data, error } = await client
-      .from("slides")
-      .select()
-      .eq("id", useRoute().params.id)
-      .single();
-
-    if (error) console.log(error);
-
-    return data;
-  }
+  async () => await useSlides().fetchSlides(useRoute().params.id)
 );
 
 onMounted(() => {

@@ -23,16 +23,7 @@ let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
   "slides",
-  async () => {
-    const { data, error } = await client
-      .from("slides")
-      .select("*")
-      .match({ lapidary: useAuthStore().user?.id });
-
-    if (error) console.log(error);
-
-    return data;
-  }
+  async () => await useSlides().fetchAllSlides()
 );
 
 async function insertNewSlides() {
