@@ -9,13 +9,28 @@
   <div v-else class="flex flex-col h-screen">
     <AtelierToolbar :title="slides.title" />
     <div class="flex flex-1">
-      <AtelierInspector />
+      <aside class="inspector">
+        <AtelierHierarchy />
+        <div class="whitespace"></div>
+        <AtelierProperties />
+      </aside>
       <AtelierPreview />
     </div>
   </div>
 </template>
 
-<style scoped lang="postcss"></style>
+<style scoped lang="postcss">
+.inspector {
+  @apply bg-dark-500 w-2xl p-[2.5ch];
+  @apply border-solid border-0 border-r-2 border-dark-200;
+  @apply flex flex-col;
+
+  .hierarchy,
+  .properties {
+    @apply flex-1 h-full;
+  }
+}
+</style>
 
 <script setup lang="ts">
 import { RealtimeChannel } from "@supabase/supabase-js";
