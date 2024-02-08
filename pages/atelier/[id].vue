@@ -25,9 +25,13 @@
   @apply border-solid border-0 border-r-2 border-dark-200;
   @apply flex flex-col;
 
+  /*
+    The bottom padding offsets back the hidden overflow on the Y axis,
+    which prevents the last element to be not scrollable.
+  */
   .hierarchy,
   .properties {
-    @apply flex-1 h-full;
+    @apply flex-1 overflow-y-hidden pb-12;
   }
 }
 </style>

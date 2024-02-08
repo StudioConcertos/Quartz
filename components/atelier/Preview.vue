@@ -16,10 +16,10 @@
 
 <style scoped lang="postcss">
 .preview {
-  @apply flex flex-1 flex-col justify-center items-center;
+  @apply flex flex-1 flex-col px-40 justify-center items-center;
 
   .slides {
-    @apply bg-light-200 w-4xl h-lg border-rd;
+    @apply bg-light-200 w-full border-rd aspect-video;
   }
 
   button {
