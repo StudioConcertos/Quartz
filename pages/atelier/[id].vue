@@ -10,7 +10,11 @@
     <AtelierToolbar :title="slides.title" />
     <div class="flex flex-1">
       <aside class="inspector">
-        <AtelierHierarchy />
+        <div class="hierarchy">
+          <h3>Hierarchy</h3>
+          <div class="whitespace"></div>
+          <AtelierHierarchyTree />
+        </div>
         <div class="whitespace"></div>
         <AtelierProperties />
       </aside>
