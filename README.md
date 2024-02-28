@@ -6,4 +6,4 @@
 
 ## Contributing
 
-Contributions are always welcomed, please refer to [CODE_OF_CONDUCT.MD](CODE_OF_CONDUCT.MD) & [CONTRIBUTING.MD](CONTRIBUTING.MD).
+Contributions are always welcomed, please refer to our [Code of Conduct](CODE_OF_CONDUCT.md) & [Contributing](CONTRIBUTING.md).
