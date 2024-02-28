@@ -1,10 +1,16 @@
 <template>
   <li class="node">
-    <button @click="">
-      <div :class="isGroup ? 'i-carbon-caret-right' : props.icon"></div>
+    <button
+      :class="{ selected: useSlidesStore().selectedNode === $el }"
+      @click="toggleNode"
+    >
+      <div
+        ref="icon"
+        :class="isGroup ? 'i-carbon-caret-right' : props.icon"
+      ></div>
       <p>{{ props.name }}</p>
     </button>
-    <ul v-if="isGroup">
+    <ul ref="nested" v-if="isGroup">
       <slot />
     </ul>
   </li>
@@ -26,6 +32,10 @@
     @apply list-none ml-6;
   }
 }
+
+.selected {
+  @apply bg-light-200 text-dark-500;
+}
 </style>
 
 <script setup lang="ts">
@@ -37,4 +47,18 @@ const props = defineProps({
   icon: String,
   isGroup: Boolean,
 });
+
+const icon = ref<HTMLDivElement>();
+const nested = ref<HTMLUListElement>();
+
+function toggleNode(event: Event) {
+  const node = event.target as HTMLButtonElement;
+
+  useSlidesStore().selectedNode = node.parentNode as HTMLLIElement;
+
+  if (props.isGroup) {
+    icon.value?.classList.toggle("rotate-90");
+    nested.value?.classList.toggle("hidden");
+  }
+}
 </script>

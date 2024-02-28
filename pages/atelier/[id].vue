@@ -66,6 +66,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  useSlidesStore().selectedNode = null;
+
   client.removeChannel(realtimeChannel);
 });
 </script>

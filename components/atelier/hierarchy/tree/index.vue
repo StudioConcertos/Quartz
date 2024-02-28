@@ -1,5 +1,5 @@
 <template>
-  <ul class="tree">
+  <ul class="tree" @contextmenu.prevent>
     <AtelierHierarchyTreeNode name="Page 1" isGroup>
       <AtelierHierarchyTreeNode
         name="Text 1"
