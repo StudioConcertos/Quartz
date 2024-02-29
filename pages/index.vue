@@ -1,4 +1,6 @@
 <template>
   <Title>Quartz</Title>
-  <button @click="useAuth().signIn()">Sign In</button>
+  <div class="flex justify-center items-center h-screen">
+    <p>Temporal landing page of Quartz, go to /auth to sign in.</p>
+  </div>
 </template>

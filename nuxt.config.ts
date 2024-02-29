@@ -12,8 +12,9 @@ export default defineNuxtConfig({
   modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt"],
   supabase: {
     redirectOptions: {
-      login: "/",
+      login: "/auth",
       callback: "/atelier",
+      exclude: ["/"],
     },
   },
   pinia: {

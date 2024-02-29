@@ -7,7 +7,7 @@
     >
       <div
         ref="icon"
-        :class="isGroup ? 'i-carbon-caret-right' : props.icon"
+        :class="isGroup ? 'i-carbon-caret-down' : props.icon"
       ></div>
       <p>{{ props.name }}</p>
     </button>
@@ -66,7 +66,7 @@ function toggleNode(event: Event) {
 function toggleGroup() {
   if (!props.isGroup) return;
 
-  icon.value?.classList.toggle("rotate-90");
+  icon.value?.classList.toggle("-rotate-90");
   nested.value?.classList.toggle("hidden");
 }
 </script>

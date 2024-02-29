@@ -17,7 +17,7 @@
 a,
 button {
   @apply bg-transparent decoration-none border-none;
-  @apply text-light-200 cursor-pointer;
+  @apply text-light-200 cursor-pointer select-none;
 }
 
 main {

@@ -5,7 +5,7 @@
     class="editor"
     @contextmenu.prevent
   />
-  <div v-else class="placeholder">
+  <div v-else class="placeholder" @contextmenu.prevent>
     <div class="i-carbon-error"></div>
     <p>Select a node</p>
   </div>
