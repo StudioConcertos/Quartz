@@ -3,6 +3,7 @@
     <button
       :class="{ selected: useSlidesStore().selectedNode === $el }"
       @click="toggleNode"
+      @dblclick="toggleGroup"
     >
       <div
         ref="icon"
@@ -22,6 +23,11 @@
     @apply flex text-sm items-center p-2;
     @apply w-full transition-colors border-rd;
     @apply hover-bg-light-200 hover-text-dark-500;
+
+    p,
+    [class*="i-"] {
+      @apply pointer-events-none;
+    }
 
     [class*="i-"] {
       @apply text-xl mr-2;
@@ -54,11 +60,13 @@ const nested = ref<HTMLUListElement>();
 function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;
 
-  useSlidesStore().selectedNode = node.parentNode as HTMLLIElement;
+  useSlidesStore().selectedNode = node.parentElement as HTMLLIElement;
+}
 
-  if (props.isGroup) {
-    icon.value?.classList.toggle("rotate-90");
-    nested.value?.classList.toggle("hidden");
-  }
+function toggleGroup() {
+  if (!props.isGroup) return;
+
+  icon.value?.classList.toggle("rotate-90");
+  nested.value?.classList.toggle("hidden");
 }
 </script>
