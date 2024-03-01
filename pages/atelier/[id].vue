@@ -35,7 +35,7 @@
   */
   .hierarchy,
   .properties {
-    @apply flex-1 overflow-y-hidden pb-12;
+    @apply flex-1 overflow-y-hidden pb-10;
   }
 }
 </style>

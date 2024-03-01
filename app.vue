@@ -24,6 +24,10 @@ main {
   @apply bg-dark-800 text-light-200 h-screen;
 }
 
+.sortable-ghost {
+  @apply opacity-0;
+}
+
 .whitespace {
   @apply my-6;
 }

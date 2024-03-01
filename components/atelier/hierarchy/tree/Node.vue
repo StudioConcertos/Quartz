@@ -20,7 +20,7 @@
 <style scoped lang="postcss">
 .node {
   button {
-    @apply flex text-sm items-center p-2;
+    @apply flex text-sm items-center p-2 mb-2;
     @apply w-full transition-colors border-rd;
     @apply hover-bg-light-200 hover-text-dark-500;
 
@@ -45,6 +45,8 @@
 </style>
 
 <script setup lang="ts">
+import { useSortable } from "@vueuse/integrations/useSortable";
+
 const props = defineProps({
   name: {
     type: String,
@@ -56,6 +58,12 @@ const props = defineProps({
 
 const icon = ref<HTMLDivElement>();
 const nested = ref<HTMLUListElement>();
+
+useSortable(nested, [], {
+  animation: "200",
+  easing: "cubic-bezier(1, 0, 0, 1)",
+  forceFallback: true,
+});
 
 function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;

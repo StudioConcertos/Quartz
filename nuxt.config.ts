@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
-  modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt"],
+  modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt", "@vueuse/nuxt"],
   supabase: {
     redirectOptions: {
       login: "/auth",

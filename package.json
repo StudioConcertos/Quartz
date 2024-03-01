@@ -15,7 +15,11 @@
     "@pinia/nuxt": "^0.5.1",
     "@supabase/supabase-js": "^2.39.3",
     "@unocss/nuxt": "^0.58.4",
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/integrations": "^10.9.0",
+    "@vueuse/nuxt": "^10.9.0",
     "nuxt": "^3.9.3",
+    "sortablejs": "^1",
     "vue": "^3.4.14",
     "vue-router": "^4.2.5"
   }
