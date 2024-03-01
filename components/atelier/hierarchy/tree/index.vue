@@ -1,9 +1,5 @@
 <template>
-  <ul
-    class="tree"
-    @keydown.esc="useSlidesStore().selectedNode = null"
-    @contextmenu.prevent
-  >
+  <ul class="tree">
     <AtelierHierarchyTreeNode name="Page 1" isGroup>
       <AtelierHierarchyTreeNode
         name="Text 1"

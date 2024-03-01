@@ -6,15 +6,11 @@
     <p>Either the slides does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
-  <div v-else class="flex flex-col h-screen">
+  <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
     <AtelierToolbar :title="slides.title" />
     <div class="flex flex-1">
       <aside class="inspector">
-        <div class="hierarchy">
-          <h3>Hierarchy</h3>
-          <div class="whitespace"></div>
-          <AtelierHierarchyTree />
-        </div>
+        <AtelierHierarchy />
         <div class="whitespace"></div>
         <AtelierProperties />
       </aside>

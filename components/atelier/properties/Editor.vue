@@ -25,7 +25,6 @@
 
 .placeholder {
   @apply flex justify-center items-center;
-  @apply select-none;
 
   [class*="i-"] {
     @apply text-4xl mr-4;
