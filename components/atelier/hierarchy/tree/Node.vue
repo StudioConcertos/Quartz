@@ -2,6 +2,7 @@
   <li class="node">
     <button
       :class="{ selected: useSlidesStore().selectedNode === $el }"
+      class="primaryBtn"
       @click="toggleNode"
       @dblclick="toggleGroup"
     >
@@ -20,9 +21,8 @@
 <style scoped lang="postcss">
 .node {
   button {
-    @apply flex text-sm items-center p-2 mb-2;
-    @apply w-full transition-colors border-rd;
-    @apply hover-bg-light-200 hover-text-dark-500;
+    @apply px-2 mb-2 justify-initial;
+    @apply w-full border-none;
 
     p,
     [class*="i-"] {

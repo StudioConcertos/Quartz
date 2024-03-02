@@ -32,8 +32,7 @@
   }
 
   input {
-    @apply bg-transparent border-none text-center;
-    @apply text-light-200 text-4 py-4;
+    @apply text-center border-none text-4;
     @apply hover-underline focus-underline;
   }
 }

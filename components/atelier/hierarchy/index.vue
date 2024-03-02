@@ -3,7 +3,7 @@
     <h3>
       Hierarchy
       <div class="actions">
-        <button>
+        <button @click="dialog?.showModal()">
           <div class="i-carbon-new-tab"></div>
         </button>
         <button>
@@ -13,6 +13,28 @@
     </h3>
     <div class="whitespace"></div>
     <AtelierHierarchyTree />
+    <dialog ref="dialog">
+      <h4>Create new node:</h4>
+      <div class="whitespace" />
+      <form>
+        <input
+          v-model="nodeName"
+          ref="nodeNameInput"
+          class="px-1"
+          maxlength="20"
+          placeholder="Name"
+          type="text"
+        />
+        <select>
+          <option>Text</option>
+          <option>Group</option>
+        </select>
+      </form>
+      <div class="whitespace" />
+      <button @click="dialog?.close()" class="primaryBtn w-full text-sm">
+        Confirm
+      </button>
+    </dialog>
   </div>
 </template>
 
@@ -25,7 +47,7 @@
       @apply flex justify-between items-center;
 
       button {
-        @apply text-2xl mx-2;
+        @apply text-xl mx-2;
       }
 
       button:first-of-type {
@@ -39,3 +61,17 @@
   }
 }
 </style>
+<script setup lang="ts">
+const dialog = ref<HTMLDialogElement>();
+
+const nodeName = ref<String>();
+const nodeNameInput = ref<HTMLInputElement>();
+
+watch(nodeName, () => {
+  if (nodeName.value) {
+    nodeNameInput.value?.classList.add("border-light-200");
+  } else {
+    nodeNameInput.value?.classList.remove("border-light-200");
+  }
+});
+</script>
