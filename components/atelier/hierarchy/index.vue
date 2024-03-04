@@ -3,12 +3,16 @@
     <h3>
       Hierarchy
       <div class="actions">
-        <button @click="dialog?.showModal()">
-          <div class="i-carbon-new-tab"></div>
-        </button>
-        <button>
-          <div class="i-carbon-sort-ascending"></div>
-        </button>
+        <Tooltip description="New node">
+          <button @click="dialog?.showModal()">
+            <div class="i-carbon-new-tab"></div>
+          </button>
+        </Tooltip>
+        <Tooltip description="Sort">
+          <button>
+            <div class="i-carbon-sort-ascending"></div>
+          </button>
+        </Tooltip>
       </div>
     </h3>
     <div class="whitespace"></div>
@@ -46,21 +50,26 @@
     .actions {
       @apply flex justify-between items-center;
 
-      button {
-        @apply text-xl mx-2;
+      .tooltip {
+        @apply flex mx-2;
+
+        button {
+          @apply text-xl;
+        }
       }
 
-      button:first-of-type {
+      .tooltip:first-of-type {
         @apply ml-0;
       }
 
-      button:last-of-type {
+      .tooltip:last-of-type {
         @apply mr-0;
       }
     }
   }
 }
 </style>
+
 <script setup lang="ts">
 const dialog = ref<HTMLDialogElement>();
 
