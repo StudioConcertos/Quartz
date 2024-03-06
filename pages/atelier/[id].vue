@@ -10,7 +10,7 @@
     <AtelierToolbar :title="slides.title" />
     <div class="flex flex-1">
       <aside class="inspector">
-        <AtelierHierarchy />
+        <AtelierHierarchy :pages="slides.pages" />
         <div class="whitespace"></div>
         <AtelierProperties />
       </aside>
@@ -46,7 +46,7 @@ const client = useSupabaseClient<Database>();
 let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
-  async () => await useSlides().fetchSlides(useRoute().params.id)
+  async () => await useSlides().fetchSlides(useRoute().params.id),
 );
 
 onMounted(() => {
@@ -55,7 +55,7 @@ onMounted(() => {
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "slides" },
-      () => refreshSlides()
+      () => refreshSlides(),
     );
 
   realtimeChannel.subscribe();

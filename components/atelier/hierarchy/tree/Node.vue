@@ -12,8 +12,14 @@
       ></div>
       <p>{{ props.name }}</p>
     </button>
-    <ul ref="nested" v-if="isGroup">
-      <slot />
+    <ul ref="nested" v-if="isGroup && props.children">
+      <AtelierHierarchyTreeNode
+        v-for="node in props.children"
+        :children="node.children"
+        :name="node.name"
+        icon="i-carbon-text-short-paragraph"
+        :isGroup="node.type === 'group'"
+      />
     </ul>
   </li>
 </template>
@@ -54,6 +60,7 @@ const props = defineProps({
   },
   icon: String,
   isGroup: Boolean,
+  children: [Object],
 });
 
 const icon = ref<HTMLDivElement>();

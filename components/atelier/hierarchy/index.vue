@@ -16,11 +16,11 @@
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierHierarchyTree />
+    <AtelierHierarchyTree :page="props.pages[0]" />
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
-      <form>
+      <form ref="form">
         <input
           v-model="nodeName"
           ref="nodeNameInput"
@@ -35,7 +35,11 @@
         </select>
       </form>
       <div class="whitespace" />
-      <button @click="dialog?.close()" class="primaryBtn w-full text-sm">
+      <button
+        @click="createNewNode()"
+        :class="{ disabled: !nodeNameInput?.value }"
+        class="primaryBtn w-full text-sm"
+      >
         Confirm
       </button>
     </dialog>
@@ -71,7 +75,19 @@
 </style>
 
 <script setup lang="ts">
+import type { Database } from "~/types/database";
+
+const client = useSupabaseClient<Database>();
+
+const props = defineProps({
+  pages: {
+    type: [Object],
+    required: true,
+  },
+});
+
 const dialog = ref<HTMLDialogElement>();
+const form = ref<HTMLFormElement>();
 
 const nodeName = ref<String>();
 const nodeNameInput = ref<HTMLInputElement>();
@@ -83,4 +99,11 @@ watch(nodeName, () => {
     nodeNameInput.value?.classList.remove("border-light-200");
   }
 });
+
+async function createNewNode() {
+  dialog.value?.close();
+
+  form.value?.reset();
+  nodeNameInput.value?.classList.remove("border-light-200");
+}
 </script>

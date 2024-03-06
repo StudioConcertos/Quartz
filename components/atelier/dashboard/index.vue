@@ -23,7 +23,7 @@ let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
   "slides",
-  async () => await useSlides().fetchAllSlides()
+  async () => await useSlides().fetchAllSlides(),
 );
 
 async function insertNewSlides() {
@@ -31,6 +31,14 @@ async function insertNewSlides() {
     .from("slides")
     .insert({
       lapidary: `${useAuthStore().user?.id}`,
+      pages: [
+        [
+          {
+            name: "Title",
+            type: "text",
+          },
+        ],
+      ],
     })
     .select()
     .single();
@@ -54,7 +62,7 @@ onMounted(() => {
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "slides" },
-      () => refreshSlides()
+      () => refreshSlides(),
     );
 
   realtimeChannel.subscribe();

@@ -1,17 +1,6 @@
 <template>
   <ul class="tree">
-    <AtelierHierarchyTreeNode name="Page 1" isGroup>
-      <AtelierHierarchyTreeNode
-        name="Text 1"
-        icon="i-carbon-text-short-paragraph"
-      />
-      <AtelierHierarchyTreeNode name="Group" isGroup>
-        <AtelierHierarchyTreeNode
-          name="Text 2"
-          icon="i-carbon-text-short-paragraph"
-        />
-      </AtelierHierarchyTreeNode>
-    </AtelierHierarchyTreeNode>
+    <AtelierHierarchyTreeNode :children="props.page" name="Page 1" isGroup />
   </ul>
 </template>
 
@@ -27,3 +16,12 @@
   @apply list-none h-full max-h-[50vh] overflow-y-auto;
 }
 </style>
+
+<script setup lang="ts">
+const props = defineProps({
+  page: {
+    type: [Object],
+    required: true,
+  },
+});
+</script>

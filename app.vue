@@ -32,7 +32,7 @@ dialog::backdrop {
 }
 
 input {
-  @apply bg-transparent border-none;
+  @apply bg-transparent border-none transition-colors;
   @apply text-light-200 py-4 text-sm;
   @apply border-solid border-0 border-b-1;
 }
@@ -63,10 +63,14 @@ select {
   }
 }
 
+.disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
 .primaryBtn {
   @apply flex justify-center items-center;
   @apply border-solid border-1 border-light-200 border-rd;
-  @apply px-4 py-2 transition-colors;
+  @apply px-4 py-2 transition-all;
   @apply hover-bg-light-200 hover-text-dark-800;
 
   [class*="i-"] {
