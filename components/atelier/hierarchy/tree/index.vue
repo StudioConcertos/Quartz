@@ -1,6 +1,12 @@
 <template>
   <ul class="tree">
-    <AtelierHierarchyTreeNode :children="props.page" name="Page 1" isGroup />
+    <AtelierHierarchyTreeNode
+      :children="props.page.children"
+      :name="
+        `${props.page.name}` + ' ' + `${useSlidesStore().selectedPage + 1}`
+      "
+      isGroup
+    />
   </ul>
 </template>
 
@@ -20,7 +26,7 @@
 <script setup lang="ts">
 const props = defineProps({
   page: {
-    type: [Object],
+    type: Object,
     required: true,
   },
 });

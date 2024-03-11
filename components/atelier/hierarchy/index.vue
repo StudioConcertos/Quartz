@@ -1,5 +1,8 @@
 <template>
-  <div class="hierarchy" @keydown.esc="useSlidesStore().selectedNode = null">
+  <div
+    class="hierarchy"
+    @keydown.esc="useSlidesStore().selectedNode = undefined"
+  >
     <h3>
       Hierarchy
       <div class="actions">
@@ -16,7 +19,7 @@
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierHierarchyTree :page="props.pages[0]" />
+    <AtelierHierarchyTree :page="props.pages[useSlidesStore().selectedPage]" />
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />

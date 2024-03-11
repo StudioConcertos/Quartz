@@ -14,7 +14,7 @@
         <div class="whitespace"></div>
         <AtelierProperties />
       </aside>
-      <AtelierPreview />
+      <AtelierPreview :pages="slides.pages" />
     </div>
   </div>
 </template>
@@ -62,8 +62,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  useSlidesStore().selectedNode = null;
-
   client.removeChannel(realtimeChannel);
 });
 </script>

@@ -1,5 +1,6 @@
 export const useSlidesStore = defineStore("slides", () => {
-  const selectedNode = ref<HTMLLIElement | null>();
+  const selectedPage = ref<number>(0);
+  const selectedNode = ref<HTMLLIElement>();
 
-  return { selectedNode };
+  return { selectedPage, selectedNode };
 });

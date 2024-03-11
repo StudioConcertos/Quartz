@@ -32,12 +32,12 @@ async function insertNewSlides() {
     .insert({
       lapidary: `${useAuthStore().user?.id}`,
       pages: [
-        [
-          {
-            name: "Title",
-            type: "text",
-          },
-        ],
+        {
+          name: "Page",
+          type: "group",
+          reference: "root",
+          children: [],
+        },
       ],
     })
     .select()
