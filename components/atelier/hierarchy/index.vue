@@ -23,7 +23,7 @@
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
-      <form ref="form">
+      <form @submit.prevent="insertNewNode()" ref="form">
         <input
           v-model="nodeName"
           ref="nodeNameInput"
@@ -31,15 +31,16 @@
           maxlength="20"
           placeholder="Name"
           type="text"
+          required
         />
-        <select>
-          <option>Text</option>
-          <option>Group</option>
+        <select v-model="nodeType" required>
+          <option value="text">Text</option>
+          <option value="group">Group</option>
         </select>
       </form>
       <div class="whitespace" />
       <button
-        @click="createNewNode()"
+        @click="insertNewNode()"
         :class="{ disabled: !nodeNameInput?.value }"
         class="primaryBtn w-full text-sm"
       >
@@ -93,6 +94,8 @@ const dialog = ref<HTMLDialogElement>();
 const form = ref<HTMLFormElement>();
 
 const nodeName = ref<String>();
+const nodeType = ref<String>();
+
 const nodeNameInput = ref<HTMLInputElement>();
 
 watch(nodeName, () => {
@@ -103,10 +106,23 @@ watch(nodeName, () => {
   }
 });
 
-async function createNewNode() {
+async function insertNewNode() {
+  const { error } = await client.rpc("insert_new_node", {
+    node: { name: nodeName?.value, type: nodeType?.value },
+    parent: null,
+    page_index: useSlidesStore().selectedPage,
+    slides_id: useRoute().params.id.toString(),
+  });
+
+  if (error) console.log(error);
+
   dialog.value?.close();
 
-  form.value?.reset();
+  nodeName.value = null;
   nodeNameInput.value?.classList.remove("border-light-200");
 }
+
+onMounted(() => {
+  nodeType.value = "text";
+});
 </script>

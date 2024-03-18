@@ -20,6 +20,7 @@
     "@vueuse/nuxt": "^10.9.0",
     "nuxt": "^3.9.3",
     "sortablejs": "^1",
+    "supabase": "^1.148.6",
     "vue": "^3.4.14",
     "vue-router": "^4.2.5"
   }
