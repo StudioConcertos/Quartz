@@ -6,11 +6,24 @@
       @click="toggleNode"
       @dblclick="toggleGroup"
     >
-      <div
-        ref="icon"
-        :class="isGroup ? 'i-carbon-caret-down' : props.icon"
-      ></div>
-      <p>{{ props.name }}</p>
+      <div class="flex items-center">
+        <div
+          ref="icon"
+          :class="isGroup ? 'i-carbon-caret-down' : props.icon"
+        ></div>
+        <p class="text-nowrap">
+          {{ props.name }}
+        </p>
+      </div>
+      <p
+        v-if="props.reference"
+        :class="{
+          'opacity-0': useSlidesStore().selectedNode !== $el,
+        }"
+        class="reference"
+      >
+        {{ props.reference }}
+      </p>
     </button>
     <ul ref="nested" v-if="isGroup && props.children">
       <AtelierHierarchyTreeNode
@@ -27,17 +40,26 @@
 <style scoped lang="postcss">
 .node {
   button {
-    @apply px-2 mb-2 justify-initial;
+    @apply px-2 mb-2 justify-between;
     @apply w-full border-none;
 
-    p,
+    div p,
     [class*="i-"] {
       @apply pointer-events-none;
     }
 
-    [class*="i-"] {
+    div [class*="i-"] {
       @apply text-xl mr-2;
     }
+
+    .reference {
+      @apply italic text-dark-800 mr-2;
+      @apply transition-opacity;
+    }
+  }
+
+  button:hover .reference {
+    @apply opacity-100;
   }
 
   ul {
@@ -46,7 +68,7 @@
 }
 
 .selected {
-  @apply bg-light-200 text-dark-500;
+  @apply bg-light-200 text-dark-800;
 }
 </style>
 
@@ -58,6 +80,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  reference: String,
   icon: String,
   isGroup: Boolean,
   children: [Object],
@@ -76,6 +99,8 @@ function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;
 
   useSlidesStore().selectedNode = node.parentElement as HTMLLIElement;
+
+  console.log(useSlidesStore().selectedNode);
 }
 
 function toggleGroup() {

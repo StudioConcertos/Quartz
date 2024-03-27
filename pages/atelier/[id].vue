@@ -27,7 +27,7 @@
 
   /*
     The bottom padding offsets back the hidden overflow on the Y axis,
-    which prevents the last element to be not scrollable.
+    which prevents the last element not being scrollable.
   */
   .hierarchy,
   .properties {

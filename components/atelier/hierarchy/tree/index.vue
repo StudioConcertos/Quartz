@@ -1,10 +1,11 @@
 <template>
   <ul class="tree">
     <AtelierHierarchyTreeNode
-      :children="props.page.children"
       :name="
         `${props.page.name}` + ' ' + `${useSlidesStore().selectedPage + 1}`
       "
+      :reference="props.page.reference"
+      :children="props.page.children"
       isGroup
     />
   </ul>
