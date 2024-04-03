@@ -5,7 +5,7 @@
     <div class="whitespace"></div>
     <button class="primaryBtn" @click="useAuth().signIn()">
       Sign In with Github
-      <div class="i-carbon-logo-github"></div>
+      <div class="i-carbon-logo-github ml-2"></div>
     </button>
   </div>
 </template>

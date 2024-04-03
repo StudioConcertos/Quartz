@@ -1,14 +1,22 @@
 <template>
-  <div class="dashboard">
-    <p>Currently signed in as: {{ useAuthStore().user?.id }}</p>
-    <p v-if="slides?.length">Slides:</p>
-    <div v-for="slide in slides" :key="slide.id">
-      <NuxtLink target="_blank" :to="`/atelier/${slide.id}`">{{
-        slide.title
-      }}</NuxtLink>
+  <div class="flex">
+    <AtelierDashboardSidebar />
+    <div class="flex-1 p-6">
+      <button class="primaryBtn">
+        <div class="i-carbon-add mr-2"></div>
+        New Slides
+      </button>
+      <div class="whitespace"></div>
+      <div class="flex">
+        <AtelierDashboardSlides
+          v-for="slide in slides"
+          :title="slide.title"
+          :id="slide.id"
+          :created_at="slide.created_at.toString()"
+          :key="slide.id"
+        />
+      </div>
     </div>
-    <button @click="insertNewSlides()">Create new Slides</button>
-    <button @click="useAuth().signOut()">Sign Out</button>
   </div>
 </template>
 

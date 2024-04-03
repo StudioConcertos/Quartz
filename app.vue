@@ -23,7 +23,7 @@ button {
 dialog {
   @apply absolute top-1/2 left-1/2 px-8 py-12;
   @apply translate-x-[-50%] translate-y-[-50%];
-  @apply border-1 border-dark-200 border-rd;
+  @apply border-2 border-dark-200 border-rd;
   @apply bg-dark-800 text-light-200 select-none;
 }
 
@@ -74,7 +74,7 @@ select {
   @apply hover-bg-light-200 hover-text-dark-800;
 
   [class*="i-"] {
-    @apply text-2xl ml-2;
+    @apply text-2xl;
   }
 }
 
