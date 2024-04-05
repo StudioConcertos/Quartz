@@ -1,5 +1,10 @@
 <template>
-  <aside class="sidebar"></aside>
+  <aside class="sidebar">
+    <h3>Dashboard</h3>
+    <div class="whitespace"></div>
+    <p class="mb-6">Currently logged in as: {{ useAuthStore().user?.email }}</p>
+    <button @click="useAuth().signOut()" class="primaryBtn">Sign out</button>
+  </aside>
 </template>
 
 <style scoped lang="postcss">

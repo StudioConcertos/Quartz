@@ -6,7 +6,7 @@
       @click="toggleNode"
       @dblclick="toggleGroup"
     >
-      <div class="flex items-center">
+      <div class="flex items-center pointer-events-none">
         <div
           ref="icon"
           :class="isGroup ? 'i-carbon-caret-down' : props.icon"
@@ -99,8 +99,6 @@ function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;
 
   useSlidesStore().selectedNode = node.parentElement as HTMLLIElement;
-
-  console.log(useSlidesStore().selectedNode);
 }
 
 function toggleGroup() {

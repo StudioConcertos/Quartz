@@ -109,7 +109,7 @@ watch(nodeName, () => {
 async function insertNewNode() {
   const { error } = await client.rpc("insert_new_node", {
     node: { name: nodeName?.value, type: nodeType?.value },
-    parent: null,
+    parent: {},
     page_index: useSlidesStore().selectedPage,
     slides_id: useRoute().params.id.toString(),
   });
@@ -118,7 +118,7 @@ async function insertNewNode() {
 
   dialog.value?.close();
 
-  nodeName.value = null;
+  nodeName.value = "";
   nodeNameInput.value?.classList.remove("border-light-200");
 }
 

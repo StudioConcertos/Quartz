@@ -2,12 +2,12 @@
   <div class="flex">
     <AtelierDashboardSidebar />
     <div class="flex-1 p-6">
-      <button class="primaryBtn">
+      <button @click="" class="primaryBtn">
         <div class="i-carbon-add mr-2"></div>
         New Slides
       </button>
       <div class="whitespace"></div>
-      <div class="flex">
+      <div class="flex flex-wrap gap-6">
         <AtelierDashboardSlides
           v-for="slide in slides"
           :title="slide.title"
@@ -31,7 +31,7 @@ let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
   "slides",
-  async () => await useSlides().fetchAllSlides(),
+  async () => await useSlides().fetchAllSlides()
 );
 
 async function insertNewSlides() {
@@ -70,7 +70,7 @@ onMounted(() => {
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "slides" },
-      () => refreshSlides(),
+      () => refreshSlides()
     );
 
   realtimeChannel.subscribe();

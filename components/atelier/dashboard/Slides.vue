@@ -10,9 +10,9 @@
 <style scoped lang="postcss">
 .slides {
   @apply block w-sm aspect-video;
-  @apply bg-dark-500 p-6;
-  @apply border-rd border-solid border-2;
-  @apply border-dark-200;
+  @apply bg-dark-500 p-6 transition;
+  @apply border-rd border-solid border-1;
+  @apply border-dark-200 hover-border-light-200;
 }
 </style>
 
