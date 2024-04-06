@@ -7,7 +7,8 @@ export const useSlides = () => {
     const { data, error } = await client
       .from("slides")
       .select("*")
-      .match({ lapidary: useAuthStore().user?.id });
+      .match({ lapidary: useAuthStore().user?.id })
+      .order("last_modified", { ascending: false });
 
     if (error) console.log(error);
 

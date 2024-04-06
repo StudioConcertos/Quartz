@@ -1,7 +1,9 @@
 <template>
   <NuxtLink class="slides" target="_blank" :to="`/atelier/${props.id}`">
     <p class="mb-2">{{ props.title }}</p>
-    <p class="italic opacity-60">Last modified: {{ props.created_at }}</p>
+    <p class="opacity-60">
+      {{ new Date(props.last_modified).toLocaleString() }}
+    </p>
     <div class="whitespace"></div>
     <div class="w-full aspect-video bg-light-200 border-rd mb-2"></div>
   </NuxtLink>
@@ -26,7 +28,7 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  created_at: {
+  last_modified: {
     type: String,
     required: true,
   },

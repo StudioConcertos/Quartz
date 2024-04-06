@@ -1,3 +1,11 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export type Database = {
   public: {
     Tables: {
@@ -18,23 +26,23 @@ export type Database = {
       };
       slides: {
         Row: {
-          created_at: string;
           id: string;
           lapidary: string;
+          last_modified: string;
           pages: Json[];
           title: string;
         };
         Insert: {
-          created_at: string;
           id?: string;
           lapidary: string;
+          last_modified?: string;
           pages: Json[];
           title?: string;
         };
         Update: {
-          created_at?: string;
           id?: string;
           lapidary?: string;
+          last_modified?: string;
           pages?: Json[];
           title?: string;
         };
@@ -57,7 +65,7 @@ export type Database = {
         Args: {
           slides_id: string;
           page_index: number;
-          node: Json;
+          node: Object;
         };
         Returns: undefined;
       };
@@ -65,8 +73,8 @@ export type Database = {
         Args: {
           slides_id: string;
           page_index: number;
-          node: Json;
-          parent: Json;
+          node: Object;
+          parent: Object;
         };
         Returns: undefined;
       };

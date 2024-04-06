@@ -2,7 +2,7 @@
   <div class="flex">
     <AtelierDashboardSidebar />
     <div class="flex-1 p-6">
-      <button @click="" class="primaryBtn">
+      <button @click="insertNewSlides()" class="primaryBtn">
         <div class="i-carbon-add mr-2"></div>
         New Slides
       </button>
@@ -12,7 +12,7 @@
           v-for="slide in slides"
           :title="slide.title"
           :id="slide.id"
-          :created_at="slide.created_at.toString()"
+          :last_modified="slide.last_modified"
           :key="slide.id"
         />
       </div>

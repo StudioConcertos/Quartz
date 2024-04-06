@@ -1,9 +1,9 @@
 <template>
   <div class="tooltip">
     <slot />
-    <span :style="{ 'margin-left': `-${width / 2 - 4}px` }" ref="el">{{
-      description
-    }}</span>
+    <span :style="{ 'margin-left': `-${width / 2 - 4}px` }" ref="el">
+      {{ props.description }}
+    </span>
   </div>
 </template>
 
