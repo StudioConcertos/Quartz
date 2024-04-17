@@ -13,7 +13,7 @@ export default defineNuxtConfig({
   supabase: {
     redirectOptions: {
       login: "/auth",
-      callback: "/atelier",
+      callback: "/atelier/",
       exclude: ["/"],
     },
   },
