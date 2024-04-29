@@ -1,13 +1,13 @@
 export const useSlidesStore = defineStore("slides", () => {
-  const slidesPages = ref<[Object]>([{}]);
+  const slidesPages = ref<[]>([]);
 
-  const selectedPage = ref<[Object]>();
+  const selectedPage = ref<[]>([]);
   const selectedPageIndex = ref<number>(0);
 
   const selectedNode = ref<HTMLLIElement>();
 
   watchDebounced(
-    selectedPage,
+    selectedPage.value,
     () => {
       useSlides().updateSlidesPages(useRoute().params.id, slidesPages.value);
     },

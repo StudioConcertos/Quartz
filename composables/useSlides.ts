@@ -1,4 +1,4 @@
-import type { Database, Json } from "~/types/database";
+import type { Database } from "~/types/database";
 
 export const useSlides = () => {
   const client = useSupabaseClient<Database>();
@@ -28,7 +28,7 @@ export const useSlides = () => {
     return data;
   }
 
-  async function updateSlidesPages(id: String | String[], newData: any) {
+  async function updateSlidesPages(id: String | String[], newData: []) {
     const { data, error } = await client
       .from("slides")
       .update({ pages: newData })

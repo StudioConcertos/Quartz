@@ -25,7 +25,7 @@
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
-      <form @submit.prevent="insertNewNode()" ref="form">
+      <form @submit.prevent="pushNewNode()" ref="form">
         <input
           v-model="nodeName"
           ref="nodeNameInput"
@@ -42,7 +42,7 @@
       </form>
       <div class="whitespace" />
       <button
-        @click="insertNewNode()"
+        @click="pushNewNode()"
         :class="{ disabled: !nodeNameInput?.value }"
         class="primaryBtn w-full text-sm"
       >
@@ -108,8 +108,8 @@ watch(nodeName, () => {
   }
 });
 
-async function insertNewNode() {
-  useSlidesStore().selectedPage = useSlidesStore().selectedPage.push({
+function pushNewNode() {
+  useSlidesStore().selectedPage.push({
     name: nodeName?.value,
     type: nodeType?.value,
   });
