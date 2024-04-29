@@ -4,19 +4,20 @@
     <div class="whitespace"></div>
     <div class="flex flex-row">
       <button
-        :class="{ disabled: useSlidesStore().selectedPage === 0 }"
-        @click="useSlidesStore().selectedPage--"
+        :class="{ disabled: useSlidesStore().selectedPageIndex === 0 }"
+        @click="useSlidesStore().selectedPageIndex--"
       >
         <div class="i-carbon-arrow-left"></div>
       </button>
       <p class="mx-6">
-        {{ useSlidesStore().selectedPage + 1 }} / {{ props.pages.length }}
+        {{ useSlidesStore().selectedPageIndex + 1 }} / {{ props.pages.length }}
       </p>
       <button
         :class="{
-          disabled: useSlidesStore().selectedPage + 1 === props.pages.length,
+          disabled:
+            useSlidesStore().selectedPageIndex + 1 === props.pages.length,
         }"
-        @click="useSlidesStore().selectedPage++"
+        @click="useSlidesStore().selectedPageIndex++"
       >
         <div class="i-carbon-arrow-right"></div>
       </button>

@@ -1,4 +1,4 @@
-import type { Database } from "~/types/database";
+import type { Database, Json } from "~/types/database";
 
 export const useSlides = () => {
   const client = useSupabaseClient<Database>();
@@ -28,5 +28,16 @@ export const useSlides = () => {
     return data;
   }
 
-  return { fetchAllSlides, fetchSlides };
+  async function updateSlidesPages(id: String | String[], newData: any) {
+    const { data, error } = await client
+      .from("slides")
+      .update({ pages: newData })
+      .eq("id", id);
+
+    if (error) console.log(error);
+
+    return data;
+  }
+
+  return { fetchAllSlides, fetchSlides, updateSlidesPages };
 };

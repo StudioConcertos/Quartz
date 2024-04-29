@@ -50,6 +50,8 @@ const { data: slides, refresh: refreshSlides } = await useAsyncData(
 );
 
 onMounted(() => {
+  useSlidesStore().slidesPages = slides.value.pages;
+
   realtimeChannel = client
     .channel("public:slides")
     .on(

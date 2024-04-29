@@ -2,7 +2,7 @@
   <ul class="tree">
     <AtelierHierarchyTreeNode
       :name="
-        `${props.page.name}` + ' ' + `${useSlidesStore().selectedPage + 1}`
+        `${props.page.name}` + ' ' + `${useSlidesStore().selectedPageIndex + 1}`
       "
       :reference="props.page.reference"
       :children="props.page.children"
@@ -31,4 +31,11 @@ const props = defineProps({
     required: true,
   },
 });
+
+watch(
+  () => useSlidesStore().selectedPageIndex,
+  function () {
+    useSlidesStore().selectedPage = props.page.children;
+  },
+);
 </script>

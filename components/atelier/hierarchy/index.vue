@@ -19,7 +19,9 @@
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierHierarchyTree :page="props.pages[useSlidesStore().selectedPage]" />
+    <AtelierHierarchyTree
+      :page="props.pages[useSlidesStore().selectedPageIndex]"
+    />
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
@@ -107,14 +109,10 @@ watch(nodeName, () => {
 });
 
 async function insertNewNode() {
-  const { error } = await client.rpc("insert_new_node", {
-    node: { name: nodeName?.value, type: nodeType?.value },
-    parent: {},
-    page_index: useSlidesStore().selectedPage,
-    slides_id: useRoute().params.id.toString(),
+  useSlidesStore().selectedPage = useSlidesStore().selectedPage.push({
+    name: nodeName?.value,
+    type: nodeType?.value,
   });
-
-  if (error) console.log(error);
 
   dialog.value?.close();
 
