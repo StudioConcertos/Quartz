@@ -11,7 +11,7 @@ export const useSlidesStore = defineStore("slides", () => {
     () => {
       useSlides().updateSlidesPages(useRoute().params.id, slidesPages.value);
     },
-    { debounce: 10000 },
+    { debounce: 5000 },
   );
 
   return { slidesPages, selectedPage, selectedPageIndex, selectedNode };

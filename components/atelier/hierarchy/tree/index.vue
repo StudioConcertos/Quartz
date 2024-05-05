@@ -38,4 +38,8 @@ watch(
     useSlidesStore().selectedPage = props.page.children;
   },
 );
+
+onMounted(() => {
+  useSlidesStore().selectedPage = props.page.children;
+});
 </script>
