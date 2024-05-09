@@ -9,6 +9,9 @@ export default defineNuxtConfig({
   devtools: {
     enabled: true,
   },
+  imports: {
+    dirs: ["types/*.ts"],
+  },
   modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt", "@vueuse/nuxt"],
   supabase: {
     redirectOptions: {

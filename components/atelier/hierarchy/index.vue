@@ -81,8 +81,6 @@
 </style>
 
 <script setup lang="ts">
-import type { Database } from "~/types/database";
-
 const client = useSupabaseClient<Database>();
 
 const props = defineProps({

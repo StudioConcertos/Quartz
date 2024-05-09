@@ -23,15 +23,13 @@
 <script setup lang="ts">
 import { RealtimeChannel } from "@supabase/supabase-js";
 
-import type { Database } from "~/types/database";
-
 const client = useSupabaseClient<Database>();
 
 let realtimeChannel: RealtimeChannel;
 
 const { data: slides, refresh: refreshSlides } = await useAsyncData(
   "slides",
-  async () => await useSlides().fetchAllSlides()
+  async () => await useSlides().fetchAllSlides(),
 );
 
 async function insertNewSlides() {
@@ -70,7 +68,7 @@ onMounted(() => {
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "slides" },
-      () => refreshSlides()
+      () => refreshSlides(),
     );
 
   realtimeChannel.subscribe();
