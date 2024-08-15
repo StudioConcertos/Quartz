@@ -1,7 +1,7 @@
 <template>
   <li class="node">
     <button
-      :class="{ selected: useSlidesStore().selectedNode === $el }"
+      :class="{ selected: useDeckStore().selectedNode === $el }"
       class="primaryBtn"
       @click="toggleNode"
       @dblclick="toggleGroup"
@@ -18,7 +18,7 @@
       <p
         v-if="props.reference"
         :class="{
-          'opacity-0': useSlidesStore().selectedNode !== $el,
+          'opacity-0': useDeckStore().selectedNode !== $el,
         }"
         class="reference"
       >
@@ -98,7 +98,7 @@ useSortable(nested, [], {
 function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;
 
-  useSlidesStore().selectedNode = node.parentElement as HTMLLIElement;
+  useDeckStore().selectedNode = node.parentElement as HTMLLIElement;
 }
 
 function toggleGroup() {

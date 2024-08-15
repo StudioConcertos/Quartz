@@ -1,8 +1,5 @@
 <template>
-  <div
-    class="hierarchy"
-    @keydown.esc="useSlidesStore().selectedNode = undefined"
-  >
+  <div class="hierarchy" @keydown.esc="useDeckStore().selectedNode = undefined">
     <h3>
       Hierarchy
       <div class="actions">
@@ -19,13 +16,11 @@
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierHierarchyTree
-      :page="props.pages[useSlidesStore().selectedPageIndex]"
-    />
+    <AtelierHierarchyTree />
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
-      <form @submit.prevent="pushNewNode()" ref="form">
+      <form @submit.prevent="insertNewNode()" ref="form">
         <input
           v-model="nodeName"
           ref="nodeNameInput"
@@ -42,7 +37,7 @@
       </form>
       <div class="whitespace" />
       <button
-        @click="pushNewNode()"
+        @click="insertNewNode()"
         :class="{ disabled: !nodeNameInput?.value }"
         class="primaryBtn w-full text-sm"
       >
@@ -81,15 +76,6 @@
 </style>
 
 <script setup lang="ts">
-const client = useSupabaseClient<Database>();
-
-const props = defineProps({
-  pages: {
-    type: [Object],
-    required: true,
-  },
-});
-
 const dialog = ref<HTMLDialogElement>();
 const form = ref<HTMLFormElement>();
 
@@ -106,11 +92,12 @@ watch(nodeName, () => {
   }
 });
 
-function pushNewNode() {
-  useSlidesStore().selectedPage.push({
-    name: nodeName?.value,
-    type: nodeType?.value,
-  });
+function insertNewNode() {
+  useNode().insertNewNode(
+    `${useDeckStore().selectedSlides?.id}`,
+    `${nodeName.value}`,
+    nodeType.value as NodeType
+  );
 
   dialog.value?.close();
 

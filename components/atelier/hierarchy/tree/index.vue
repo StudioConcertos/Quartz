@@ -1,11 +1,7 @@
 <template>
   <ul class="tree">
     <AtelierHierarchyTreeNode
-      :name="
-        `${props.page.name}` + ' ' + `${useSlidesStore().selectedPageIndex + 1}`
-      "
-      :reference="props.page.reference"
-      :children="props.page.children"
+      :name="`${undefined}` + ' ' + `${useDeckStore().selectedSlidesIndex + 1}`"
       isGroup
     />
   </ul>
@@ -25,17 +21,5 @@
 </style>
 
 <script setup lang="ts">
-const props = defineProps({
-  page: {
-    type: Object,
-    required: true,
-  },
-});
-
-watch(
-  () => useSlidesStore().selectedPageIndex,
-  function () {
-    useSlidesStore().selectedPage = props.page.children;
-  },
-);
+console.log(useDeckStore().selectedSlides);
 </script>

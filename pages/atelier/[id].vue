@@ -1,20 +1,18 @@
 <template>
-  <Title v-if="slides"
-    >{{ slides?.title ?? "Slides not found" }} | Quartz</Title
-  >
-  <div v-if="!slides">
-    <p>Either the slides does not exist or you do not have access.</p>
+  <Title v-if="deck">{{ deck?.title ?? "404" }} | Quartz</Title>
+  <div v-if="!deck">
+    <p>Either the deck does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
-    <AtelierToolbar :title="slides.title" />
+    <AtelierToolbar :title="deck.title" />
     <div class="flex flex-1">
       <aside class="inspector">
-        <AtelierHierarchy :pages="slides.pages" />
+        <AtelierHierarchy />
         <div class="whitespace"></div>
         <AtelierProperties />
       </aside>
-      <AtelierPreview :pages="slides.pages" />
+      <AtelierPreview />
     </div>
   </div>
 </template>
@@ -41,27 +39,48 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 
 const client = useSupabaseClient<Database>();
 
-let realtimeChannel: RealtimeChannel;
+let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
-const { data: slides, refresh: refreshSlides } = await useAsyncData(
-  async () => await useSlides().fetchSlides(useRoute().params.id),
+const { data: deck, refresh: refreshDeck } = await useAsyncData(
+  async () => await useDeck().fetchDeck(useRoute().params.id)
 );
 
-onMounted(() => {
-  useSlidesStore().slidesPages = slides.value.pages;
+const { data: slides, refresh: refreshSlides } = await useAsyncData(
+  async () => await useSlides().fetchAllSlides(useRoute().params.id)
+);
 
-  realtimeChannel = client
+watchEffect(() => {
+  useDeckStore().slides = slides.value ?? [];
+  useDeckStore().selectedSlides =
+    useDeckStore().slides[useDeckStore().selectedSlidesIndex];
+});
+
+onMounted(() => {
+  deckRC = client
+    .channel("public:decks")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "decks" },
+      () => refreshDeck()
+    )
+    .subscribe();
+
+  slidesRC = client
     .channel("public:slides")
     .on(
       "postgres_changes",
-      { event: "*", schema: "public", table: "slides" },
-      () => refreshSlides(),
-    );
-
-  realtimeChannel.subscribe();
+      {
+        event: "*",
+        schema: "public",
+        table: "slides",
+        filter: `deck=eq.${deck.value?.id}`,
+      },
+      () => refreshSlides()
+    )
+    .subscribe();
 });
 
 onUnmounted(() => {
-  client.removeChannel(realtimeChannel);
+  client.removeAllChannels();
 });
 </script>

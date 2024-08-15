@@ -3,41 +3,17 @@ import type { Database } from "~/types/database";
 export const useSlides = () => {
   const client = useSupabaseClient<Database>();
 
-  async function fetchAllSlides() {
+  async function fetchAllSlides(deck: String | String[]) {
     const { data, error } = await client
       .from("slides")
       .select("*")
-      .match({ lapidary: useAuthStore().user?.id })
-      .order("last_modified", { ascending: false });
+      .match({ deck: deck })
+      .order("index", { ascending: false });
 
     if (error) console.log(error);
 
     return data;
   }
 
-  async function fetchSlides(id: String | String[]) {
-    const { data, error } = await client
-      .from("slides")
-      .select("*")
-      .match({ lapidary: useAuthStore().user?.id })
-      .eq("id", id)
-      .single();
-
-    if (error) console.log(error);
-
-    return data;
-  }
-
-  async function updateSlidesPages(id: String | String[], newData: []) {
-    const { data, error } = await client
-      .from("slides")
-      .update({ pages: newData })
-      .eq("id", id);
-
-    if (error) console.log(error);
-
-    return data;
-  }
-
-  return { fetchAllSlides, fetchSlides, updateSlidesPages };
+  return { fetchAllSlides };
 };

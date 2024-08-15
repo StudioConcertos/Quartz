@@ -4,20 +4,22 @@
     <div class="whitespace"></div>
     <div class="flex flex-row">
       <button
-        :class="{ disabled: useSlidesStore().selectedPageIndex === 0 }"
-        @click="useSlidesStore().selectedPageIndex--"
+        :class="{ disabled: useDeckStore().selectedSlidesIndex === 0 }"
+        @click="useDeckStore().selectedSlidesIndex--"
       >
         <div class="i-carbon-arrow-left"></div>
       </button>
       <p class="mx-6">
-        {{ useSlidesStore().selectedPageIndex + 1 }} / {{ props.pages.length }}
+        {{ useDeckStore().selectedSlidesIndex + 1 }} /
+        {{ useDeckStore().slides.length }}
       </p>
       <button
         :class="{
           disabled:
-            useSlidesStore().selectedPageIndex + 1 === props.pages.length,
+            useDeckStore().selectedSlidesIndex + 1 ===
+            useDeckStore().slides.length,
         }"
-        @click="useSlidesStore().selectedPageIndex++"
+        @click="useDeckStore().selectedSlidesIndex++"
       >
         <div class="i-carbon-arrow-right"></div>
       </button>
@@ -40,12 +42,3 @@
   }
 }
 </style>
-
-<script setup lang="ts">
-const props = defineProps({
-  pages: {
-    type: [Object],
-    required: true,
-  },
-});
-</script>

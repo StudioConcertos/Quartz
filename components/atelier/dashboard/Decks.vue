@@ -1,5 +1,5 @@
 <template>
-  <NuxtLink class="slides" target="_blank" :to="`/atelier/${props.id}`">
+  <NuxtLink class="decks" target="_blank" :to="`/atelier/${props.id}`">
     <p class="mb-2">{{ props.title }}</p>
     <p class="opacity-60">
       {{ new Date(props.last_modified).toLocaleString() }}
@@ -10,7 +10,7 @@
 </template>
 
 <style scoped lang="postcss">
-.slides {
+.decks {
   @apply block w-sm aspect-video;
   @apply bg-dark-500 p-6 transition;
   @apply border-rd border-solid border-1;

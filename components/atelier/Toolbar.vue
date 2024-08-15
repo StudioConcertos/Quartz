@@ -65,7 +65,7 @@ async function updateSlidesTItle(event: Event) {
   title.value = title.value.trimEnd();
 
   await client
-    .from("slides")
+    .from("decks")
     .update({ title: title.value })
     .eq("id", useRoute().params.id);
 }

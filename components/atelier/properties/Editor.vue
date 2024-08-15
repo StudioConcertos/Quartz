@@ -1,6 +1,6 @@
 <template>
   <textarea
-    v-if="useSlidesStore().selectedNode"
+    v-if="useDeckStore().selectedNode"
     wrap="hard"
     class="editor"
     @contextmenu.prevent
