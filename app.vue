@@ -6,7 +6,7 @@
 
 <style lang="postcss">
 ::selection {
-  @apply bg-light-200 text-dark-800;
+  @apply bg-light-200 text-dark-900;
 }
 
 * {
@@ -50,7 +50,12 @@ form {
 }
 
 main {
-  @apply bg-dark-800 text-light-200 h-screen;
+  @apply bg-dark-900 text-light-200 h-screen;
+  @apply overflow-x-hidden;
+}
+
+section {
+  @apply h-screen;
 }
 
 select {
@@ -71,7 +76,7 @@ select {
   @apply flex justify-center items-center;
   @apply border-solid border-1 border-light-200 border-rd;
   @apply px-4 py-2 transition-all;
-  @apply hover-bg-light-200 hover-text-dark-800;
+  @apply hover-bg-light-200 hover-text-dark-900;
 
   [class*="i-"] {
     @apply text-2xl;
