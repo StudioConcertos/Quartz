@@ -1,5 +1,5 @@
 <template>
-  <div class="hierarchy" @keydown.esc="useDeckStore().selectedNode = undefined">
+  <div class="hierarchy" @keydown.esc="selectedNode = null">
     <h3>
       Hierarchy
       <div class="actions">
@@ -76,6 +76,8 @@
 </style>
 
 <script setup lang="ts">
+const { currentSlides, selectedNode } = storeToRefs(useDeckStore());
+
 const dialog = ref<HTMLDialogElement>();
 const form = ref<HTMLFormElement>();
 
@@ -93,8 +95,8 @@ watch(nodeName, () => {
 });
 
 function insertNewNode() {
-  useNode().insertNewNode(
-    `${useDeckStore().selectedSlides?.id}`,
+  useDeckStore().insertNewNode(
+    `${currentSlides.value.id}`,
     `${nodeName.value}`,
     nodeType.value as NodeType
   );

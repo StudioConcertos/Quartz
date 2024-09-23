@@ -2,7 +2,7 @@
   <div class="flex">
     <AtelierDashboardSidebar />
     <div class="flex-1 p-6">
-      <button @click="useDeck().insertNewDeck()" class="primaryBtn">
+      <button @click="useDeckStore().insertNewDeck()" class="primaryBtn">
         <div class="i-carbon-add mr-2"></div>
         New Deck
       </button>
@@ -29,7 +29,7 @@ let realtimeChannel: RealtimeChannel;
 
 const { data: decks, refresh: refreshDecks } = await useAsyncData(
   "decks",
-  async () => await useDeck().fetchAllDecks()
+  async () => await useDeckStore().fetchAllDecks()
 );
 
 onMounted(() => {

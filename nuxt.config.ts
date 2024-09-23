@@ -1,5 +1,3 @@
-import { defineNuxtConfig } from "nuxt/config";
-
 export default defineNuxtConfig({
   app: {
     head: {
@@ -8,6 +6,9 @@ export default defineNuxtConfig({
   },
   devtools: {
     enabled: true,
+    timeline: {
+      enabled: true,
+    },
   },
   imports: {
     dirs: ["types/*.ts"],
@@ -35,4 +36,3 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-08-15",
 });
-

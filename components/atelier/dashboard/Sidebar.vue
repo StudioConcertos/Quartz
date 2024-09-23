@@ -1,9 +1,6 @@
 <template>
   <aside class="sidebar">
     <h3>Dashboard</h3>
-    <div class="whitespace"></div>
-    <p class="mb-6">Currently signed in as: {{ useAuthStore().user?.email }}</p>
-    <button @click="useAuth().signOut()" class="primaryBtn">Sign out</button>
   </aside>
 </template>
 

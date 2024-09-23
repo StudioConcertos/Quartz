@@ -1,7 +1,7 @@
 <template>
   <li class="node">
     <button
-      :class="{ selected: useDeckStore().selectedNode === $el }"
+      :class="{ selected: selectedNode === $el }"
       class="primaryBtn"
       @click="toggleNode"
       @dblclick="toggleGroup"
@@ -18,7 +18,7 @@
       <p
         v-if="props.reference"
         :class="{
-          'opacity-0': useDeckStore().selectedNode !== $el,
+          'opacity-0': selectedNode !== $el,
         }"
         class="reference"
       >
@@ -75,6 +75,8 @@
 <script setup lang="ts">
 import { useSortable } from "@vueuse/integrations/useSortable";
 
+const { selectedNode } = storeToRefs(useDeckStore());
+
 const props = defineProps({
   name: {
     type: String,
@@ -98,7 +100,7 @@ useSortable(nested, [], {
 function toggleNode(event: Event) {
   const node = event.target as HTMLButtonElement;
 
-  useDeckStore().selectedNode = node.parentElement as HTMLLIElement;
+  selectedNode.value = node.parentElement as HTMLLIElement;
 }
 
 function toggleGroup() {

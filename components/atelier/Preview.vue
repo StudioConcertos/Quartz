@@ -4,22 +4,20 @@
     <div class="whitespace"></div>
     <div class="flex flex-row">
       <button
-        :class="{ disabled: useDeckStore().selectedSlidesIndex === 0 }"
-        @click="useDeckStore().selectedSlidesIndex--"
+        :class="{ disabled: currentSlidesIndex === 0 }"
+        @click="deckStore.prevSlides()"
       >
         <div class="i-carbon-arrow-left"></div>
       </button>
       <p class="mx-6">
-        {{ useDeckStore().selectedSlidesIndex + 1 }} /
-        {{ useDeckStore().slides.length }}
+        {{ currentSlidesIndex + 1 }} /
+        {{ slides.length }}
       </p>
       <button
         :class="{
-          disabled:
-            useDeckStore().selectedSlidesIndex + 1 ===
-            useDeckStore().slides.length,
+          disabled: currentSlidesIndex + 1 === slides.length,
         }"
-        @click="useDeckStore().selectedSlidesIndex++"
+        @click="deckStore.nextSlides()"
       >
         <div class="i-carbon-arrow-right"></div>
       </button>
@@ -42,3 +40,8 @@
   }
 }
 </style>
+
+<script setup lang="ts">
+const deckStore = useDeckStore();
+const { slides, currentSlidesIndex } = storeToRefs(useDeckStore());
+</script>

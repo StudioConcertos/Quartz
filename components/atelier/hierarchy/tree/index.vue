@@ -1,7 +1,7 @@
 <template>
   <ul class="tree">
     <AtelierHierarchyTreeNode
-      :name="`${undefined}` + ' ' + `${useDeckStore().selectedSlidesIndex + 1}`"
+      :name="`${undefined}` + ' ' + `${useDeckStore().currentSlidesIndex + 1}`"
       isGroup
     />
   </ul>
@@ -19,7 +19,3 @@
   @apply list-none h-full max-h-[50vh] overflow-y-auto;
 }
 </style>
-
-<script setup lang="ts">
-console.log(useDeckStore().selectedSlides);
-</script>
