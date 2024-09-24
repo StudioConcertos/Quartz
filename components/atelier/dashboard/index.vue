@@ -1,14 +1,11 @@
 <template>
   <div class="flex">
     <AtelierDashboardSidebar />
-    <div class="flex-1 p-6">
-      <button @click="useDeckStore().insertNewDeck()" class="primaryBtn">
-        <div class="i-carbon-add mr-2"></div>
-        New Deck
-      </button>
+    <div class="flex-1">
+      <AtelierDashboardHeader />
       <div class="whitespace"></div>
-      <div class="flex flex-wrap gap-6">
-        <AtelierDashboardDecks
+      <div class="flex flex-wrap gap-6 p-6 pt-0">
+        <AtelierDashboardDeck
           v-for="deck in decks"
           :title="deck.title"
           :id="deck.id"

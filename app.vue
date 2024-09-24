@@ -60,7 +60,7 @@ section {
 
 select {
   @apply bg-transparent text-light-200;
-  @apply border-0 border-b-1 border-light-200;
+  @apply border-0! border-b-1! border-light-200;
   @apply text-sm py-4 cursor-pointer;
 
   option {

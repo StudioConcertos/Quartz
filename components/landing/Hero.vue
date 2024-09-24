@@ -24,7 +24,7 @@
 
   .title {
     @apply self-end w-screen absolute z-1;
-    @apply text-[10vw] text-center;
+    @apply text-[10vw]! text-center;
     @apply font-100 line-height-normal;
     @apply uppercase select-none;
   }

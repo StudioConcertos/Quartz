@@ -1,7 +1,7 @@
 <template>
   <div class="hierarchy" @keydown.esc="selectedNode = null">
     <h3>
-      Hierarchy
+      Inspector
       <div class="actions">
         <Tooltip description="New node">
           <button @click="dialog?.showModal()">
