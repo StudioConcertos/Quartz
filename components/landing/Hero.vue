@@ -6,7 +6,7 @@
         :position="[0, 0, 0.01]"
       />
       <TresMesh>
-        <TresPlaneGeometry :args="[1.5, 1.5, 300, 300]" />
+        <TresPlaneGeometry :args="[1.5, 1.5, 150, 150]" />
         <TresShaderMaterial
           :vertex-shader="vertexShader"
           :fragment-shader="fragmentShader"
@@ -14,7 +14,7 @@
         ></TresShaderMaterial>
       </TresMesh>
     </TresCanvas>
-    <h2 class="title">Quartz</h2>
+    <h2 class="title">quartz.graphics</h2>
   </div>
 </template>
 
@@ -25,8 +25,8 @@
   .title {
     @apply self-end w-screen absolute z-1;
     @apply text-[10vw]! text-center;
-    @apply font-100 line-height-normal;
-    @apply uppercase select-none;
+    @apply font-300 line-height-normal;
+    @apply select-none;
   }
 }
 </style>
@@ -59,7 +59,7 @@ onMounted(async () => {
   await nextTick();
 
   onLoop(() => {
-    uniforms.uTime.value += 0.0002;
+    uniforms.uTime.value += 0.0001;
   });
 });
 </script>
