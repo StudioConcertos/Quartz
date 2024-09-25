@@ -45,7 +45,7 @@ const { data: deck, refresh: refreshDeck } = await useAsyncData(
   async () => await useDeckStore().fetchDeck(useRoute().params.id)
 );
 
-const { data: slides, refresh: refreshSlides } = await useAsyncData(
+const { refresh: refreshSlides } = await useAsyncData(
   async () => await useDeckStore().fetchAllSlides(useRoute().params.id)
 );
 

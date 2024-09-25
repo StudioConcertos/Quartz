@@ -1,11 +1,11 @@
 export const useDeckStore = defineStore("deck", () => {
   const client = useSupabaseClient<Database>();
 
-  const slides = ref<Slides[]>([]);
+  const slides = ref<TSlides[]>([]);
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
   const currentSlidesIndex = ref<number>(0);
 
-  const nodes = ref<Object[]>([]);
+  const nodes = ref<TNode[]>([]);
   const selectedNode = ref<HTMLLIElement | null>();
 
   async function fetchAllDecks() {
@@ -71,14 +71,16 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("nodes")
       .select("*")
-      .eq("slides", useRoute().params.id);
+      .eq("slides", currentSlides.value.id);
 
     if (error) throw error;
+
+    if (data) nodes.value = data;
 
     return data;
   }
 
-  async function insertNewNode(slides: string, name: string, type: NodeType) {
+  async function insertNewNode(slides: string, name: string, type: TType) {
     const { data, error } = await client
       .from("nodes")
       .insert({

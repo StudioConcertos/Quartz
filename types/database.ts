@@ -1,5 +1,6 @@
-export type Slides = Database["public"]["Tables"]["slides"]["Row"];
-export type NodeType = Database["public"]["Enums"]["type"];
+export type TSlides = Database["public"]["Tables"]["slides"]["Row"];
+export type TNode = Database["public"]["Tables"]["nodes"]["Row"];
+export type TType = Database["public"]["Enums"]["type"];
 
 export type Database = {
   public: {

@@ -1,7 +1,11 @@
 <template>
   <ul class="tree">
     <AtelierHierarchyTreeNode
-      :name="`${undefined}` + ' ' + `${useDeckStore().currentSlidesIndex + 1}`"
+      :name="
+        `${useDeckStore().nodes[0].name}` +
+        ' ' +
+        `${useDeckStore().currentSlidesIndex + 1}`
+      "
       isGroup
     />
   </ul>
@@ -19,3 +23,30 @@
   @apply list-none h-full max-h-[50vh] overflow-y-auto;
 }
 </style>
+
+<script setup lang="ts">
+import { RealtimeChannel } from "@supabase/supabase-js";
+
+const client = useSupabaseClient<Database>();
+
+let nodesRC: RealtimeChannel;
+
+const { refresh: refreshNodes } = await useAsyncData(
+  async () => await useDeckStore().fetchAllNodes()
+);
+
+onMounted(() => {
+  nodesRC = client
+    .channel("public:nodes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "nodes" },
+      () => refreshNodes()
+    )
+    .subscribe();
+});
+
+onUnmounted(() => {
+  client.removeAllChannels();
+});
+</script>
