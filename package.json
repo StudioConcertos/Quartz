@@ -10,18 +10,20 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@iconify-json/carbon": "^1.1.28",
-    "@nuxtjs/supabase": "^1.1.6",
-    "@pinia/nuxt": "^0.5.1",
-    "@supabase/supabase-js": "^2.39.3",
-    "@unocss/nuxt": "^0.58.4",
-    "@vueuse/core": "^10.9.0",
-    "@vueuse/integrations": "^10.9.0",
-    "@vueuse/nuxt": "^10.9.0",
-    "nuxt": "^3.9.3",
-    "sortablejs": "^1",
-    "supabase": "^1.148.6",
-    "vue": "^3.4.14",
-    "vue-router": "^4.2.5"
+    "@iconify-json/carbon": "^1.2.1",
+    "@nuxtjs/supabase": "^1.4.0",
+    "@pinia/nuxt": "^0.5.4",
+    "@supabase/supabase-js": "^2.45.4",
+    "@tresjs/nuxt": "^3.0.7",
+    "@unocss/nuxt": "^0.58.9",
+    "@vueuse/core": "^10.11.1",
+    "@vueuse/integrations": "^10.11.1",
+    "@vueuse/nuxt": "^10.11.1",
+    "nuxt": "^3.13.2",
+    "sortablejs": "^1.15.3",
+    "supabase": "^1.192.5",
+    "three": "^0.167.1",
+    "vue": "^3.5.7",
+    "vue-router": "^4.4.5"
   }
 }

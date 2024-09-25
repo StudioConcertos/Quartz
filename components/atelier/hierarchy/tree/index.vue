@@ -2,10 +2,10 @@
   <ul class="tree">
     <AtelierHierarchyTreeNode
       :name="
-        `${props.page.name}` + ' ' + `${useSlidesStore().selectedPageIndex + 1}`
+        `${useDeckStore().nodes[0].name}` +
+        ' ' +
+        `${useDeckStore().currentSlidesIndex + 1}`
       "
-      :reference="props.page.reference"
-      :children="props.page.children"
       isGroup
     />
   </ul>
@@ -25,21 +25,28 @@
 </style>
 
 <script setup lang="ts">
-const props = defineProps({
-  page: {
-    type: Object,
-    required: true,
-  },
-});
+import { RealtimeChannel } from "@supabase/supabase-js";
 
-watch(
-  () => useSlidesStore().selectedPageIndex,
-  function () {
-    useSlidesStore().selectedPage = props.page.children;
-  },
+const client = useSupabaseClient<Database>();
+
+let nodesRC: RealtimeChannel;
+
+const { refresh: refreshNodes } = await useAsyncData(
+  async () => await useDeckStore().fetchAllNodes()
 );
 
 onMounted(() => {
-  useSlidesStore().selectedPage = props.page.children;
+  nodesRC = client
+    .channel("public:nodes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "nodes" },
+      () => refreshNodes()
+    )
+    .subscribe();
+});
+
+onUnmounted(() => {
+  client.removeAllChannels();
 });
 </script>

@@ -1,6 +1,8 @@
 <template>
   <Title>Quartz</Title>
-  <div class="flex justify-center items-center h-screen">
-    <p>Temporal landing page of Quartz, go to /auth to sign in.</p>
-  </div>
+  <LandingNavbar />
+  <LandingHero />
+  <section class="flex flex-col justify-center items-center">
+    <p>Landing page is still work in progress.</p>
+  </section>
 </template>

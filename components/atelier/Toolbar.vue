@@ -39,8 +39,6 @@
 </style>
 
 <script setup lang="ts">
-import type { Database } from "~/types/database";
-
 const client = useSupabaseClient<Database>();
 
 const props = defineProps({
@@ -67,7 +65,7 @@ async function updateSlidesTItle(event: Event) {
   title.value = title.value.trimEnd();
 
   await client
-    .from("slides")
+    .from("decks")
     .update({ title: title.value })
     .eq("id", useRoute().params.id);
 }

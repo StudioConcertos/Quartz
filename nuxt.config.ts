@@ -1,5 +1,3 @@
-import { defineNuxtConfig } from "nuxt/config";
-
 export default defineNuxtConfig({
   app: {
     head: {
@@ -8,8 +6,20 @@ export default defineNuxtConfig({
   },
   devtools: {
     enabled: true,
+    timeline: {
+      enabled: true,
+    },
   },
-  modules: ["@nuxtjs/supabase", "@pinia/nuxt", "@unocss/nuxt", "@vueuse/nuxt"],
+  imports: {
+    dirs: ["types/*.ts"],
+  },
+  modules: [
+    "@nuxtjs/supabase",
+    "@pinia/nuxt",
+    "@tresjs/nuxt",
+    "@unocss/nuxt",
+    "@vueuse/nuxt",
+  ],
   supabase: {
     redirectOptions: {
       login: "/auth",
@@ -20,4 +30,9 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ["./stores/**"],
   },
+  tres: {
+    devtools: true,
+    glsl: true,
+  },
+  compatibilityDate: "2024-08-15",
 });
