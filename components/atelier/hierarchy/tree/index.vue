@@ -1,11 +1,7 @@
 <template>
   <ul class="tree">
     <AtelierHierarchyTreeNode
-      :name="
-        `${useDeckStore().nodes[0].name}` +
-        ' ' +
-        `${useDeckStore().currentSlidesIndex + 1}`
-      "
+      :name="`${nodes[0].name}` + ' ' + `${currentSlidesIndex + 1}`"
       isGroup
     />
   </ul>
@@ -29,6 +25,8 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 
 const client = useSupabaseClient<Database>();
 
+const { nodes, currentSlidesIndex } = storeToRefs(useDeckStore());
+
 let nodesRC: RealtimeChannel;
 
 const { refresh: refreshNodes } = await useAsyncData(
@@ -47,6 +45,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  client.removeAllChannels();
+  client.removeChannel(nodesRC);
 });
 </script>

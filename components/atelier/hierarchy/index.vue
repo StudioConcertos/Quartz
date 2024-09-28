@@ -98,7 +98,7 @@ function insertNewNode() {
   useDeckStore().insertNewNode(
     `${currentSlides.value.id}`,
     `${nodeName.value}`,
-    nodeType.value as NodeType
+    nodeType.value as TType
   );
 
   dialog.value?.close();

@@ -3,10 +3,10 @@
     <TresCanvas>
       <TresPerspectiveCamera
         :args="[45, 1, 0.001, 1000]"
-        :position="[0, 0, 0.01]"
+        :position="[0, 0, 0.1]"
       />
       <TresMesh>
-        <TresPlaneGeometry :args="[1.5, 1.5, 150, 150]" />
+        <TresPlaneGeometry :args="[1.5, 1.5, 100, 100]" />
         <TresShaderMaterial
           :vertex-shader="vertexShader"
           :fragment-shader="fragmentShader"
@@ -32,8 +32,8 @@
 </style>
 
 <script setup lang="ts">
-import vertexShader from "~/assets/shaders/hero/vertex.glsl";
-import fragmentShader from "~/assets/shaders/hero/fragment.glsl";
+import vertexShader from "~/assets/shaders/hero/vertex.glsl?raw";
+import fragmentShader from "~/assets/shaders/hero/fragment.glsl?raw";
 
 import { useRenderLoop } from "@tresjs/core";
 

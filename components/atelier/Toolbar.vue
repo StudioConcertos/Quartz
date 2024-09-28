@@ -7,7 +7,7 @@
       type="text"
       maxlength="30"
       v-model="titleInput"
-      @change="updateSlidesTItle($event)"
+      @change="updateSlidesTitle($event)"
       :style="{ width: `${titleInput.length + 4}ch` }"
     />
     <NuxtLink to="/atelier">
@@ -56,7 +56,7 @@ watch(titleInput, () => {
   titleInput.value = props.title[0];
 });
 
-async function updateSlidesTItle(event: Event) {
+async function updateSlidesTitle(event: Event) {
   const title = event.target as HTMLInputElement;
 
   if (!title.value) return;

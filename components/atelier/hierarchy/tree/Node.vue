@@ -5,6 +5,16 @@
       class="primaryBtn"
       @click="toggleNode"
       @dblclick="toggleGroup"
+      @contextmenu.prevent="
+        useContextMenu().open($event, [
+          {
+            label: 'Rename',
+            action: () => {
+              console.log('test');
+            },
+          },
+        ])
+      "
     >
       <div class="flex items-center pointer-events-none">
         <div

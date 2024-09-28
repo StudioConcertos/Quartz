@@ -1,4 +1,4 @@
 <template>
   <Title>Dashboard | Quartz</Title>
-  <AtelierDashboard />
+  <AtelierDashboard @contextmenu.prevent />
 </template>
