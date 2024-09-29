@@ -24,7 +24,7 @@ dialog {
   @apply absolute top-1/2 left-1/2 px-8 py-12;
   @apply translate-x-[-50%] translate-y-[-50%];
   @apply border-2 border-dark-200 border-rd;
-  @apply bg-dark-800 text-light-200 select-none;
+  @apply bg-dark-900 text-light-200 select-none;
 }
 
 dialog::backdrop {
@@ -70,6 +70,18 @@ select {
 
 .disabled {
   @apply opacity-50 pointer-events-none;
+}
+
+.fade-enter-from {
+  @apply opacity-0;
+}
+
+.fade-enter-to {
+  @apply opacity-100;
+}
+
+.fade-enter-active {
+  @apply transition-opacity;
 }
 
 .primaryBtn {

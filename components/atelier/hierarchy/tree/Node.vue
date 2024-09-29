@@ -9,9 +9,11 @@
         useContextMenu().open($event, [
           {
             label: 'Rename',
-            action: () => {
-              console.log('test');
-            },
+            action: () => {},
+          },
+          {
+            label: 'Delete',
+            action: () => {},
           },
         ])
       "

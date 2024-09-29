@@ -10,15 +10,15 @@
 <style scoped lang="postcss">
 .tooltip {
   span {
-    @apply absolute invisible;
+    @apply absolute opacity-0 invisible;
     @apply text-sm font-normal text-center;
     @apply bg-dark-200 border-rd;
-    @apply p-2 mt-8;
+    @apply p-2 mt-8 transition-opacity;
   }
 }
 
 .tooltip:hover span {
-  @apply visible;
+  @apply opacity-100 visible;
 }
 </style>
 
