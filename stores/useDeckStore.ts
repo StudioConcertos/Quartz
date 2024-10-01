@@ -12,7 +12,7 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("decks")
       .select("*")
-      .match({ lapidary: useAuthStore().user?.id })
+      .match({ lapidarist: useAuthStore().user?.id })
       .order("last_modified", { ascending: false });
 
     if (error) throw error;
@@ -24,7 +24,7 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("decks")
       .select("*")
-      .match({ lapidary: useAuthStore().user?.id })
+      .match({ lapidarist: useAuthStore().user?.id })
       .eq("id", id)
       .single();
 
@@ -37,7 +37,7 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("decks")
       .insert({
-        lapidary: `${useAuthStore().user?.id}`,
+        lapidarist: `${useAuthStore().user?.id}`,
         title: "New Deck",
       })
       .select()
@@ -57,8 +57,8 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("slides")
       .select("*")
-      .match({ deck: deck })
-      .order("index", { ascending: false });
+      .eq("deck", deck)
+      .order("index", { ascending: true });
 
     if (error) throw error;
 
@@ -71,7 +71,8 @@ export const useDeckStore = defineStore("deck", () => {
     const { data, error } = await client
       .from("nodes")
       .select("*")
-      .eq("slides", currentSlides.value.id);
+      .eq("slides", currentSlides.value.id)
+      .order("path", { ascending: true });
 
     if (error) throw error;
 
@@ -87,7 +88,7 @@ export const useDeckStore = defineStore("deck", () => {
         slides: slides.toString(),
         name: name,
         type: type,
-        path: "",
+        path: `root.${name}`,
       })
       .select();
 

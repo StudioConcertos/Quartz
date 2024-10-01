@@ -3,16 +3,8 @@
     <AtelierHierarchyTreeNode
       :name="`${nodes[0].name}` + ' ' + `${currentSlidesIndex + 1}`"
       isGroup
-      @contextmenu.prevent="
-        useContextMenu().open($event, [
-          {
-            label: 'Rename',
-            action: () => {
-              console.log('test');
-            },
-          },
-        ])
-      "
+      :children="nodes.slice(1)"
+      :reference="nodes[0].reference ?? ''"
     />
   </ul>
 </template>

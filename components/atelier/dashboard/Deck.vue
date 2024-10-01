@@ -1,5 +1,17 @@
 <template>
-  <NuxtLink class="deck" target="_blank" :to="`/atelier/${props.id}`">
+  <NuxtLink
+    class="deck"
+    target="_blank"
+    :to="`/atelier/${props.id}`"
+    @contextmenu.prevent="
+      useContextMenu().open($event, [
+        {
+          label: 'Delete',
+          action: () => {},
+        },
+      ])
+    "
+  >
     <p class="mb-2">{{ props.title }}</p>
     <p class="opacity-60">
       {{ new Date(props.last_modified).toLocaleString() }}

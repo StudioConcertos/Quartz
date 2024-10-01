@@ -11,10 +11,6 @@
             label: 'Rename',
             action: () => {},
           },
-          {
-            label: 'Delete',
-            action: () => {},
-          },
         ])
       "
     >
@@ -44,6 +40,18 @@
         :name="node.name"
         icon="i-carbon-text-short-paragraph"
         :isGroup="node.type === 'group'"
+        @contextmenu.prevent="
+          useContextMenu().open($event, [
+            {
+              label: 'Rename',
+              action: () => {},
+            },
+            {
+              label: 'Delete',
+              action: () => {},
+            },
+          ])
+        "
       />
     </ul>
   </li>

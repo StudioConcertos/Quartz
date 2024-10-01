@@ -1,20 +1,22 @@
 <template>
-  <Transition name="fade">
-    <div
-      v-if="isVisible"
-      :style="{ top: `${y}px`, left: `${x}px` }"
-      class="contextMenu"
-      @contextmenu.prevent
-    >
-      <button
-        v-for="item in menuItems"
-        :key="item.label"
-        @click="item.action(), (isVisible = false)"
+  <Teleport to="body">
+    <Transition name="fade">
+      <div
+        v-if="isVisible"
+        :style="{ top: `${y}px`, left: `${x}px` }"
+        class="contextMenu"
+        @contextmenu.prevent
       >
-        {{ item.label }}
-      </button>
-    </div>
-  </Transition>
+        <button
+          v-for="item in menuItems"
+          :key="item.label"
+          @click="item.action(), (isVisible = false)"
+        >
+          {{ item.label }}
+        </button>
+      </div>
+    </Transition>
+  </Teleport>
 </template>
 
 <style scoped lang="postcss">

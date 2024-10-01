@@ -4,26 +4,26 @@ export type Database = {
       decks: {
         Row: {
           id: string;
-          lapidary: string;
+          lapidarist: string;
           last_modified: string;
           title: string;
         };
         Insert: {
           id?: string;
-          lapidary: string;
+          lapidarist: string;
           last_modified?: string;
           title?: string;
         };
         Update: {
           id?: string;
-          lapidary?: string;
+          lapidarist?: string;
           last_modified?: string;
           title?: string;
         };
         Relationships: [
           {
-            foreignKeyName: "slides_lapidary_fkey";
-            columns: ["lapidary"];
+            foreignKeyName: "decks_lapidarist_fkey";
+            columns: ["lapidarist"];
             isOneToOne: false;
             referencedRelation: "lapidaries";
             referencedColumns: ["id"];
@@ -50,6 +50,7 @@ export type Database = {
           id: string;
           name: string;
           path: unknown;
+          reference: string | null;
           slides: string | null;
           type: Database["public"]["Enums"]["type"];
         };
@@ -57,6 +58,7 @@ export type Database = {
           id?: string;
           name: string;
           path: unknown;
+          reference?: string | null;
           slides?: string | null;
           type: Database["public"]["Enums"]["type"];
         };
@@ -64,6 +66,7 @@ export type Database = {
           id?: string;
           name?: string;
           path?: unknown;
+          reference?: string | null;
           slides?: string | null;
           type?: Database["public"]["Enums"]["type"];
         };
@@ -108,23 +111,7 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      delete_selected_node: {
-        Args: {
-          slides_id: string;
-          page_index: number;
-          node: Object;
-        };
-        Returns: undefined;
-      };
-      insert_new_node: {
-        Args: {
-          slides_id: string;
-          page_index: number;
-          node: Object;
-          parent: Object;
-        };
-        Returns: undefined;
-      };
+      [_ in never]: never;
     };
     Enums: {
       type: "text" | "group";
