@@ -17,29 +17,29 @@
       <div class="flex items-center pointer-events-none">
         <div
           ref="icon"
-          :class="isGroup ? 'i-carbon-caret-down' : props.icon"
+          :class="
+            isGroup ? 'i-carbon-caret-down' : 'i-carbon-text-short-paragraph'
+          "
         ></div>
         <p class="text-nowrap">
-          {{ props.name }}
+          {{ props.node.name }}
         </p>
       </div>
       <p
-        v-if="props.reference"
+        v-if="props.node.reference"
         :class="{
           'opacity-0': selectedNode !== $el,
         }"
         class="reference"
       >
-        {{ props.reference }}
+        {{ props.node.reference }}
       </p>
     </button>
-    <ul ref="nested" v-if="isGroup && props.children">
+    <ul ref="nested" v-if="isGroup && node.children">
       <AtelierHierarchyTreeNode
-        v-for="node in props.children"
-        :children="node.children"
-        :name="node.name"
-        icon="i-carbon-text-short-paragraph"
-        :isGroup="node.type === 'group'"
+        v-for="child in node.children"
+        :data-path="child.path"
+        :node="child"
         @contextmenu.prevent="
           useContextMenu().open($event, [
             {
@@ -48,7 +48,7 @@
             },
             {
               label: 'Delete',
-              action: () => {},
+              action: () => deckStore.deleteSelectedNode(),
             },
           ])
         "
@@ -73,7 +73,7 @@
     }
 
     .reference {
-      @apply italic text-dark-800 mr-2;
+      @apply italic text-dark-900 mr-2;
       @apply transition-opacity;
     }
   }
@@ -88,24 +88,25 @@
 }
 
 .selected {
-  @apply bg-light-200 text-dark-800;
+  @apply bg-light-200 text-dark-900;
 }
 </style>
 
 <script setup lang="ts">
 import { useSortable } from "@vueuse/integrations/useSortable";
 
+const deckStore = useDeckStore();
 const { selectedNode } = storeToRefs(useDeckStore());
 
 const props = defineProps({
-  name: {
-    type: String,
+  node: {
+    type: Object as PropType<Tree>,
     required: true,
   },
-  reference: String,
-  icon: String,
-  isGroup: Boolean,
-  children: [Object],
+});
+
+const isGroup = computed(() => {
+  return props.node.type === "group";
 });
 
 const icon = ref<HTMLDivElement>();
@@ -114,7 +115,6 @@ const nested = ref<HTMLUListElement>();
 useSortable(nested, [], {
   animation: "200",
   easing: "cubic-bezier(1, 0, 0, 1)",
-  forceFallback: true,
 });
 
 function toggleNode(event: Event) {
@@ -124,7 +124,7 @@ function toggleNode(event: Event) {
 }
 
 function toggleGroup() {
-  if (!props.isGroup) return;
+  if (!isGroup) return;
 
   icon.value?.classList.toggle("-rotate-90");
   nested.value?.classList.toggle("hidden");

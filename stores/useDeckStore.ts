@@ -5,7 +5,7 @@ export const useDeckStore = defineStore("deck", () => {
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
   const currentSlidesIndex = ref<number>(0);
 
-  const tree = ref<Tree>({
+  const nodes = ref<Tree>({
     id: "",
     name: "",
     path: "",
@@ -13,6 +13,7 @@ export const useDeckStore = defineStore("deck", () => {
     slides: "",
     type: "group",
   });
+
   const selectedNode = ref<HTMLLIElement | null>();
 
   async function fetchAllDecks() {
@@ -106,7 +107,7 @@ export const useDeckStore = defineStore("deck", () => {
         }
       });
 
-      tree.value = lookup["root"];
+      nodes.value = lookup["root"];
     }
 
     return data;
@@ -128,11 +129,31 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
+  async function deleteSelectedNode() {
+    const node = selectedNode.value;
+
+    if (node) {
+      const path = node.dataset.path;
+
+      // Using an RPC because Supabase query sucks.
+      const { error } = await client.rpc("delete_node_and_children", {
+        node_path: path!,
+        slides_id: currentSlides.value.id,
+      });
+
+      if (error) {
+        throw error;
+      } else {
+        selectedNode.value = null;
+      }
+    }
+  }
+
   return {
     slides,
     currentSlides,
     currentSlidesIndex,
-    tree,
+    nodes,
     selectedNode,
     fetchAllDecks,
     fetchDeck,
@@ -142,5 +163,6 @@ export const useDeckStore = defineStore("deck", () => {
     prevSlides,
     fetchAllNodes,
     insertNewNode,
+    deleteSelectedNode,
   };
 });

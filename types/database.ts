@@ -51,7 +51,7 @@ export type Database = {
           name: string;
           path: string;
           reference: string | null;
-          slides: string | null;
+          slides: string;
           type: Database["public"]["Enums"]["type"];
         };
         Insert: {
@@ -59,7 +59,7 @@ export type Database = {
           name: string;
           path: string;
           reference?: string | null;
-          slides?: string | null;
+          slides: string;
           type: Database["public"]["Enums"]["type"];
         };
         Update: {
@@ -67,7 +67,7 @@ export type Database = {
           name?: string;
           path?: string;
           reference?: string | null;
-          slides?: string | null;
+          slides?: string;
           type?: Database["public"]["Enums"]["type"];
         };
         Relationships: [
@@ -111,7 +111,13 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      delete_node_and_children: {
+        Args: {
+          node_path: string;
+          slides_id: string;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       type: "text" | "group";

@@ -1,12 +1,6 @@
 <template>
   <ul class="tree">
-    <AtelierHierarchyTreeNode
-      :key="tree.id"
-      :name="`${tree.name}` + ' ' + `${currentSlidesIndex + 1}`"
-      isGroup
-      :children="tree.children"
-      :reference="tree.reference ?? ''"
-    />
+    <AtelierHierarchyTreeNode data-path="root" :node="nodes" />
   </ul>
 </template>
 
@@ -28,7 +22,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 
 const client = useSupabaseClient<Database>();
 
-const { tree, currentSlidesIndex } = storeToRefs(useDeckStore());
+const { nodes } = storeToRefs(useDeckStore());
 
 let nodesRC: RealtimeChannel;
 
