@@ -84,7 +84,7 @@ select {
   @apply transition-opacity;
 }
 
-.primaryBtn {
+.primaryButton {
   @apply flex justify-center items-center;
   @apply border-solid border-1 border-light-200 border-rd;
   @apply px-4 py-2 transition-all;

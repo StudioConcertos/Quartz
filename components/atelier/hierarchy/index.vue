@@ -39,7 +39,7 @@
       <button
         @click="insertNewNode()"
         :class="{ disabled: !nodeNameInput?.value }"
-        class="primaryBtn w-full text-sm"
+        class="primaryButton w-full text-sm"
       >
         Confirm
       </button>

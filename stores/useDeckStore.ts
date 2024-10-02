@@ -120,11 +120,16 @@ export const useDeckStore = defineStore("deck", () => {
         slides: slides.toString(),
         name: name,
         type: type,
-        path: `root.${name}`,
+        path:
+          selectedNode.value?.dataset.type === "group"
+            ? `${selectedNode.value.dataset.path}.${name}`
+            : `root.${name}`,
       })
       .select();
 
     if (error) throw error;
+
+    selectedNode.value = null;
 
     return data;
   }

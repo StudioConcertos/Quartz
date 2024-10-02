@@ -2,7 +2,7 @@
   <li class="node">
     <button
       :class="{ selected: selectedNode === $el }"
-      class="primaryBtn"
+      class="primaryButton"
       @click="toggleNode"
       @dblclick="toggleGroup"
       @contextmenu.prevent="
@@ -13,6 +13,7 @@
           },
         ])
       "
+      @keydown.delete="deckStore.deleteSelectedNode()"
     >
       <div class="flex items-center pointer-events-none">
         <div
@@ -39,6 +40,7 @@
       <AtelierHierarchyTreeNode
         v-for="child in node.children"
         :data-path="child.path"
+        :data-type="child.type"
         :node="child"
         @contextmenu.prevent="
           useContextMenu().open($event, [

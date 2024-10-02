@@ -5,7 +5,7 @@
         v-if="isVisible"
         :style="{ top: `${y}px`, left: `${x}px` }"
         class="contextMenu"
-        @contextmenu.prevent
+        @contextmenu.prevent="isVisible = false"
       >
         <button
           v-for="item in menuItems"
