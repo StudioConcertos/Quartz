@@ -49,7 +49,7 @@ export type Database = {
         Row: {
           id: string;
           name: string;
-          path: unknown;
+          path: string;
           reference: string | null;
           slides: string | null;
           type: Database["public"]["Enums"]["type"];
@@ -57,7 +57,7 @@ export type Database = {
         Insert: {
           id?: string;
           name: string;
-          path: unknown;
+          path: string;
           reference?: string | null;
           slides?: string | null;
           type: Database["public"]["Enums"]["type"];
@@ -65,7 +65,7 @@ export type Database = {
         Update: {
           id?: string;
           name?: string;
-          path?: unknown;
+          path?: string;
           reference?: string | null;
           slides?: string | null;
           type?: Database["public"]["Enums"]["type"];

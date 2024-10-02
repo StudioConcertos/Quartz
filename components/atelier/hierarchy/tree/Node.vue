@@ -61,7 +61,7 @@
 .node {
   button {
     @apply px-2 mb-2 justify-between;
-    @apply w-full border-none;
+    @apply w-full border-none pointer-events-auto;
 
     div p,
     [class*="i-"] {

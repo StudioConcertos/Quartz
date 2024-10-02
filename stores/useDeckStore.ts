@@ -5,7 +5,14 @@ export const useDeckStore = defineStore("deck", () => {
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
   const currentSlidesIndex = ref<number>(0);
 
-  const nodes = ref<TNode[]>([]);
+  const tree = ref<Tree>({
+    id: "",
+    name: "",
+    path: "",
+    reference: "",
+    slides: "",
+    type: "group",
+  });
   const selectedNode = ref<HTMLLIElement | null>();
 
   async function fetchAllDecks() {
@@ -13,7 +20,7 @@ export const useDeckStore = defineStore("deck", () => {
       .from("decks")
       .select("*")
       .match({ lapidarist: useAuthStore().user?.id })
-      .order("last_modified", { ascending: false });
+      .order("last_modified", { ascending: true });
 
     if (error) throw error;
 
@@ -67,6 +74,14 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
+  function nextSlides() {
+    currentSlidesIndex.value++;
+  }
+
+  function prevSlides() {
+    currentSlidesIndex.value--;
+  }
+
   async function fetchAllNodes() {
     const { data, error } = await client
       .from("nodes")
@@ -76,7 +91,23 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (error) throw error;
 
-    if (data) nodes.value = data;
+    if (data) {
+      // Converts the data array into a hierachical tree.
+      const lookup: Record<string, { children: TNode[] } & TNode> = {};
+
+      data.forEach((node) => {
+        lookup[node.path] = { ...node, children: [] };
+
+        const parentPath = node.path.split(".").slice(0, -1).join(".");
+        const parentNode = lookup[parentPath];
+
+        if (parentNode) {
+          parentNode.children.push(lookup[node.path]);
+        }
+      });
+
+      tree.value = lookup["root"];
+    }
 
     return data;
   }
@@ -97,27 +128,19 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  function nextSlides() {
-    currentSlidesIndex.value++;
-  }
-
-  function prevSlides() {
-    currentSlidesIndex.value--;
-  }
-
   return {
     slides,
     currentSlides,
     currentSlidesIndex,
-    nodes,
+    tree,
     selectedNode,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,
-    fetchAllNodes,
-    insertNewNode,
     fetchAllSlides,
     nextSlides,
     prevSlides,
+    fetchAllNodes,
+    insertNewNode,
   };
 });
