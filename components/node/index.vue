@@ -37,7 +37,7 @@
       </p>
     </button>
     <ul ref="nested" v-if="isGroup && node.children">
-      <AtelierHierarchyTreeNode
+      <Node
         v-for="child in node.children"
         :data-path="child.path"
         :data-type="child.type"

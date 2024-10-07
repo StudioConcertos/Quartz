@@ -7,10 +7,10 @@
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
     <AtelierToolbar :title="deck.title" />
     <div class="flex flex-1">
-      <aside class="inspector">
+      <aside class="editor">
         <AtelierHierarchy />
         <div class="whitespace"></div>
-        <AtelierProperties />
+        <AtelierInspector />
       </aside>
       <AtelierPreview />
     </div>
@@ -18,7 +18,7 @@
 </template>
 
 <style scoped lang="postcss">
-.inspector {
+.editor {
   @apply bg-dark-500 w-2xl p-[2.5ch];
   @apply border-solid border-0 border-r-2 border-dark-200;
   @apply flex flex-col;
@@ -28,7 +28,7 @@
     which prevents the last element not being scrollable.
   */
   .hierarchy,
-  .properties {
+  .inspector {
     @apply flex-1 overflow-y-hidden pb-10;
   }
 }

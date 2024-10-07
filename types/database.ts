@@ -1,6 +1,40 @@
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
+
 export type Database = {
   public: {
     Tables: {
+      components: {
+        Row: {
+          data: Json | null;
+          node: string;
+          type: Database["public"]["Enums"]["componenttype"];
+        };
+        Insert: {
+          data?: Json | null;
+          node: string;
+          type: Database["public"]["Enums"]["componenttype"];
+        };
+        Update: {
+          data?: Json | null;
+          node?: string;
+          type?: Database["public"]["Enums"]["componenttype"];
+        };
+        Relationships: [
+          {
+            foreignKeyName: "components_node_fkey";
+            columns: ["node"];
+            isOneToOne: false;
+            referencedRelation: "nodes";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       decks: {
         Row: {
           id: string;
@@ -52,7 +86,7 @@ export type Database = {
           path: string;
           reference: string | null;
           slides: string;
-          type: Database["public"]["Enums"]["type"];
+          type: Database["public"]["Enums"]["nodetype"];
         };
         Insert: {
           id?: string;
@@ -60,7 +94,7 @@ export type Database = {
           path: string;
           reference?: string | null;
           slides: string;
-          type: Database["public"]["Enums"]["type"];
+          type: Database["public"]["Enums"]["nodetype"];
         };
         Update: {
           id?: string;
@@ -68,7 +102,7 @@ export type Database = {
           path?: string;
           reference?: string | null;
           slides?: string;
-          type?: Database["public"]["Enums"]["type"];
+          type?: Database["public"]["Enums"]["nodetype"];
         };
         Relationships: [
           {
@@ -120,7 +154,8 @@ export type Database = {
       };
     };
     Enums: {
-      type: "text" | "group";
+      componenttype: "animation" | "text" | "transform";
+      nodetype: "text" | "group";
     };
     CompositeTypes: {
       [_ in never]: never;

@@ -1,10 +1,6 @@
 <template>
   <ul class="tree">
-    <AtelierHierarchyTreeNode
-      data-path="root"
-      data-type="group"
-      :node="nodes"
-    />
+    <Node data-path="root" data-type="group" :node="nodes" />
   </ul>
 </template>
 

@@ -94,7 +94,7 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (data) {
       // Converts the data array into a hierachical tree.
-      const lookup: Record<string, { children: TNode[] } & TNode> = {};
+      const lookup: Record<string, { children: TreeNode[] } & TreeNode> = {};
 
       data.forEach((node) => {
         lookup[node.path] = { ...node, children: [] };
@@ -113,7 +113,7 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  async function insertNewNode(slides: string, name: string, type: TType) {
+  async function insertNewNode(slides: string, name: string, type: NodeType) {
     const { data, error } = await client
       .from("nodes")
       .insert({

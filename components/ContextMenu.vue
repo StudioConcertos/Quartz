@@ -26,9 +26,10 @@
 
   button {
     @apply w-full h-12 cursor-pointer transition-colors;
+    @apply hover-bg-light-200 hover-text-dark-900;
 
-    &:hover {
-      @apply bg-light-200 text-dark-900;
+    &:not(:last-child) {
+      @apply border-solid border-0 border-b-1 border-dark-200;
     }
   }
 }

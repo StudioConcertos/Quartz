@@ -1,7 +1,7 @@
 <template>
   <div class="hierarchy" @keydown.esc="selectedNode = null">
     <h3>
-      Inspector
+      Hierarchy
       <div class="actions">
         <Tooltip description="New node">
           <button @click="dialog?.showModal()">
@@ -98,7 +98,7 @@ function insertNewNode() {
   useDeckStore().insertNewNode(
     `${currentSlides.value.id}`,
     `${nodeName.value}`,
-    nodeType.value as TType
+    nodeType.value as NodeType
   );
 
   dialog.value?.close();

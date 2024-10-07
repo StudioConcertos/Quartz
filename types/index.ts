@@ -1,10 +1,12 @@
 export type TSlides = Database["public"]["Tables"]["slides"]["Row"];
-export type TNode = Database["public"]["Tables"]["nodes"]["Row"];
-export type TType = Database["public"]["Enums"]["type"];
 
-export type Tree = TNode & {
+export type Tree = TreeNode & {
   children?: Tree[];
 };
+export type TreeNode = Database["public"]["Tables"]["nodes"]["Row"];
+
+export type NodeType = Database["public"]["Enums"]["nodetype"];
+export type ComponentType = Database["public"]["Enums"]["componenttype"];
 
 export interface ContextMenuItem {
   label: string;
