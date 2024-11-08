@@ -22,6 +22,8 @@ export const useAuthStore = defineStore("auth", () => {
   async function signOut() {
     await client.auth.signOut();
 
+    user.value = null;
+
     navigateTo("/", { replace: true });
   }
 

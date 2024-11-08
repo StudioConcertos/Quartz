@@ -11,7 +11,7 @@
     it prevents the tree to overflow,
     and also makes it responsive to different screen heights.
 
-    (100vh / Number of elements inside the inspector)
+    (100vh / Amount of views inside the inspector)
   */
   @apply list-none h-full max-h-[50vh] overflow-y-auto;
 }

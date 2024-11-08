@@ -18,6 +18,10 @@
   @apply bg-dark-800 text-light-200;
 }
 
+.view {
+  @apply overflow-y-auto;
+}
+
 .placeholder {
   @apply flex flex-col justify-center items-center text-4;
 
