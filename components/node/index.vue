@@ -41,6 +41,7 @@
         v-for="child in node.children"
         :data-path="child.path"
         :data-type="child.type"
+        :id="child.id"
         :node="child"
         @contextmenu.prevent="
           useContextMenu().open($event, [
@@ -126,7 +127,7 @@ function toggleNode(event: Event) {
 }
 
 function toggleGroup() {
-  if (!isGroup) return;
+  if (!isGroup.value) return;
 
   icon.value?.classList.toggle("-rotate-90");
   nested.value?.classList.toggle("hidden");

@@ -3,7 +3,10 @@
     <h3>
       Inspector
       <div class="actions">
-        <Tooltip description="New component">
+        <Tooltip
+          :class="{ disabled: !useDeckStore().selectedNode }"
+          description="Add component"
+        >
           <button @click="">
             <div class="i-carbon-new-tab"></div>
           </button>

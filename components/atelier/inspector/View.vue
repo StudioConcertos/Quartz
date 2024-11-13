@@ -1,8 +1,11 @@
 <template>
   <div v-if="useDeckStore().selectedNode" class="view" @contextmenu.prevent>
-    <NodeComponentBase />
-    <NodeComponentTransform :data="{}" />
-    <NodeComponentText :data="{}" />
+    <Component
+      v-for="component in components"
+      :key="component.type"
+      :is="resolvedComponents[component.type]"
+      :data="component.data"
+    />
   </div>
   <div v-else class="placeholder" @contextmenu.prevent>
     <div class="i-carbon-error"></div>
@@ -30,3 +33,17 @@
   }
 }
 </style>
+
+<script setup lang="ts">
+const deckStore = useDeckStore();
+
+// @ts-ignore (Type instantiation is excessively deep and possibly infinite.)
+const components = computed(() => deckStore.selectedNodeComponents);
+
+const resolvedComponents = {
+  animation: resolveComponent("NodeComponentAnimation"),
+  base: resolveComponent("NodeComponentBase"),
+  text: resolveComponent("NodeComponentText"),
+  transform: resolveComponent("NodeComponentTransform"),
+};
+</script>

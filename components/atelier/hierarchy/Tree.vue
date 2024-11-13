@@ -1,6 +1,6 @@
 <template>
   <ul class="tree">
-    <Node data-path="root" data-type="group" :node="nodes" />
+    <Node :id="nodes.id" data-path="root" data-type="group" :node="nodes" />
   </ul>
 </template>
 

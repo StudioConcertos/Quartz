@@ -31,7 +31,8 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-input {
+input,
+textarea {
   @apply bg-transparent border-none transition-colors;
   @apply text-light-200 py-4 text-sm;
   @apply border-solid border-0 border-b-1;
@@ -68,8 +69,12 @@ select {
   }
 }
 
+textarea {
+  @apply resize-none;
+}
+
 .disabled {
-  @apply opacity-50 pointer-events-none;
+  @apply opacity-50 pointer-events-none transition-opacity;
 }
 
 .fade-enter-from {

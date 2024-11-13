@@ -1,7 +1,5 @@
 <template>
-  <NodeComponent>
-    <h4>TRANSFORM:</h4>
-    <div class="whitespace"></div>
+  <NodeComponent name="transform">
     <div class="row">
       <div class="column">
         <p>x:</p>
@@ -25,12 +23,3 @@
     </div>
   </NodeComponent>
 </template>
-
-<script setup lang="ts">
-const props = defineProps({
-  data: {
-    type: Object,
-    required: true,
-  },
-});
-</script>

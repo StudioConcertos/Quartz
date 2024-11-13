@@ -1,5 +1,5 @@
 <template>
-  <NodeComponent name="base">
+  <NodeComponent name="animation">
     <div class="row">
       <div class="column">
         <p>reference:</p>

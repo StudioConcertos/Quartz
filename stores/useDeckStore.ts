@@ -1,3 +1,5 @@
+// TODO: Refactor this whole mess.
+
 export const useDeckStore = defineStore("deck", () => {
   const client = useSupabaseClient<Database>();
 
@@ -15,6 +17,19 @@ export const useDeckStore = defineStore("deck", () => {
   });
 
   const selectedNode = ref<HTMLLIElement | null>();
+  const selectedNodeComponents = ref<TComponents[]>([]);
+
+  watchEffect(async () => {
+    if (!selectedNode.value?.id) {
+      selectedNodeComponents.value = [];
+
+      return;
+    }
+
+    const data = await fetchNodeComponents(selectedNode.value.id);
+
+    selectedNodeComponents.value = data || [];
+  });
 
   async function fetchAllDecks() {
     const { data, error } = await client
@@ -154,12 +169,25 @@ export const useDeckStore = defineStore("deck", () => {
     }
   }
 
+  async function fetchNodeComponents(node: string) {
+    const { data, error } = await client
+      .from("components")
+      .select("*")
+      .eq("node", node)
+      .order("type", { ascending: true });
+
+    if (error) throw error;
+
+    return data;
+  }
+
   return {
     slides,
     currentSlides,
     currentSlidesIndex,
     nodes,
     selectedNode,
+    selectedNodeComponents,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,
@@ -169,5 +197,6 @@ export const useDeckStore = defineStore("deck", () => {
     fetchAllNodes,
     insertNewNode,
     deleteSelectedNode,
+    fetchNodeComponents,
   };
 });

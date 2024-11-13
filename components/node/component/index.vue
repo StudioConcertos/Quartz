@@ -1,5 +1,7 @@
 <template>
   <div class="component">
+    <h4>{{ props.name.toUpperCase() }}:</h4>
+    <div class="whitespace"></div>
     <slot />
   </div>
 </template>
@@ -13,11 +15,7 @@
     @apply flex;
 
     .column {
-      @apply flex items-center;
-
-      input {
-        @apply p-0 ml-2 w-12 text-center;
-      }
+      @apply flex;
     }
   }
 }
@@ -28,10 +26,15 @@
 
 .component:deep(.row) {
   .column {
-    @apply flex items-center;
+    @apply flex items-start w-full;
 
-    input {
-      @apply p-0 ml-2 w-12 text-center;
+    input,
+    textarea {
+      @apply p-0 ml-2 w-12;
+    }
+
+    textarea {
+      @apply w-full;
     }
   }
 
@@ -40,3 +43,12 @@
   }
 }
 </style>
+
+<script setup lang="ts">
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+});
+</script>
