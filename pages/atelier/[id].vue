@@ -12,14 +12,19 @@
         <div class="whitespace"></div>
         <AtelierInspector />
       </aside>
-      <AtelierPreview />
+      <div class="flex flex-1 flex-col">
+        <div class="px-40 h-[80vh] flex items-center">
+          <AtelierRender />
+        </div>
+        <AtelierTimeline />
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped lang="postcss">
 .editor {
-  @apply bg-dark-500 w-2xl p-[2.5ch];
+  @apply bg-dark-500 w-[30vw] p-[2.5ch];
   @apply border-solid border-0 border-r-2 border-dark-200;
   @apply flex flex-col;
 

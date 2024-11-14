@@ -3,6 +3,7 @@
     <h4>{{ props.name.toUpperCase() }}:</h4>
     <div class="whitespace"></div>
     <slot />
+    <div class="whitespace"></div>
   </div>
 </template>
 

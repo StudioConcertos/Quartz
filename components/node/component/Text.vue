@@ -6,6 +6,5 @@
         <textarea rows="3" />
       </div>
     </div>
-    <div class="whitespace"></div>
   </NodeComponent>
 </template>

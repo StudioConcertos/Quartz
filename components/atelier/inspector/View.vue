@@ -1,5 +1,5 @@
 <template>
-  <div v-if="useDeckStore().selectedNode" class="view" @contextmenu.prevent>
+  <div v-if="selectedNode" class="view" @contextmenu.prevent>
     <Component
       v-for="component in components"
       :key="component.type"
@@ -35,10 +35,9 @@
 </style>
 
 <script setup lang="ts">
-const deckStore = useDeckStore();
+const { selectedNode, selectedNodeComponents } = storeToRefs(useDeckStore());
 
-// @ts-ignore (Type instantiation is excessively deep and possibly infinite.)
-const components = computed(() => deckStore.selectedNodeComponents);
+const components = computed(() => selectedNodeComponents.value);
 
 const resolvedComponents = {
   animation: resolveComponent("NodeComponentAnimation"),

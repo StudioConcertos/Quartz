@@ -6,12 +6,14 @@
       @click="toggleNode"
       @dblclick="toggleGroup"
       @contextmenu.prevent="
+        toggleNode($event);
+
         useContextMenu().open($event, [
           {
             label: 'Rename',
             action: () => {},
           },
-        ])
+        ]);
       "
       @keydown.delete="deckStore.deleteSelectedNode()"
     >
