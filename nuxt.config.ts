@@ -1,9 +1,4 @@
 export default defineNuxtConfig({
-  app: {
-    head: {
-      title: "Quartz",
-    },
-  },
   devtools: {
     enabled: true,
     timeline: {

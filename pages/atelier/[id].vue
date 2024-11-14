@@ -69,10 +69,19 @@ onMounted(() => {
     .on(
       "postgres_changes",
       {
-        event: "*",
+        event: "INSERT",
         schema: "public",
         table: "slides",
         filter: `deck=eq.${deck.value?.id}`,
+      },
+      () => refreshSlides()
+    )
+    .on(
+      "postgres_changes",
+      {
+        event: "DELETE",
+        schema: "public",
+        table: "slides",
       },
       () => refreshSlides()
     )

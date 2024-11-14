@@ -90,6 +90,20 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
+  async function insertNewSlides(deck: string) {
+    const { data, error } = await client
+      .from("slides")
+      .insert({
+        deck: deck,
+        index: slides.value.length,
+      })
+      .select();
+
+    if (error) throw error;
+
+    return data;
+  }
+
   function nextSlides() {
     currentSlidesIndex.value++;
   }
@@ -192,6 +206,7 @@ export const useDeckStore = defineStore("deck", () => {
     fetchDeck,
     insertNewDeck,
     fetchAllSlides,
+    insertNewSlides,
     nextSlides,
     prevSlides,
     fetchAllNodes,
