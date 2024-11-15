@@ -2,7 +2,8 @@ export type TSlides = Database["public"]["Tables"]["slides"]["Row"];
 export type TComponents = Database["public"]["Tables"]["components"]["Row"];
 
 export type Tree = TreeNode & {
-  children?: Tree[];
+  children: Tree[];
+  components: TComponents[];
 };
 export type TreeNode = Database["public"]["Tables"]["nodes"]["Row"];
 

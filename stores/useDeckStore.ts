@@ -9,40 +9,30 @@ export const useDeckStore = defineStore("deck", () => {
 
   const EMPTY_TREE: Tree = {
     id: "",
+    slides: "",
     name: "",
     path: "",
-    reference: "",
-    slides: "",
     type: "group",
+    reference: "",
+    children: [],
+    components: [],
   };
 
-  const nodes = ref<Tree>(EMPTY_TREE);
+  const tree = ref<Tree>(EMPTY_TREE);
 
   const selectedNode = ref<HTMLLIElement | null>();
-  const selectedNodeComponents = ref<TComponents[]>([]);
 
   // Fetch nodes when the current slides change.
   watchEffect(async () => {
     if (!currentSlides.value) {
-      nodes.value = EMPTY_TREE;
+      tree.value = EMPTY_TREE;
 
       return;
     }
+
+    selectedNode.value = null;
 
     await fetchAllNodes();
-  });
-
-  // Fetch components when the selected node changes.
-  watchEffect(async () => {
-    if (!selectedNode.value?.id) {
-      selectedNodeComponents.value = [];
-
-      return;
-    }
-
-    const data = await fetchNodeComponents(selectedNode.value.id);
-
-    selectedNodeComponents.value = data || [];
   });
 
   async function fetchAllDecks() {
@@ -128,11 +118,19 @@ export const useDeckStore = defineStore("deck", () => {
     if (error) throw error;
 
     if (data) {
-      // Converts the data array into a hierachical tree.
-      const lookup: Record<string, { children: TreeNode[] } & TreeNode> = {};
+      const lookup: Record<string, Tree> = {};
 
-      data.forEach((node) => {
-        lookup[node.path] = { ...node, children: [] };
+      const components = await Promise.all(
+        data.map((node) => fetchNodeComponents(node.id))
+      );
+
+      // Converts the data array into a hierachical tree.
+      data.forEach((node, index) => {
+        lookup[node.path] = {
+          ...node,
+          children: [] as Tree[],
+          components: components[index],
+        } as Tree;
 
         const parentPath = node.path.split(".").slice(0, -1).join(".");
         const parentNode = lookup[parentPath];
@@ -142,7 +140,7 @@ export const useDeckStore = defineStore("deck", () => {
         }
       });
 
-      nodes.value = lookup["root"];
+      tree.value = lookup["root"];
     }
 
     return data;
@@ -205,9 +203,8 @@ export const useDeckStore = defineStore("deck", () => {
     slides,
     currentSlides,
     currentSlidesIndex,
-    nodes,
+    tree,
     selectedNode,
-    selectedNodeComponents,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,

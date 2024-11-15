@@ -1,11 +1,11 @@
 <template>
   <ul class="tree">
     <Node
-      v-if="nodes"
-      :id="nodes.id"
+      v-if="tree"
+      :id="tree.id"
       data-path="root"
       data-type="group"
-      :node="nodes"
+      :node="tree"
     />
   </ul>
 </template>
@@ -28,7 +28,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 
 const client = useSupabaseClient<Database>();
 
-const { nodes } = storeToRefs(useDeckStore());
+const { tree } = storeToRefs(useDeckStore());
 
 let nodesRC: RealtimeChannel;
 

@@ -35,14 +35,32 @@
 </style>
 
 <script setup lang="ts">
-const { selectedNode, selectedNodeComponents } = storeToRefs(useDeckStore());
+const { tree, selectedNode } = storeToRefs(useDeckStore());
 
-const components = computed(() => selectedNodeComponents.value);
-
+// TODO: Refactor this.
 const resolvedComponents = {
   animation: resolveComponent("NodeComponentAnimation"),
   base: resolveComponent("NodeComponentBase"),
   text: resolveComponent("NodeComponentText"),
   transform: resolveComponent("NodeComponentTransform"),
 };
+
+const components = computed<TComponents[]>(() => {
+  if (!selectedNode.value?.id) return [];
+
+  // @ts-expect-error
+  return searchNodeComponents(tree.value, selectedNode.value.id);
+});
+
+function searchNodeComponents(tree: Tree, id: string): TComponents[] {
+  if (tree.id === id) return tree.components;
+
+  for (const child of tree.children || []) {
+    const components = searchNodeComponents(child, id);
+
+    if (components.length) return components;
+  }
+
+  return [];
+}
 </script>
