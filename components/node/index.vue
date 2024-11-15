@@ -1,7 +1,7 @@
 <template>
   <li class="node">
     <button
-      :class="{ selected: selectedNode === $el }"
+      :class="{ selected: selectedNode?.id === node.id }"
       class="primaryButton"
       @click="toggleNode"
       @dblclick="toggleGroup"

@@ -7,18 +7,32 @@ export const useDeckStore = defineStore("deck", () => {
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
   const currentSlidesIndex = ref<number>(0);
 
-  const nodes = ref<Tree>({
+  const EMPTY_TREE: Tree = {
     id: "",
     name: "",
     path: "",
     reference: "",
     slides: "",
     type: "group",
-  });
+  };
+
+  const nodes = ref<Tree>(EMPTY_TREE);
 
   const selectedNode = ref<HTMLLIElement | null>();
   const selectedNodeComponents = ref<TComponents[]>([]);
 
+  // Fetch nodes when the current slides change.
+  watchEffect(async () => {
+    if (!currentSlides.value) {
+      nodes.value = EMPTY_TREE;
+
+      return;
+    }
+
+    await fetchAllNodes();
+  });
+
+  // Fetch components when the selected node changes.
   watchEffect(async () => {
     if (!selectedNode.value?.id) {
       selectedNodeComponents.value = [];
@@ -102,14 +116,6 @@ export const useDeckStore = defineStore("deck", () => {
     if (error) throw error;
 
     return data;
-  }
-
-  function nextSlides() {
-    currentSlidesIndex.value++;
-  }
-
-  function prevSlides() {
-    currentSlidesIndex.value--;
   }
 
   async function fetchAllNodes() {
@@ -207,8 +213,6 @@ export const useDeckStore = defineStore("deck", () => {
     insertNewDeck,
     fetchAllSlides,
     insertNewSlides,
-    nextSlides,
-    prevSlides,
     fetchAllNodes,
     insertNewNode,
     deleteSelectedNode,

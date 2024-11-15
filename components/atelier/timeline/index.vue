@@ -1,7 +1,11 @@
 <template>
   <div class="timeline">
     <TransitionGroup name="list">
-      <AtelierTimelineFrame v-for="slide in slides" :key="slide.id" />
+      <AtelierTimelineFrame
+        v-for="slide in slides"
+        :key="slide.id"
+        :index="slide.index"
+      />
       <button
         key="new"
         :class="{ 'opacity-100! cursor-not-allowed': isLoading }"
@@ -15,8 +19,9 @@
 
 <style scoped lang="postcss">
 .timeline {
-  @apply flex flex-1 overflow-x-auto scroll-smooth;
+  @apply flex flex-1 scroll-smooth;
   @apply bg-dark-800 w-full p-8;
+  @apply overflow-x-auto overflow-y-hidden;
   @apply border-solid border-0 border-t-2 border-dark-200;
 
   .list-move,

@@ -1,6 +1,12 @@
 <template>
   <ul class="tree">
-    <Node :id="nodes.id" data-path="root" data-type="group" :node="nodes" />
+    <Node
+      v-if="nodes"
+      :id="nodes.id"
+      data-path="root"
+      data-type="group"
+      :node="nodes"
+    />
   </ul>
 </template>
 
@@ -26,17 +32,13 @@ const { nodes } = storeToRefs(useDeckStore());
 
 let nodesRC: RealtimeChannel;
 
-const { refresh: refreshNodes } = await useAsyncData(
-  async () => await useDeckStore().fetchAllNodes()
-);
-
 onMounted(() => {
   nodesRC = client
     .channel("public:nodes")
     .on(
       "postgres_changes",
       { event: "*", schema: "public", table: "nodes" },
-      () => refreshNodes()
+      () => useDeckStore().fetchAllNodes()
     )
     .subscribe();
 });
