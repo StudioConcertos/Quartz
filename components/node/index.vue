@@ -1,7 +1,7 @@
 <template>
   <li class="node">
     <button
-      :class="{ selected: selectedNode?.id === node.id }"
+      :class="{ selected: isSelected }"
       class="primaryButton"
       @click="toggleNode"
       @dblclick="toggleGroup"
@@ -31,7 +31,7 @@
       <p
         v-if="props.node.reference"
         :class="{
-          'opacity-0': selectedNode !== $el,
+          'opacity-0': !isSelected,
         }"
         class="reference"
       >
@@ -110,6 +110,9 @@ const props = defineProps({
   },
 });
 
+const isSelected = computed(() => {
+  return selectedNode.value?.id === props.node.id;
+});
 const isGroup = computed(() => {
   return props.node.type === "group";
 });
