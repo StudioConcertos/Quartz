@@ -31,6 +31,10 @@ dialog::backdrop {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
+img {
+  @apply select-none;
+}
+
 input,
 textarea {
   @apply bg-transparent border-none transition-colors;
@@ -73,6 +77,10 @@ textarea {
   @apply resize-none;
 }
 
+.absolute-center {
+  @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
 .disabled {
   @apply opacity-50 pointer-events-none transition-opacity;
 }
@@ -86,7 +94,7 @@ textarea {
 }
 
 .fade-enter-active {
-  @apply transition-opacity;
+  @apply transition-opacity duration-500;
 }
 
 .primaryButton {

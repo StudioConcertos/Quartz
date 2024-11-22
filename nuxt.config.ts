@@ -9,10 +9,12 @@ export default defineNuxtConfig({
     dirs: ["types/*.ts"],
   },
   modules: [
+    "@nuxt/image",
     "@nuxtjs/supabase",
     "@pinia/nuxt",
     "@tresjs/nuxt",
     "@unocss/nuxt",
+    "@vee-validate/nuxt",
     "@vueuse/nuxt",
   ],
   supabase: {

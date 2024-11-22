@@ -5,7 +5,7 @@
     </div>
     <button @click="useAuthStore().signOut()" class="primaryButton signOut">
       <div class="i-carbon-exit mr-4"></div>
-      Sign out
+      Sign Out
     </button>
   </aside>
 </template>

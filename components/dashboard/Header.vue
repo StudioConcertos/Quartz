@@ -2,8 +2,8 @@
   <div class="header">
     <p>Decks:</p>
     <button @click="useDeckStore().insertNewDeck()" class="primaryButton">
-      <div class="i-carbon-add mr-4"></div>
       New Deck
+      <div class="i-carbon-add ml-2 mr--2"></div>
     </button>
   </div>
 </template>
