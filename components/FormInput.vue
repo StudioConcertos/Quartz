@@ -1,0 +1,32 @@
+<template>
+  <Field v-slot="{ field, meta }" :name="props.name">
+    <input
+      v-bind="field"
+      :class="[
+        'w-full transition-border-color duration-300',
+        { 'border-light-200': meta.valid && meta.touched },
+      ]"
+      :type="props.type"
+      :placeholder="props.placeholder"
+      autocomplete="off"
+    />
+    <ErrorMessage :name="props.name" />
+  </Field>
+</template>
+
+<script setup lang="ts">
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
+  placeholder: {
+    type: String,
+    required: true,
+  },
+});
+</script>
