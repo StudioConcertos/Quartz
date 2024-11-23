@@ -8,24 +8,41 @@ export const useAuthStore = defineStore("auth", () => {
 
   client.auth.onAuthStateChange((event, session) => {
     user.value = session?.user || null;
+
+    if (event === "SIGNED_IN") {
+      navigateTo("/atelier", { replace: true });
+    } else if (event === "SIGNED_OUT") {
+      navigateTo("/auth", { replace: true });
+    }
   });
 
-  async function signIn() {
-    await client.auth.signInWithOAuth({
-      provider: "github",
-      options: {
-        redirectTo: `${window.location.origin}/atelier`,
-      },
+  async function register(email: string, password: string) {
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
     });
+
+    if (error) throw error;
+
+    return data;
+  }
+
+  async function signIn(email: string, password: string) {
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+
+    return data;
   }
 
   async function signOut() {
     await client.auth.signOut();
 
     user.value = null;
-
-    navigateTo("/", { replace: true });
   }
 
-  return { user, isSignedIn, signIn, signOut };
+  return { user, isSignedIn, register, signIn, signOut };
 });

@@ -1,5 +1,5 @@
 <template>
-  <Form :validation-schema="loginSchema" @submit="console.log($event)">
+  <form @submit="onSubmit">
     <h2 class="text-center text-3xl">Welcome back!</h2>
     <div class="whitespace"></div>
     <div class="flex flex-col gap-4">
@@ -11,7 +11,7 @@
       Sign In
       <div class="i-carbon-login ml-2" />
     </button>
-  </Form>
+  </form>
 </template>
 
 <script setup lang="ts">
@@ -22,7 +22,16 @@ const loginSchema = toTypedSchema(
     email: zod.string().email(),
     password: zod
       .string()
+      .trim()
       .min(8, { message: "Password must be at least 8 characters long" }),
   })
 );
+
+const { handleSubmit } = useForm({
+  validationSchema: loginSchema,
+});
+
+const onSubmit = handleSubmit((values) => {
+  useAuthStore().signIn(values.email, values.password);
+});
 </script>

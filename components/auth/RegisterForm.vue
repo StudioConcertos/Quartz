@@ -1,8 +1,9 @@
 <template>
-  <Form :validation-schema="registerSchema" @submit="console.log($event)">
+  <form @submit="onSubmit">
     <h2 class="text-center text-3xl">New here?</h2>
     <div class="whitespace"></div>
     <div class="flex flex-col gap-4">
+      <FormInput name="username" type="text" placeholder="Username" />
       <FormInput name="email" type="email" placeholder="Email" />
       <FormInput name="password" type="password" placeholder="Password" />
       <FormInput
@@ -16,29 +17,45 @@
       Register
       <div class="i-carbon-login ml-2" />
     </button>
-  </Form>
+  </form>
 </template>
 
 <script setup lang="ts">
 import zod from "zod";
 
+const baseSchema = zod.object({
+  username: zod.string().trim().min(1),
+  email: zod.string().email(),
+});
+
+const passwordSchema = zod
+  .object({
+    password: zod
+      .string()
+      .trim()
+      .min(8, { message: "Password must be at least 8 characters long" }),
+
+    confirmPassword: zod.string().trim().min(8, { message: "" }),
+  })
+  .superRefine((val, ctx) => {
+    if (val.password !== val.confirmPassword) {
+      ctx.addIssue({
+        code: zod.ZodIssueCode.custom,
+        message: "Passwords don't match",
+        path: ["confirmPassword"],
+      });
+    }
+  });
+
 const registerSchema = toTypedSchema(
-  zod
-    .object({
-      email: zod.string().email(),
-      password: zod
-        .string()
-        .min(8, { message: "Password must be at least 8 characters long" }),
-      confirmPassword: zod.string(),
-    })
-    .superRefine((val, ctx) => {
-      if (val.password !== val.confirmPassword) {
-        ctx.addIssue({
-          code: "custom",
-          message: "Passwords don't match",
-          path: ["confirmPassword"],
-        });
-      }
-    })
+  zod.intersection(baseSchema, passwordSchema)
 );
+
+const { handleSubmit } = useForm({
+  validationSchema: registerSchema,
+});
+
+const onSubmit = handleSubmit((values) => {
+  useAuthStore().register(values.email, values.password);
+});
 </script>
