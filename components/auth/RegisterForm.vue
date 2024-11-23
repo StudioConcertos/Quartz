@@ -13,10 +13,16 @@
       />
     </div>
     <div class="whitespace"></div>
-    <button type="submit" class="primaryButton py-4!">
+    <button
+      type="submit"
+      :class="{ disabled: !meta.valid }"
+      class="primaryButton py-4!"
+    >
       Register
       <div class="i-carbon-login ml-2" />
     </button>
+    <div class="whitespace"></div>
+    <p v-if="error" class="text-center text-red-500">ERROR: {{ error }}</p>
   </form>
 </template>
 
@@ -34,7 +40,6 @@ const passwordSchema = zod
       .string()
       .trim()
       .min(8, { message: "Password must be at least 8 characters long" }),
-
     confirmPassword: zod.string().trim().min(8, { message: "" }),
   })
   .superRefine((val, ctx) => {
@@ -51,11 +56,19 @@ const registerSchema = toTypedSchema(
   zod.intersection(baseSchema, passwordSchema)
 );
 
-const { handleSubmit } = useForm({
+const { handleSubmit, meta } = useForm({
   validationSchema: registerSchema,
 });
 
-const onSubmit = handleSubmit((values) => {
-  useAuthStore().register(values.email, values.password);
+const error = ref("");
+
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    error.value = "";
+
+    await useAuthStore().register(values.email, values.password);
+  } catch (err) {
+    error.value = (err as Error).message;
+  }
 });
 </script>
