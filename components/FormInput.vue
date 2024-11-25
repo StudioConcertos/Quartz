@@ -8,6 +8,7 @@
       ]"
       :type="props.type"
       :placeholder="props.placeholder"
+      :maxlength="props.maxlength"
       autocomplete="off"
     />
     <ErrorMessage :name="props.name" />
@@ -28,5 +29,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  maxlength: Number,
 });
 </script>

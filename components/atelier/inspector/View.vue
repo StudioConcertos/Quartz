@@ -45,14 +45,14 @@ const resolvedComponents = {
   transform: resolveComponent("NodeComponentTransform"),
 };
 
-const components = computed<TComponents[]>(() => {
+const components = computed<ComponentModel[]>(() => {
   if (!selectedNode.value?.id) return [];
 
   // @ts-expect-error
   return searchNodeComponents(tree.value, selectedNode.value.id);
 });
 
-function searchNodeComponents(tree: Tree, id: string): TComponents[] {
+function searchNodeComponents(tree: Tree, id: string): ComponentModel[] {
   if (tree.id === id) return tree.components;
 
   for (const child of tree.children || []) {

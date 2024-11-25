@@ -20,29 +20,25 @@
     <dialog ref="dialog">
       <h4>Create new node:</h4>
       <div class="whitespace" />
-      <form @submit.prevent="insertNewNode()" ref="form">
-        <input
-          v-model="nodeName"
-          ref="nodeNameInput"
-          class="px-1"
-          maxlength="20"
-          placeholder="Name"
-          type="text"
-          required
-        />
-        <select v-model="nodeType" required>
-          <option value="text">Text</option>
-          <option value="group">Group</option>
-        </select>
+      <form @submit="onSubmit">
+        <FormInput name="name" type="text" placeholder="Name" :maxlength="20" />
+        <Field name="type" v-slot="{ field }">
+          <select v-bind="field">
+            <option v-for="type in types.options" :value="type">
+              {{ type.charAt(0).toUpperCase() + type.slice(1) }}
+            </option>
+          </select>
+        </Field>
+        <button
+          type="submit"
+          :class="{ disabled: !meta.valid }"
+          class="primaryButton w-full text-sm mt-10"
+        >
+          Confirm
+        </button>
+        <div v-if="error" class="whitespace"></div>
+        <p v-if="error" class="text-center text-red-500">ERROR: {{ error }}</p>
       </form>
-      <div class="whitespace" />
-      <button
-        @click="insertNewNode()"
-        :class="{ disabled: !nodeNameInput?.value }"
-        class="primaryButton w-full text-sm"
-      >
-        Confirm
-      </button>
     </dialog>
   </div>
 </template>
@@ -76,38 +72,45 @@
 </style>
 
 <script setup lang="ts">
+import zod from "zod";
+
 const { currentSlides, selectedNode } = storeToRefs(useDeckStore());
 
 const dialog = ref<HTMLDialogElement>();
-const form = ref<HTMLFormElement>();
 
-const nodeName = ref<String>();
-const nodeType = ref<String>();
+const types = zod.enum(["text", "group"]);
 
-const nodeNameInput = ref<HTMLInputElement>();
+const nodeSchema = toTypedSchema(
+  zod.object({
+    name: zod.string().min(1),
+    type: zod.enum(types.options),
+  })
+);
 
-watch(nodeName, () => {
-  if (nodeName.value) {
-    nodeNameInput.value?.classList.add("border-light-200");
-  } else {
-    nodeNameInput.value?.classList.remove("border-light-200");
-  }
+const { handleSubmit, meta, resetForm } = useForm({
+  validationSchema: nodeSchema,
+  initialValues: {
+    type: types.options[0],
+  },
 });
 
-function insertNewNode() {
-  useDeckStore().insertNewNode(
-    `${currentSlides.value.id}`,
-    `${nodeName.value}`,
-    nodeType.value as NodeType
-  );
+const error = ref("");
 
-  dialog.value?.close();
+const onSubmit = handleSubmit(async (values) => {
+  try {
+    error.value = "";
 
-  nodeName.value = "";
-  nodeNameInput.value?.classList.remove("border-light-200");
-}
+    await useDeckStore().insertNewNode(
+      `${currentSlides.value.id}`,
+      `${values.name}`,
+      values.type
+    );
 
-onMounted(() => {
-  nodeType.value = "text";
+    dialog.value?.close();
+
+    resetForm();
+  } catch (err) {
+    error.value = (err as Error).message;
+  }
 });
 </script>
