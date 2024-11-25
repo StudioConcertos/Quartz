@@ -1,5 +1,5 @@
 <template>
-  <form @submit="onSubmit">
+  <form v-if="!hasRegistered" @submit="onSubmit">
     <h2 class="text-center text-3xl">New here?</h2>
     <div class="whitespace"></div>
     <div class="flex flex-col gap-4">
@@ -24,6 +24,9 @@
     <div class="whitespace"></div>
     <p v-if="error" class="text-center text-red-500">ERROR: {{ error }}</p>
   </form>
+  <div v-else class="text-center text-5">
+    <p>A verification email has been sent to your email address.</p>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -62,6 +65,8 @@ const { handleSubmit, meta } = useForm({
 
 const error = ref("");
 
+const hasRegistered = ref(false);
+
 const onSubmit = handleSubmit(async (values) => {
   try {
     error.value = "";
@@ -69,6 +74,8 @@ const onSubmit = handleSubmit(async (values) => {
     await useAuthStore().register(values.email, values.password, {
       username: values.username,
     });
+
+    hasRegistered.value = true;
   } catch (err) {
     error.value = (err as Error).message;
   }

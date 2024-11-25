@@ -9,6 +9,7 @@ export default defineNuxtConfig({
     dirs: ["types/*.ts"],
   },
   modules: [
+    "nuxt-resend",
     "@nuxt/image",
     "@nuxtjs/supabase",
     "@pinia/nuxt",
@@ -20,7 +21,7 @@ export default defineNuxtConfig({
   supabase: {
     redirectOptions: {
       login: "/auth",
-      callback: "/atelier/",
+      callback: "/auth/callback",
       exclude: ["/"],
     },
   },

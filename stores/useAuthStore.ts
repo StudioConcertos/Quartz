@@ -28,6 +28,7 @@ export const useAuthStore = defineStore("auth", () => {
         data: {
           username: options.username,
         },
+        emailRedirectTo: `${window.location.origin}/auth/callback`,
       },
     });
 

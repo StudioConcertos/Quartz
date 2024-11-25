@@ -23,6 +23,7 @@
     "@vueuse/integrations": "^10.11.1",
     "@vueuse/nuxt": "^10.11.1",
     "nuxt": "^3.13.2",
+    "nuxt-resend": "^0.0.2",
     "sortablejs": "^1.15.3",
     "supabase": "^1.192.5",
     "three": "^0.167.1",
