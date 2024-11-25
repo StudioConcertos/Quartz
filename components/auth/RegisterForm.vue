@@ -3,7 +3,12 @@
     <h2 class="text-center text-3xl">New here?</h2>
     <div class="whitespace"></div>
     <div class="flex flex-col gap-4">
-      <FormInput name="username" type="text" placeholder="Username" />
+      <FormInput
+        name="username"
+        type="text"
+        placeholder="Username"
+        :maxlength="20"
+      />
       <FormInput name="email" type="email" placeholder="Email" />
       <FormInput name="password" type="password" placeholder="Password" />
       <FormInput
@@ -33,7 +38,7 @@
 import zod from "zod";
 
 const baseSchema = zod.object({
-  username: zod.string().trim().min(1),
+  username: zod.string().trim().min(1, { message: "Required" }),
   email: zod.string().email(),
 });
 

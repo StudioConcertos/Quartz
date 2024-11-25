@@ -12,21 +12,24 @@
     </section>
     <section class="form">
       <Transition name="fade" mode="out-in">
-        <AuthSignInForm v-if="!isRegister" />
-        <AuthRegisterForm v-else />
+        <div :key="isRegister ? 'register' : 'signin'">
+          <AuthSignInForm v-if="!isRegister" />
+          <AuthRegisterForm v-else />
+          <div class="whitespace flex justify-center">
+            <button
+              type="button"
+              class="text-center underline text-lg"
+              @click="toggleForm"
+            >
+              {{
+                !isRegister
+                  ? "Don't have an account yet?"
+                  : "Already have an account?"
+              }}
+            </button>
+          </div>
+        </div>
       </Transition>
-      <div class="whitespace"></div>
-      <button
-        type="button"
-        class="underline text-lg mx-auto"
-        @click="toggleForm"
-      >
-        {{
-          !isRegister
-            ? "Don't have an account yet?"
-            : "Already have an account?"
-        }}
-      </button>
     </section>
   </div>
 </template>
