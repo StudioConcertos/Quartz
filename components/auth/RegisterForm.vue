@@ -66,7 +66,9 @@ const onSubmit = handleSubmit(async (values) => {
   try {
     error.value = "";
 
-    await useAuthStore().register(values.email, values.password);
+    await useAuthStore().register(values.email, values.password, {
+      username: values.username,
+    });
   } catch (err) {
     error.value = (err as Error).message;
   }

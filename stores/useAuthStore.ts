@@ -16,10 +16,19 @@ export const useAuthStore = defineStore("auth", () => {
     }
   });
 
-  async function register(email: string, password: string) {
+  async function register(
+    email: string,
+    password: string,
+    options: { username: string }
+  ) {
     const { data, error } = await client.auth.signUp({
       email,
       password,
+      options: {
+        data: {
+          username: options.username,
+        },
+      },
     });
 
     if (error) throw error;
