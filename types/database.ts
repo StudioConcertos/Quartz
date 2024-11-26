@@ -5,30 +5,28 @@ export type NodeModel = Database["public"]["Tables"]["nodes"]["Row"];
 export type NodeType = Database["public"]["Enums"]["nodetype"];
 export type ComponentType = Database["public"]["Enums"]["componenttype"];
 
-export type Json =
-  | string
-  | number
-  | boolean
-  | null
-  | { [key: string]: Json | undefined }
-  | Json[];
-
 export type Database = {
   public: {
     Tables: {
       components: {
         Row: {
-          data: Json | null;
+          data: {
+            [key: string]: any;
+          };
           node: string;
           type: Database["public"]["Enums"]["componenttype"];
         };
         Insert: {
-          data?: Json | null;
+          data?: {
+            [key: string]: any;
+          };
           node: string;
           type: Database["public"]["Enums"]["componenttype"];
         };
         Update: {
-          data?: Json | null;
+          data?: {
+            [key: string]: any;
+          };
           node?: string;
           type?: Database["public"]["Enums"]["componenttype"];
         };
@@ -161,7 +159,7 @@ export type Database = {
       };
     };
     Enums: {
-      componenttype: "animation" | "text" | "transform";
+      componenttype: "animation" | "base" | "text" | "transform";
       nodetype: "text" | "group";
     };
     CompositeTypes: {

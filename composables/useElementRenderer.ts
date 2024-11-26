@@ -7,7 +7,7 @@ export function useElementRenderer() {
           (component) => component.type === "text"
         );
 
-        return JSON.stringify(text?.data);
+        return text?.data.string;
       },
     },
     group: {

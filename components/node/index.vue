@@ -1,5 +1,5 @@
 <template>
-  <li class="node">
+  <li class="node" :data-reference="props.node.reference">
     <button
       :class="{ selected: isSelected }"
       class="primaryButton"

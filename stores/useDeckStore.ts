@@ -3,7 +3,7 @@
 export const useDeckStore = defineStore("deck", () => {
   const client = useSupabaseClient<Database>();
 
-  const slides = ref<TSlides[]>([]);
+  const slides = ref<SlidesModel[]>([]);
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
   const currentSlidesIndex = ref<number>(0);
 
@@ -22,6 +22,9 @@ export const useDeckStore = defineStore("deck", () => {
 
   const selectedNode = ref<HTMLLIElement | null>();
 
+  const components = ref<ComponentModel[]>([]);
+  const changedComponents = ref<ComponentModel[]>([]);
+
   // Fetch nodes when the current slides change.
   watchEffect(async () => {
     if (!currentSlides.value) {
@@ -30,10 +33,26 @@ export const useDeckStore = defineStore("deck", () => {
       return;
     }
 
+    if (changedComponents.value.length) {
+      await upsertComponents();
+    }
+
     selectedNode.value = null;
+    changedComponents.value = [];
 
     await fetchAllNodes();
   });
+
+  // Autosave the components.
+  watchDebounced(
+    changedComponents,
+    async (changes) => {
+      if (!changes.length) return;
+
+      await upsertComponents();
+    },
+    { debounce: 5000, deep: true }
+  );
 
   async function fetchAllDecks() {
     const { data, error } = await client
@@ -65,7 +84,11 @@ export const useDeckStore = defineStore("deck", () => {
       .from("decks")
       .insert({
         lapidarist: `${useAuthStore().user?.id}`,
-        title: "New Deck",
+        title: `Unnamed Deck (${
+          (
+            await fetchAllDecks()
+          ).filter((deck) => deck.title === "Unnamed Deck").length + 1
+        })`,
       })
       .select()
       .single();
@@ -120,17 +143,19 @@ export const useDeckStore = defineStore("deck", () => {
     if (data) {
       const lookup: Record<string, Tree> = {};
 
-      const components = await Promise.all(
+      const fetchedComponents = await Promise.all(
         data.map((node) => fetchNodeComponents(node.id))
       );
+
+      components.value = fetchedComponents.flat();
 
       // Converts the data array into a hierachical tree.
       data.forEach((node, index) => {
         lookup[node.path] = {
           ...node,
-          children: [] as Tree[],
-          components: components[index],
-        } as Tree;
+          children: [],
+          components: fetchedComponents[index],
+        };
 
         const parentPath = node.path.split(".").slice(0, -1).join(".");
         const parentNode = lookup[parentPath];
@@ -199,12 +224,35 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
+  async function updateNodeComponent(component: ComponentModel) {
+    const index = components.value.findIndex(
+      (c) => c.node === component.node && c.type === component.type
+    );
+
+    changedComponents.value.push(components.value[index]);
+  }
+
+  async function upsertComponents() {
+    const { error } = await client
+      .from("components")
+      .upsert(changedComponents.value, {
+        onConflict: "node, type",
+        ignoreDuplicates: false,
+      });
+
+    if (error) throw error;
+
+    changedComponents.value = [];
+  }
+
   return {
     slides,
     currentSlides,
     currentSlidesIndex,
     tree,
     selectedNode,
+    components,
+    changedComponents,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,
@@ -214,5 +262,6 @@ export const useDeckStore = defineStore("deck", () => {
     insertNewNode,
     deleteSelectedNode,
     fetchNodeComponents,
+    updateNodeComponent,
   };
 });
