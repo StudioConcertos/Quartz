@@ -10,7 +10,8 @@
 
 <style scoped lang="postcss">
 .frame {
-  @apply bg-light-200 aspect-video transition-opacity transform-gpu;
+  @apply bg-light-200 aspect-video min-w-[100px];
+  @apply transition-opacity transform-gpu;
 }
 </style>
 

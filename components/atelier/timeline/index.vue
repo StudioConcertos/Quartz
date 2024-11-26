@@ -47,7 +47,7 @@
   button {
     @apply aspect-video opacity-60 transition-opacity;
     @apply border-1 border-rd border-solid b-light-200;
-    @apply flex items-center justify-center;
+    @apply flex items-center justify-center min-w-[100px];
 
     div {
       @apply text-5xl! origin-center;
