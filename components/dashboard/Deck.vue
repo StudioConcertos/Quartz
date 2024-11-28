@@ -7,7 +7,7 @@
       useContextMenu().open($event, [
         {
           label: 'Delete',
-          action: () => {},
+          action: () => deleteDeck(props.id),
         },
       ])
     "
@@ -35,18 +35,11 @@
 </style>
 
 <script setup lang="ts">
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-  id: {
-    type: String,
-    required: true,
-  },
-  last_modified: {
-    type: String,
-    required: true,
-  },
-});
+const { deleteDeck } = useDeckStore();
+
+const props = defineProps<{
+  title: string;
+  id: string;
+  last_modified: string;
+}>();
 </script>

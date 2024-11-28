@@ -1,12 +1,12 @@
 <template>
-  <li class="node" :data-reference="props.node.reference">
+  <li class="node">
     <button
       :class="{ selected: isSelected }"
       class="primaryButton"
-      @click="toggleNode"
+      @click="selectNode(props.node)"
       @dblclick="toggleGroup"
       @contextmenu.prevent="
-        toggleNode($event);
+        selectNode(props.node);
 
         useContextMenu().open($event, [
           {
@@ -15,7 +15,6 @@
           },
         ]);
       "
-      @keydown.delete="deckStore.deleteSelectedNode()"
     >
       <div class="flex items-center pointer-events-none">
         <div
@@ -41,19 +40,22 @@
     <ul ref="nested" v-if="isGroup && node.children">
       <Node
         v-for="child in node.children"
-        :data-path="child.path"
-        :data-type="child.type"
-        :id="child.id"
         :node="child"
+        @keydown.delete="deckStore.deleteSelectedNode"
         @contextmenu.prevent="
           useContextMenu().open($event, [
             {
               label: 'Rename',
-              action: () => {},
+              action: () => {
+                console.log('rename');
+              },
             },
             {
               label: 'Delete',
-              action: () => deckStore.deleteSelectedNode(),
+              action: () => {
+                console.log('delete');
+                deckStore.deleteSelectedNode;
+              },
             },
           ])
         "
@@ -103,15 +105,12 @@ import { useSortable } from "@vueuse/integrations/useSortable";
 const deckStore = useDeckStore();
 const { selectedNode } = storeToRefs(useDeckStore());
 
-const props = defineProps({
-  node: {
-    type: Object as PropType<Tree>,
-    required: true,
-  },
-});
+const props = defineProps<{
+  node: Tree;
+}>();
 
 const isSelected = computed(() => {
-  return selectedNode.value?.id === props.node.id;
+  return selectedNode.value === props.node;
 });
 const isGroup = computed(() => {
   return props.node.type === "group";
@@ -120,15 +119,8 @@ const isGroup = computed(() => {
 const icon = ref<HTMLDivElement>();
 const nested = ref<HTMLUListElement>();
 
-useSortable(nested, [], {
-  animation: "200",
-  easing: "cubic-bezier(1, 0, 0, 1)",
-});
-
-function toggleNode(event: Event) {
-  const node = event.target as HTMLButtonElement;
-
-  selectedNode.value = node.parentElement as HTMLLIElement;
+function selectNode(node: Tree) {
+  selectedNode.value = node;
 }
 
 function toggleGroup() {
@@ -137,4 +129,9 @@ function toggleGroup() {
   icon.value?.classList.toggle("-rotate-90");
   nested.value?.classList.toggle("hidden");
 }
+
+useSortable(nested, [], {
+  animation: "200",
+  easing: "cubic-bezier(1, 0, 0, 1)",
+});
 </script>

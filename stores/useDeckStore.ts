@@ -15,41 +15,68 @@ export const useDeckStore = defineStore("deck", () => {
     type: "group",
     reference: "",
     children: [],
-    components: [],
   };
 
   const tree = ref<Tree>(EMPTY_TREE);
 
-  const selectedNode = ref<HTMLLIElement | null>();
+  const selectedNode = ref<Tree | null>(null);
 
   const components = ref<ComponentModel[]>([]);
-  const changedComponents = ref<ComponentModel[]>([]);
 
-  // Fetch nodes when the current slides change.
-  watchEffect(async () => {
-    if (!currentSlides.value) {
-      tree.value = EMPTY_TREE;
-
-      return;
-    }
-
-    if (changedComponents.value.length) {
-      await upsertComponents();
-    }
-
-    selectedNode.value = null;
-    changedComponents.value = [];
-
-    await fetchAllNodes();
+  const pendingChanges = ref<{
+    nodes: PendingNode[];
+    components: ComponentModel[];
+  }>({
+    nodes: [],
+    components: [],
   });
 
-  // Autosave the components.
-  watchDebounced(
-    changedComponents,
-    async (changes) => {
-      if (!changes.length) return;
+  // Fetch nodes when the current slides change.
+  watch(
+    currentSlides,
+    async () => {
+      // Upsert pending changes if any.
+      if (
+        pendingChanges.value.nodes.length ||
+        pendingChanges.value.components.length
+      ) {
+        await saveChanges();
+      }
 
-      await upsertComponents();
+      // Reset the tree.
+      if (!currentSlides.value) {
+        tree.value = EMPTY_TREE;
+
+        return;
+      }
+
+      await fetchAllNodes();
+    },
+    { immediate: true }
+  );
+
+  watch(currentSlidesIndex, async () => {
+    // Reset the selected node.
+    selectedNode.value = null;
+  });
+
+  watch(
+    () => pendingChanges.value.nodes,
+    async (pendingNodes) => {
+      if (!pendingNodes.length) return;
+
+      await fetchAllNodes();
+    },
+    { deep: true }
+  );
+
+  // Autosave nodes and components.
+  watchDebounced(
+    pendingChanges,
+    async (changes) => {
+      if (!changes.nodes.length && !changes.components.length) return;
+
+      await saveChanges();
     },
     { debounce: 5000, deep: true }
   );
@@ -84,11 +111,7 @@ export const useDeckStore = defineStore("deck", () => {
       .from("decks")
       .insert({
         lapidarist: `${useAuthStore().user?.id}`,
-        title: `Unnamed Deck (${
-          (
-            await fetchAllDecks()
-          ).filter((deck) => deck.title === "Unnamed Deck").length + 1
-        })`,
+        title: "Unnamed Deck",
       })
       .select()
       .single();
@@ -101,6 +124,14 @@ export const useDeckStore = defineStore("deck", () => {
         target: "_blank",
       },
     });
+  }
+
+  async function deleteDeck(id: string) {
+    const { data, error } = await client.from("decks").delete().eq("id", id);
+
+    if (error) throw error;
+
+    return data;
   }
 
   async function fetchAllSlides(deck: String | String[]) {
@@ -149,19 +180,32 @@ export const useDeckStore = defineStore("deck", () => {
 
       components.value = fetchedComponents.flat();
 
-      // Converts the data array into a hierachical tree.
-      data.forEach((node, index) => {
+      // Process database nodes.
+      data.forEach((node) => {
         lookup[node.path] = {
           ...node,
           children: [],
-          components: fetchedComponents[index],
         };
+      });
 
+      // Process pending nodes.
+      pendingChanges.value.nodes.forEach((node: PendingNode) => {
+        if (!node._deleted) {
+          lookup[node.path] = {
+            ...node,
+            children: [],
+          };
+        } else {
+          delete lookup[node.path];
+        }
+      });
+
+      Object.values(lookup).forEach((node) => {
         const parentPath = node.path.split(".").slice(0, -1).join(".");
         const parentNode = lookup[parentPath];
 
         if (parentNode) {
-          parentNode.children.push(lookup[node.path]);
+          parentNode.children.push(node);
         }
       });
 
@@ -172,45 +216,31 @@ export const useDeckStore = defineStore("deck", () => {
   }
 
   async function insertNewNode(slides: string, name: string, type: NodeType) {
-    const { data, error } = await client
-      .from("nodes")
-      .insert({
-        slides: slides.toString(),
-        name: name,
-        type: type,
-        path:
-          selectedNode.value?.dataset.type === "group"
-            ? `${selectedNode.value.dataset.path}.${name}`
-            : `root.${name}`,
-      })
-      .select();
-
-    if (error) throw error;
+    pendingChanges.value.nodes.push({
+      id: "",
+      slides: slides,
+      name: name,
+      path:
+        selectedNode.value?.type === "group"
+          ? `${selectedNode.value.path}.${name}`
+          : `root.${name}`,
+      type: type,
+      reference: "",
+    });
 
     selectedNode.value = null;
-
-    return data;
   }
 
   async function deleteSelectedNode() {
-    const node = selectedNode.value;
+    if (!selectedNode.value) return;
 
-    if (node) {
-      const path = node.dataset.path;
-
-      // Using an RPC because Supabase query sucks.
-      const { error } = await client.rpc("delete_node_and_children", {
-        node_path: path!,
-        slides_id: currentSlides.value.id,
-      });
-
-      if (error) {
-        throw error;
-      } else {
-        selectedNode.value = null;
-      }
-    }
+    pendingChanges.value.nodes.push({
+      ...selectedNode.value,
+      _deleted: true,
+    });
   }
+
+  function updateNode(node: Tree) {}
 
   async function fetchNodeComponents(node: string) {
     const { data, error } = await client
@@ -229,20 +259,66 @@ export const useDeckStore = defineStore("deck", () => {
       (c) => c.node === component.node && c.type === component.type
     );
 
-    changedComponents.value.push(components.value[index]);
+    pendingChanges.value.components.push(components.value[index]);
   }
 
-  async function upsertComponents() {
-    const { error } = await client
-      .from("components")
-      .upsert(changedComponents.value, {
-        onConflict: "node, type",
+  async function saveChanges() {
+    const nodesToUpsert = pendingChanges.value.nodes.filter(
+      (node) => node.id && !node._deleted
+    );
+    const nodesToInsert = pendingChanges.value.nodes.filter(
+      (node) => !node.id && !node._deleted
+    );
+    const nodesToDelete = pendingChanges.value.nodes.filter(
+      (node) => node._deleted
+    );
+
+    // Node update.
+    if (nodesToUpsert.length) {
+      const { error } = await client.from("nodes").upsert(nodesToUpsert, {
+        onConflict: "id",
         ignoreDuplicates: false,
       });
 
-    if (error) throw error;
+      if (error) throw error;
+    }
 
-    changedComponents.value = [];
+    // Node insert.
+    if (nodesToInsert.length) {
+      const { error } = await client
+        .from("nodes")
+        // Remove the id and _deleted.
+        .insert(nodesToInsert.map(({ id, _deleted, ...node }) => node));
+
+      if (error) throw error;
+    }
+
+    // Node delete.
+    if (nodesToDelete.length) {
+      const { error } = await client.rpc("delete_node_and_children", {
+        node_path: nodesToDelete[0].path,
+        slides_id: nodesToDelete[0].slides,
+      });
+
+      if (error) throw error;
+    }
+
+    // Component update.
+    if (pendingChanges.value.components.length) {
+      const { error } = await client
+        .from("components")
+        .upsert(pendingChanges.value.components, {
+          onConflict: "node, type",
+          ignoreDuplicates: false,
+        });
+
+      if (error) throw error;
+    }
+
+    pendingChanges.value = {
+      nodes: [],
+      components: [],
+    };
   }
 
   return {
@@ -252,16 +328,18 @@ export const useDeckStore = defineStore("deck", () => {
     tree,
     selectedNode,
     components,
-    changedComponents,
+    pendingChanges,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,
+    deleteDeck,
     fetchAllSlides,
     insertNewSlides,
     fetchAllNodes,
     insertNewNode,
     deleteSelectedNode,
     fetchNodeComponents,
+    updateNode,
     updateNodeComponent,
   };
 });

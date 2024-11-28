@@ -1,10 +1,12 @@
 export function useElementRenderer() {
+  const { components } = storeToRefs(useDeckStore());
+
   const handlers: Record<NodeType, ElementRenderer> = {
     text: {
       element: "p",
       render: (node: Tree) => {
-        const text = node.components.find(
-          (component) => component.type === "text"
+        const text = components.value.find(
+          (component) => component.type === "text" && component.node === node.id
         );
 
         return text?.data.string;

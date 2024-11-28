@@ -1,7 +1,7 @@
 <template>
   <div v-if="selectedNode" class="view" @contextmenu.prevent>
     <Component
-      v-for="component in components"
+      v-for="component in nodeComponents"
       :key="component.type"
       :is="resolvedComponents[component.type]"
       :component="component"
@@ -35,7 +35,7 @@
 </style>
 
 <script setup lang="ts">
-const { tree, selectedNode } = storeToRefs(useDeckStore());
+const { tree, selectedNode, components } = storeToRefs(useDeckStore());
 
 // TODO: Refactor this, if possible.
 const resolvedComponents = {
@@ -45,23 +45,13 @@ const resolvedComponents = {
   transform: resolveComponent("NodeComponentTransform"),
 };
 
-const components = computed<ComponentModel[]>(() => {
+const nodeComponents = computed<ComponentModel[]>(() => {
   if (!selectedNode.value?.id || !tree.value) return [];
 
-  return searchNodeComponents(tree.value, selectedNode.value.id);
+  return searchNodeComponents(selectedNode.value.id);
 });
 
-function searchNodeComponents(tree: Tree, id: string): ComponentModel[] {
-  if (tree.id === id) return tree.components;
-
-  if (tree.children) {
-    for (const child of tree.children) {
-      const components = searchNodeComponents(child, id);
-
-      if (components.length > 0) return components;
-    }
-  }
-
-  return [];
+function searchNodeComponents(node: string): ComponentModel[] {
+  return components.value.filter((component) => component.node === node);
 }
 </script>

@@ -82,7 +82,7 @@ const types = zod.enum(["text", "group"]);
 
 const nodeSchema = toTypedSchema(
   zod.object({
-    name: zod.string().min(1),
+    name: zod.string().min(1, "Required"),
     type: zod.enum(types.options),
   })
 );
