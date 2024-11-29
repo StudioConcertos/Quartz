@@ -232,12 +232,14 @@ export const useDeckStore = defineStore("deck", () => {
   }
 
   async function deleteSelectedNode() {
-    if (!selectedNode.value) return;
+    if (!selectedNode.value || selectedNode.value.path === "root") return;
 
     pendingChanges.value.nodes.push({
       ...selectedNode.value,
       _deleted: true,
     });
+
+    selectedNode.value = null;
   }
 
   function updateNode(node: Tree) {}
@@ -295,12 +297,14 @@ export const useDeckStore = defineStore("deck", () => {
 
     // Node delete.
     if (nodesToDelete.length) {
-      const { error } = await client.rpc("delete_node_and_children", {
-        node_path: nodesToDelete[0].path,
-        slides_id: nodesToDelete[0].slides,
-      });
+      for (const node of nodesToDelete) {
+        const { error } = await client.rpc("delete_node_and_children", {
+          node_path: node.path,
+          slides_id: node.slides,
+        });
 
-      if (error) throw error;
+        if (error) throw error;
+      }
     }
 
     // Component update.

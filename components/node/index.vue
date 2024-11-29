@@ -53,8 +53,7 @@
             {
               label: 'Delete',
               action: () => {
-                console.log('delete');
-                deckStore.deleteSelectedNode;
+                deckStore.deleteSelectedNode();
               },
             },
           ])
