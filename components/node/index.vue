@@ -5,27 +5,24 @@
       class="primaryButton"
       @click="selectNode(props.node)"
       @dblclick="toggleGroup"
-      @contextmenu.prevent="
-        selectNode(props.node);
-
-        useContextMenu().open($event, [
-          {
-            label: 'Rename',
-            action: () => {},
-          },
-        ]);
-      "
     >
-      <div class="flex items-center pointer-events-none">
+      <div class="flex items-center w-full">
         <div
           ref="icon"
           :class="
             isGroup ? 'i-carbon-caret-down' : 'i-carbon-text-short-paragraph'
           "
+          class="flex-shrink-0"
         ></div>
-        <p class="text-nowrap">
-          {{ props.node.name }}
-        </p>
+        <input
+          maxlength="30"
+          @keydown.enter.esc="($event.target as HTMLInputElement).blur()"
+          @click="selectNode(props.node)"
+          v-model.lazy="nodeName"
+          :style="isSelected ? 'width: 100%' : `width: ${nodeName.length}ch`"
+          :class="{ 'text-dark-900': isSelected }"
+          class="name"
+        />
       </div>
       <p
         v-if="props.node.reference"
@@ -41,19 +38,13 @@
       <Node
         v-for="child in node.children"
         :node="child"
-        @keydown.delete="deckStore.deleteSelectedNode"
+        @keydown.delete="deleteSelectedNode"
         @contextmenu.prevent="
           useContextMenu().open($event, [
             {
-              label: 'Rename',
-              action: () => {
-                console.log('rename');
-              },
-            },
-            {
               label: 'Delete',
               action: () => {
-                deckStore.deleteSelectedNode();
+                deleteSelectedNode();
               },
             },
           ])
@@ -78,14 +69,25 @@
       @apply text-xl mr-2;
     }
 
+    .name {
+      @apply p-0 border-none;
+      @apply text-sm text-nowrap;
+    }
+
     .reference {
-      @apply italic text-dark-900 mr-2;
+      @apply italic text-dark-900 mx-2;
       @apply transition-opacity;
     }
-  }
 
-  button:hover .reference {
-    @apply opacity-100;
+    &:hover {
+      .name {
+        @apply text-dark-900;
+      }
+
+      .reference {
+        @apply opacity-100;
+      }
+    }
   }
 
   ul {
@@ -101,12 +103,26 @@
 <script setup lang="ts">
 import { useSortable } from "@vueuse/integrations/useSortable";
 
-const deckStore = useDeckStore();
+const { deleteSelectedNode, updateNode } = useDeckStore();
 const { selectedNode } = storeToRefs(useDeckStore());
 
 const props = defineProps<{
   node: Tree;
 }>();
+
+const nodeName = computed({
+  get() {
+    return props.node.name;
+  },
+  set(value) {
+    if (value.length > 30 || !value.length) return props.node.name;
+
+    updateNode({
+      ...props.node,
+      name: value,
+    });
+  },
+});
 
 const isSelected = computed(() => {
   return selectedNode.value === props.node;

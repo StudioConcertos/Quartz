@@ -242,7 +242,12 @@ export const useDeckStore = defineStore("deck", () => {
     selectedNode.value = null;
   }
 
-  function updateNode(node: Tree) {}
+  // TODO: Multiple changes of the same node at once will cause a conflict.
+  function updateNode(tree: Tree) {
+    const { children, ...node } = tree;
+
+    pendingChanges.value.nodes.push(node);
+  }
 
   async function fetchNodeComponents(node: string) {
     const { data, error } = await client
