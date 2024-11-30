@@ -38,7 +38,7 @@
       <Node
         v-for="child in node.children"
         :node="child"
-        @keydown.delete="deleteSelectedNode"
+        @keydown.delete.stop="handleDelete"
         @contextmenu.prevent="
           useContextMenu().open($event, [
             {
@@ -143,6 +143,12 @@ function toggleGroup() {
 
   icon.value?.classList.toggle("-rotate-90");
   nested.value?.classList.toggle("hidden");
+}
+
+function handleDelete(event: KeyboardEvent) {
+  if (event.key === "Backspace") return;
+
+  deleteSelectedNode();
 }
 
 useSortable(nested, [], {
