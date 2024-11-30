@@ -101,7 +101,7 @@
 </style>
 
 <script setup lang="ts">
-import { useSortable } from "@vueuse/integrations/useSortable";
+import Sortable from "sortablejs";
 
 const { deleteSelectedNode, updateNode } = useDeckStore();
 const { selectedNode } = storeToRefs(useDeckStore());
@@ -151,8 +151,12 @@ function handleDelete(event: KeyboardEvent) {
   deleteSelectedNode();
 }
 
-useSortable(nested, [], {
-  animation: "200",
-  easing: "cubic-bezier(1, 0, 0, 1)",
+onMounted(() => {
+  if (!nested.value) return;
+
+  Sortable.create(nested.value, {
+    animation: 200,
+    easing: "cubic-bezier(1, 0, 0, 1)",
+  });
 });
 </script>

@@ -1,5 +1,5 @@
 <template>
-  <div class="timeline">
+  <div ref="timeline" class="timeline">
     <TransitionGroup name="list">
       <AtelierTimelineFrame
         v-for="slide in slides"
@@ -68,12 +68,20 @@
       transform: rotate(360deg);
     }
   }
+
+  .swap {
+    @apply opacity-100;
+  }
 }
 </style>
 
 <script setup lang="ts">
+import Sortable, { Swap } from "sortablejs";
+
 const deckStore = useDeckStore();
 const { slides } = storeToRefs(useDeckStore());
+
+const timeline = ref<HTMLElement | null>(null);
 
 const isLoading = ref(false);
 
@@ -90,4 +98,19 @@ async function insertNewSlides() {
     }, 3000);
   }
 }
+
+onMounted(() => {
+  if (!timeline.value) return;
+
+  Sortable.mount(new Swap());
+
+  Sortable.create(timeline.value, {
+    draggable: ".frame",
+    swap: true,
+    swapClass: "swap",
+    onEnd: function (event) {
+      console.log(event.oldIndex, event.newIndex);
+    },
+  });
+});
 </script>
