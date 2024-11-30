@@ -3,10 +3,6 @@
 export const useDeckStore = defineStore("deck", () => {
   const client = useSupabaseClient<Database>();
 
-  const slides = ref<SlidesModel[]>([]);
-  const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
-  const currentSlidesIndex = ref<number>(0);
-
   const EMPTY_TREE: Tree = {
     id: "",
     slides: "",
@@ -17,11 +13,20 @@ export const useDeckStore = defineStore("deck", () => {
     children: [],
   };
 
-  const tree = ref<Tree>(EMPTY_TREE);
+  const slides = ref<SlidesModel[]>([]);
+  const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
 
+  const trees = ref<Tree[]>([EMPTY_TREE]);
+  const currentTree = computed(() => trees.value[currentSlidesIndex.value]);
+
+  const components = ref<ComponentModel[][]>([]);
+  const currentComponents = computed(
+    () => components.value[currentSlidesIndex.value]
+  );
+
+  const currentSlidesIndex = ref<number>(0);
   const selectedNode = ref<Tree | null>(null);
-
-  const components = ref<ComponentModel[]>([]);
+  const slidesInLoading = ref<Set<number>>(new Set());
 
   const pendingChanges = ref<{
     nodes: PendingNode[];
@@ -31,29 +36,36 @@ export const useDeckStore = defineStore("deck", () => {
     components: [],
   });
 
-  // Fetch nodes when the current slides change.
-  watch(
-    currentSlides,
-    async () => {
-      // Upsert pending changes if any.
-      if (
-        pendingChanges.value.nodes.length ||
-        pendingChanges.value.components.length
-      ) {
-        await saveChanges();
-      }
+  watch(slides, (newSlides) => {
+    if (trees.value[newSlides.length - 1]?.id) return;
 
-      // Reset the tree.
-      if (!currentSlides.value) {
-        tree.value = EMPTY_TREE;
+    // Initialise data for new slides.
+    trees.value.push(EMPTY_TREE);
+    components.value.push([]);
+  });
 
-        return;
-      }
+  watch(currentSlides, async () => {
+    if (
+      !pendingChanges.value.nodes.length ||
+      !pendingChanges.value.components.length
+    )
+      return;
 
-      await fetchAllNodes();
-    },
-    { immediate: true }
-  );
+    // Upsert pending changes if any.
+    await saveChanges();
+  });
+
+  watch(currentTree, async () => {
+    if (
+      currentTree.value.id ||
+      slidesInLoading.value.has(currentSlidesIndex.value)
+    )
+      return;
+
+    // Fetch nodes for the current slides, then load the rest in parallel.
+    await fetchAllNodes(currentSlidesIndex.value);
+    await parallelLoad();
+  });
 
   watch(currentSlidesIndex, async () => {
     // Reset the selected node.
@@ -162,11 +174,11 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  async function fetchAllNodes() {
+  async function fetchAllNodes(index: number = currentSlidesIndex.value) {
     const { data, error } = await client
       .from("nodes")
       .select("*")
-      .eq("slides", currentSlides.value.id)
+      .eq("slides", slides.value[index].id)
       .order("path", { ascending: true });
 
     if (error) throw error;
@@ -178,7 +190,7 @@ export const useDeckStore = defineStore("deck", () => {
         data.map((node) => fetchNodeComponents(node.id))
       );
 
-      components.value = fetchedComponents.flat();
+      components.value[index] = fetchedComponents.flat();
 
       // Process database nodes.
       data.forEach((node) => {
@@ -209,7 +221,7 @@ export const useDeckStore = defineStore("deck", () => {
         }
       });
 
-      tree.value = lookup["root"];
+      trees.value[index] = lookup["root"];
     }
 
     return data;
@@ -262,11 +274,11 @@ export const useDeckStore = defineStore("deck", () => {
   }
 
   async function updateNodeComponent(component: ComponentModel) {
-    const index = components.value.findIndex(
+    const index = currentComponents.value.findIndex(
       (c) => c.node === component.node && c.type === component.type
     );
 
-    pendingChanges.value.components.push(components.value[index]);
+    pendingChanges.value.components.push(currentComponents.value[index]);
   }
 
   async function saveChanges() {
@@ -330,14 +342,40 @@ export const useDeckStore = defineStore("deck", () => {
     };
   }
 
+  async function parallelLoad() {
+    if (slidesInLoading.value.size >= slides.value.length) return;
+
+    try {
+      // Parallel load slides that are not loaded or loading.
+      const promises = slides.value
+        .map((_, index) => index)
+        .filter(
+          (index) =>
+            index !== currentSlidesIndex.value &&
+            !trees.value[index]?.id &&
+            !slidesInLoading.value.has(index)
+        )
+        .map((index) => {
+          slidesInLoading.value.add(index);
+
+          return fetchAllNodes(index);
+        });
+
+      await Promise.all(promises);
+    } finally {
+      slidesInLoading.value.clear();
+    }
+  }
+
   return {
     slides,
     currentSlides,
     currentSlidesIndex,
-    tree,
-    selectedNode,
+    trees,
+    currentTree,
     components,
-    pendingChanges,
+    currentComponents,
+    selectedNode,
     fetchAllDecks,
     fetchDeck,
     insertNewDeck,

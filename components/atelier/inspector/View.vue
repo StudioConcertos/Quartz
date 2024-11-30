@@ -35,7 +35,9 @@
 </style>
 
 <script setup lang="ts">
-const { tree, selectedNode, components } = storeToRefs(useDeckStore());
+const { currentTree, selectedNode, currentComponents } = storeToRefs(
+  useDeckStore()
+);
 
 // TODO: Refactor this, if possible.
 const resolvedComponents = {
@@ -46,12 +48,12 @@ const resolvedComponents = {
 };
 
 const nodeComponents = computed<ComponentModel[]>(() => {
-  if (!selectedNode.value?.id || !tree.value) return [];
+  if (!selectedNode.value?.id || !currentTree.value) return [];
 
   return searchNodeComponents(selectedNode.value.id);
 });
 
 function searchNodeComponents(node: string): ComponentModel[] {
-  return components.value.filter((component) => component.node === node);
+  return currentComponents.value.filter((component) => component.node === node);
 }
 </script>

@@ -1,7 +1,7 @@
 <template>
   <div class="render">
     <AtelierRenderElement
-      v-for="node in tree.children"
+      v-for="node in currentTree.children"
       :key="node.id"
       :node="node"
     />
@@ -16,5 +16,5 @@
 </style>
 
 <script setup lang="ts">
-const { tree } = storeToRefs(useDeckStore());
+const { currentTree } = storeToRefs(useDeckStore());
 </script>
