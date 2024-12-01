@@ -4,6 +4,7 @@ export type Tree = NodeModel & {
 };
 
 export interface PendingNode extends NodeModel {
+  _pending?: true;
   _deleted?: boolean;
 }
 

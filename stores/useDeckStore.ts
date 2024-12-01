@@ -77,7 +77,10 @@ export const useDeckStore = defineStore("deck", () => {
     async (pendingNodes) => {
       if (!pendingNodes.length) return;
 
-      await fetchAllNodes();
+      trees.value[currentSlidesIndex.value] = buildTree([
+        ...flattenTree(currentTree.value),
+        ...pendingNodes,
+      ]);
     },
     { deep: true }
   );
@@ -184,61 +187,61 @@ export const useDeckStore = defineStore("deck", () => {
     if (error) throw error;
 
     if (data) {
-      const lookup: Record<string, Tree> = {};
-
       const fetchedComponents = await Promise.all(
         data.map((node) => fetchNodeComponents(node.id))
       );
 
       components.value[index] = fetchedComponents.flat();
 
-      // Process database nodes.
-      data.forEach((node) => {
-        lookup[node.path] = {
-          ...node,
-          children: [],
-        };
-      });
-
-      // Process pending nodes.
-      pendingChanges.value.nodes.forEach((node: PendingNode) => {
-        if (!node._deleted) {
-          lookup[node.path] = {
-            ...node,
-            children: [],
-          };
-        } else {
-          delete lookup[node.path];
-        }
-      });
-
-      Object.values(lookup).forEach((node) => {
-        const parentPath = node.path.split(".").slice(0, -1).join(".");
-        const parentNode = lookup[parentPath];
-
-        if (parentNode) {
-          parentNode.children.push(node);
-        }
-      });
-
-      trees.value[index] = lookup["root"];
+      trees.value[index] = buildTree(data);
     }
 
     return data;
   }
 
   async function insertNewNode(slides: string, name: string, type: NodeType) {
+    const { data: id, error } = await client.rpc("generate_uuid");
+
+    if (error) throw error;
+
+    const path =
+      selectedNode.value?.type === "group"
+        ? `${selectedNode.value.path}.${name}`
+        : `root.${name}`;
+
+    // Add node to pending changes.
     pendingChanges.value.nodes.push({
-      id: "",
+      id: id,
       slides: slides,
       name: name,
-      path:
-        selectedNode.value?.type === "group"
-          ? `${selectedNode.value.path}.${name}`
-          : `root.${name}`,
+      path: path,
       type: type,
       reference: "",
     });
+
+    // Create default components
+    const defaultComponents: ComponentModel[] = [
+      {
+        type: "base",
+        node: id,
+        data: {},
+      },
+    ];
+
+    if (type === "text") {
+      defaultComponents.push({
+        type: "text",
+        node: id,
+        data: {
+          content: "New Text",
+          size: 16,
+        },
+      });
+    }
+
+    components.value[currentSlidesIndex.value].push(...defaultComponents);
+
+    pendingChanges.value.components.push(...defaultComponents);
 
     selectedNode.value = null;
   }
@@ -281,6 +284,41 @@ export const useDeckStore = defineStore("deck", () => {
     pendingChanges.value.components.push(currentComponents.value[index]);
   }
 
+  function buildTree(nodes: NodeModel[] | PendingNode[]) {
+    const lookup: Record<string, Tree> = {};
+
+    // Process database nodes.
+    nodes.forEach((node) => {
+      lookup[node.path] = {
+        ...node,
+        children: [],
+      };
+    });
+
+    // Process pending nodes.
+    pendingChanges.value.nodes.forEach((node: PendingNode) => {
+      if (!node._deleted) {
+        lookup[node.path] = {
+          ...node,
+          children: [],
+        };
+      } else {
+        delete lookup[node.path];
+      }
+    });
+
+    Object.values(lookup).forEach((node) => {
+      const parentPath = node.path.split(".").slice(0, -1).join(".");
+      const parentNode = lookup[parentPath];
+
+      if (parentNode) {
+        parentNode.children.push(node);
+      }
+    });
+
+    return lookup["root"];
+  }
+
   async function saveChanges() {
     const nodesToUpsert = pendingChanges.value.nodes.filter(
       (node) => node.id && !node._deleted
@@ -292,6 +330,17 @@ export const useDeckStore = defineStore("deck", () => {
       (node) => node._deleted
     );
 
+    // Node insert.
+    if (nodesToInsert.length) {
+      const { error } = await client
+        .from("nodes")
+        // Remove the id and _deleted fields.
+        .insert(nodesToInsert.map(({ id, _deleted, ...node }) => node))
+        .select();
+
+      if (error) throw error;
+    }
+
     // Node update.
     if (nodesToUpsert.length) {
       const { error } = await client.from("nodes").upsert(nodesToUpsert, {
@@ -302,19 +351,11 @@ export const useDeckStore = defineStore("deck", () => {
       if (error) throw error;
     }
 
-    // Node insert.
-    if (nodesToInsert.length) {
-      const { error } = await client
-        .from("nodes")
-        // Remove the id and _deleted.
-        .insert(nodesToInsert.map(({ id, _deleted, ...node }) => node));
-
-      if (error) throw error;
-    }
-
     // Node delete.
     if (nodesToDelete.length) {
       for (const node of nodesToDelete) {
+        if (node._pending) return;
+
         const { error } = await client.rpc("delete_node_and_children", {
           node_path: node.path,
           slides_id: node.slides,
@@ -324,11 +365,22 @@ export const useDeckStore = defineStore("deck", () => {
       }
     }
 
-    // Component update.
+    // Component upsert.
     if (pendingChanges.value.components.length) {
+      const validNodes = new Set(
+        flattenTree(trees.value[currentSlidesIndex.value]).map(
+          (node) => node.id
+        )
+      );
+
+      // Filter nodes that still exists.
+      const componentsToUpsert = pendingChanges.value.components.filter(
+        (component) => validNodes.has(component.node)
+      );
+
       const { error } = await client
         .from("components")
-        .upsert(pendingChanges.value.components, {
+        .upsert(componentsToUpsert, {
           onConflict: "node, type",
           ignoreDuplicates: false,
         });
@@ -345,27 +397,32 @@ export const useDeckStore = defineStore("deck", () => {
   async function parallelLoad() {
     if (slidesInLoading.value.size >= slides.value.length) return;
 
-    try {
-      // Parallel load slides that are not loaded or loading.
-      const promises = slides.value
-        .map((_, index) => index)
-        .filter(
-          (index) =>
-            index !== currentSlidesIndex.value &&
-            !trees.value[index]?.id &&
-            !slidesInLoading.value.has(index)
-        )
-        .map((index) => {
-          slidesInLoading.value.add(index);
+    const slidesToLoad = slides.value
+      .map((_, index) => index)
+      .filter(
+        (index) =>
+          index !== currentSlidesIndex.value &&
+          !trees.value[index]?.id &&
+          !slidesInLoading.value.has(index)
+      );
 
-          return fetchAllNodes(index);
-        });
-
-      await Promise.all(promises);
-    } finally {
-      slidesInLoading.value.clear();
-    }
+    // Load all in parallel.
+    await Promise.all(
+      slidesToLoad.map(async (index) => {
+        slidesInLoading.value.add(index);
+        try {
+          await fetchAllNodes(index);
+        } finally {
+          slidesInLoading.value.delete(index);
+        }
+      })
+    );
   }
+
+  const flattenTree = (tree: Tree): NodeModel[] => [
+    tree,
+    ...tree.children.flatMap(flattenTree),
+  ];
 
   return {
     slides,

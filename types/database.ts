@@ -157,6 +157,10 @@ export type Database = {
         };
         Returns: undefined;
       };
+      generate_uuid: {
+        Args: {};
+        Returns: string;
+      };
     };
     Enums: {
       componenttype: "animation" | "base" | "text" | "transform";

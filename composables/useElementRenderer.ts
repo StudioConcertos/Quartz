@@ -9,7 +9,7 @@ export function useElementRenderer() {
           (component) => component.type === "text" && component.node === node.id
         );
 
-        return text?.data.string;
+        return text?.data.content;
       },
     },
     group: {
