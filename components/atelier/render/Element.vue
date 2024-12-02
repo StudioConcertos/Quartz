@@ -1,6 +1,6 @@
 <template>
-  <Component :is="getElementType(props.node)" :key="props.node.id">
-    {{ getNodeContent(props.node) }}
+  <Component :is="render.element" :key="props.node.id" :style="render.style">
+    {{ render.content }}
     <AtelierRenderElement
       v-for="child in props.node.children"
       :key="child.id"
@@ -10,6 +10,8 @@
 </template>
 
 <script setup lang="ts">
+const { renderer } = useElementRenderer();
+
 const props = defineProps({
   node: {
     type: Object as PropType<Tree>,
@@ -17,11 +19,12 @@ const props = defineProps({
   },
 });
 
-function getElementType(node: Tree) {
-  return useElementRenderer().handlers[node.type]?.element || "div";
-}
+const render = computed(() => {
+  const result = renderer[props.node.type];
 
-function getNodeContent(node: Tree) {
-  return useElementRenderer().handlers[node.type]?.render(node) || "";
-}
+  return {
+    element: result.element,
+    ...result.render(props.node),
+  };
+});
 </script>

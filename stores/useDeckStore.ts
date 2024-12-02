@@ -37,7 +37,7 @@ export const useDeckStore = defineStore("deck", () => {
   });
 
   watch(slides, (newSlides) => {
-    if (trees.value[newSlides.length - 1]?.id) return;
+    if (trees.value.length >= newSlides.length) return;
 
     // Initialise data for new slides.
     trees.value.push(EMPTY_TREE);

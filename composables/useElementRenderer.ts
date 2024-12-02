@@ -1,24 +1,33 @@
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
 
-  const handlers: Record<NodeType, ElementRenderer> = {
+  function findComponent(node: Tree, type: string) {
+    return currentComponents.value.find(
+      (component) => component.type === type && component.node === node.id
+    );
+  }
+
+  const renderer: Record<NodeType, ElementRenderer> = {
     text: {
       element: "p",
       render: (node: Tree) => {
-        const text = currentComponents.value.find(
-          (component) => component.type === "text" && component.node === node.id
-        );
+        const text = findComponent(node, "text");
 
-        return text?.data.content;
+        return {
+          content: text?.data.content,
+          style: {
+            fontSize: `${text?.data.size}px`,
+          },
+        };
       },
     },
     group: {
       element: "div",
-      render: () => "",
+      render: () => ({}),
     },
   };
 
   return {
-    handlers,
+    renderer,
   };
 }

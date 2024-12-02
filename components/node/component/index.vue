@@ -35,7 +35,7 @@
     }
 
     textarea {
-      @apply w-full;
+      @apply w-full mb-10;
     }
   }
 
