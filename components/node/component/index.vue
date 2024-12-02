@@ -1,9 +1,15 @@
 <template>
   <div class="component">
-    <h4>{{ props.name.toUpperCase() }}:</h4>
-    <div class="whitespace"></div>
-    <slot />
-    <div class="whitespace"></div>
+    <div class="flex items-center justify-between">
+      <h4>{{ props.name.toUpperCase() }}</h4>
+      <button @click="isOpen = !isOpen">
+        <div
+          :class="isOpen ? 'i-carbon-caret-down' : 'i-carbon-caret-right'"
+        ></div>
+      </button>
+    </div>
+    <div v-if="isOpen" class="whitespace"></div>
+    <slot v-if="isOpen" />
   </div>
 </template>
 
@@ -12,35 +18,34 @@
   @apply w-full p-6 bg-dark-900;
   @apply border-solid border-0 border-b-2 border-dark-200;
 
-  .row {
+  h4 {
+    @apply text-sm font-400 opacity-60;
+  }
+
+  button {
+    @apply text-2xl;
+    @apply opacity-60 duration-300 hover:opacity-100;
+  }
+
+  &:deep(.field) {
     @apply flex;
 
-    .column {
-      @apply flex;
+    &:not(:last-child) {
+      @apply mb-6;
     }
-  }
-}
 
-.component:deep(h4) {
-  @apply text-sm font-300 opacity-60;
-}
-
-.component:deep(.row) {
-  .column {
-    @apply flex items-start w-full;
+    label {
+      @apply text-sm w-1/4;
+    }
 
     input,
     textarea {
-      @apply p-0 ml-2 w-12;
+      @apply p-0 ml-2 flex-1;
     }
 
     textarea {
-      @apply w-full mb-10;
+      @apply w-full;
     }
-  }
-
-  > .column:not(:first-child) {
-    @apply ml-6;
   }
 }
 </style>
@@ -52,4 +57,6 @@ const props = defineProps({
     required: true,
   },
 });
+
+const isOpen = ref(true);
 </script>

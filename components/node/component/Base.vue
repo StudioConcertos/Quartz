@@ -1,19 +1,17 @@
 <template>
   <NodeComponent name="base">
-    <div class="row">
-      <div class="column">
-        <p>reference:</p>
-        <input
-          v-model.lazy="reference"
-          :class="{
-            'cursor-not-allowed opacity-60': isRoot,
-          }"
-          class="w-50!"
-          type="text"
-          maxlength="20"
-          :disabled="isRoot"
-        />
-      </div>
+    <div class="field">
+      <label>reference</label>
+      <input
+        v-model.lazy="reference"
+        :class="{
+          'cursor-not-allowed opacity-60': isRoot,
+        }"
+        class="w-50!"
+        type="text"
+        maxlength="20"
+        :disabled="isRoot"
+      />
     </div>
   </NodeComponent>
 </template>

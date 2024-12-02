@@ -1,20 +1,20 @@
 <template>
   <NodeComponent name="text">
-    <div class="row">
-      <div class="column">
-        <p>content:</p>
-        <textarea
-          @keydown.enter.exact.prevent="handleEnter"
-          v-model.lazy="props.component.data.content"
-          rows="3"
-        />
-      </div>
+    <div class="field">
+      <label>content</label>
+      <textarea
+        @keydown.enter.exact.prevent="handleEnter"
+        v-model.lazy="props.component.data.content"
+        rows="5"
+      />
     </div>
-    <div class="row">
-      <div class="column">
-        <p>size:</p>
-        <input type="number" v-model.lazy="props.component.data.size" />
-      </div>
+    <div class="field">
+      <label>size(px)</label>
+      <input type="number" v-model.lazy="props.component.data.size" />
+    </div>
+    <div class="field">
+      <label>weight</label>
+      <input type="number" v-model.lazy="props.component.data.weight" />
     </div>
   </NodeComponent>
 </template>
