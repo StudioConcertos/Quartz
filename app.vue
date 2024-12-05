@@ -39,7 +39,20 @@ input,
 textarea {
   @apply bg-transparent border-none transition-colors;
   @apply text-light-200 py-4 text-sm;
-  @apply border-solid border-0 border-b-1;
+  @apply border-solid border-0 border-b-1 border-neutral-500;
+}
+
+input[type="color"] {
+  @apply w-full h-auto;
+  @apply cursor-pointer;
+
+  &::-webkit-color-swatch-wrapper {
+    @apply p-0;
+  }
+
+  &::-webkit-color-swatch {
+    @apply border-none;
+  }
 }
 
 form {

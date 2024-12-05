@@ -7,7 +7,6 @@
         :class="{
           'cursor-not-allowed opacity-60': isRoot,
         }"
-        class="w-50!"
         type="text"
         maxlength="20"
         :disabled="isRoot"

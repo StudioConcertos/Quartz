@@ -163,7 +163,7 @@ export type Database = {
       };
     };
     Enums: {
-      componenttype: "animation" | "base" | "text" | "transform";
+      componenttype: "animation" | "base" | "typography" | "transform";
       nodetype: "text" | "group";
     };
     CompositeTypes: {

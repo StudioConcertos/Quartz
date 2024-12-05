@@ -230,11 +230,13 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (type === "text") {
       defaultComponents.push({
-        type: "text",
+        type: "typography",
         node: id,
         data: {
           content: "New Text",
           size: 16,
+          weight: 300,
+          colour: "#151515",
         },
       });
     }

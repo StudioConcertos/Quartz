@@ -24,7 +24,7 @@
 
   button {
     @apply text-2xl;
-    @apply opacity-60 duration-300 hover:opacity-100;
+    @apply opacity-60 transition-opacity hover:opacity-100;
   }
 
   &:deep(.field) {
@@ -35,28 +35,24 @@
     }
 
     label {
-      @apply text-sm w-1/4;
+      @apply text-sm w-1/3;
     }
 
-    input,
-    textarea {
-      @apply p-0 ml-2 flex-1;
+    > *:not(label) {
+      @apply p-0 flex-1;
     }
 
-    textarea {
-      @apply w-full;
+    select {
+      @apply appearance-none;
     }
   }
 }
 </style>
 
 <script setup lang="ts">
-const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  name: string;
+}>();
 
 const isOpen = ref(true);
 </script>
