@@ -125,7 +125,7 @@ const nodeName = computed({
 });
 
 const isSelected = computed(() => {
-  return selectedNode.value === props.node;
+  return selectedNode.value?.id === props.node.id;
 });
 const isGroup = computed(() => {
   return props.node.type === "group";

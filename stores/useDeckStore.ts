@@ -91,6 +91,8 @@ export const useDeckStore = defineStore("deck", () => {
     async (changes) => {
       if (!changes.nodes.length && !changes.components.length) return;
 
+      if (selectedNode.value) return;
+
       await saveChanges();
     },
     { debounce: 5000, deep: true }
@@ -210,14 +212,14 @@ export const useDeckStore = defineStore("deck", () => {
         : `root.${name}`;
 
     // Add node to pending changes.
-    pendingChanges.value.nodes.push({
+    const node: PendingNode = {
       id: id,
       slides: slides,
       name: name,
       path: path,
       type: type,
       reference: "",
-    });
+    };
 
     // Create default components
     const defaultComponents: ComponentModel[] = [
@@ -241,11 +243,12 @@ export const useDeckStore = defineStore("deck", () => {
       });
     }
 
-    components.value[currentSlidesIndex.value].push(...defaultComponents);
-
+    pendingChanges.value.nodes.push(node);
     pendingChanges.value.components.push(...defaultComponents);
 
-    selectedNode.value = null;
+    components.value[currentSlidesIndex.value].push(...defaultComponents);
+
+    selectedNode.value = node as Tree;
   }
 
   async function deleteSelectedNode() {
@@ -259,9 +262,16 @@ export const useDeckStore = defineStore("deck", () => {
     selectedNode.value = null;
   }
 
-  // TODO: Multiple changes of the same node at once will cause a conflict.
   function updateNode(tree: Tree) {
     const { children, ...node } = tree;
+
+    const index = pendingChanges.value.nodes.findIndex(
+      (pending) => pending.id === node.id
+    );
+
+    if (index !== -1) {
+      pendingChanges.value.nodes.splice(index, 1);
+    }
 
     pendingChanges.value.nodes.push(node);
   }
@@ -279,11 +289,15 @@ export const useDeckStore = defineStore("deck", () => {
   }
 
   async function updateNodeComponent(component: ComponentModel) {
-    const index = currentComponents.value.findIndex(
+    const index = pendingChanges.value.components.findIndex(
       (c) => c.node === component.node && c.type === component.type
     );
 
-    pendingChanges.value.components.push(currentComponents.value[index]);
+    if (index !== -1) {
+      pendingChanges.value.components[index] = component;
+    } else {
+      pendingChanges.value.components.push(component);
+    }
   }
 
   function buildTree(nodes: NodeModel[] | PendingNode[]) {
