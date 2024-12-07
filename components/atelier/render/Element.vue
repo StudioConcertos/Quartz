@@ -1,5 +1,15 @@
 <template>
-  <Component :is="render.element" :key="props.node.id" :style="render.style">
+  <Component
+    :is="render.element"
+    :key="props.node.id"
+    :style="[
+      render.style,
+      {
+        position: 'absolute',
+        transformOrigin: 'left',
+      },
+    ]"
+  >
     {{ render.content }}
     <AtelierRenderElement
       v-for="child in props.node.children"

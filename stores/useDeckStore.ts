@@ -91,8 +91,6 @@ export const useDeckStore = defineStore("deck", () => {
     async (changes) => {
       if (!changes.nodes.length && !changes.components.length) return;
 
-      if (selectedNode.value) return;
-
       await saveChanges();
     },
     { debounce: 5000, deep: true }
@@ -227,6 +225,16 @@ export const useDeckStore = defineStore("deck", () => {
         type: "base",
         node: id,
         data: {},
+      },
+      {
+        type: "transform",
+        node: id,
+        data: {
+          x: 0,
+          y: 0,
+          z: 0,
+          scale: 1,
+        },
       },
     ];
 

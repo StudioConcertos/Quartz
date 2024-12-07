@@ -15,7 +15,7 @@
       </select>
     </div>
     <div class="field">
-      <label>size(px)</label>
+      <label>size</label>
       <input type="number" v-model.lazy="props.component.data.size" />
     </div>
     <div class="field">

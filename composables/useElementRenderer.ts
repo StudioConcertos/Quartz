@@ -11,14 +11,22 @@ export function useElementRenderer() {
     text: {
       element: "p",
       render: (node: Tree) => {
-        const text = findComponent(node, "typography");
+        const text = findComponent(node, "typography")!.data;
+        const transform = findComponent(node, "transform")!.data;
+
+        const xPercent = (transform.x / 1920) * 100;
+        const yPercent = (transform.y / 1080) * 100;
 
         return {
-          content: text?.data.content,
+          content: text.content,
           style: {
-            fontSize: `${text?.data.size}px`,
-            fontWeight: text?.data.weight,
-            color: text?.data.colour,
+            top: `${yPercent}%`,
+            left: `${xPercent}%`,
+            zIndex: transform.z,
+            scale: transform.scale,
+            fontSize: `${text.size}px`,
+            fontWeight: text.weight,
+            color: text.colour,
           },
         };
       },

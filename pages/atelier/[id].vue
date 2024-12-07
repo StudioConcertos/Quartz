@@ -6,7 +6,7 @@
   </div>
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
     <AtelierToolbar :title="deck.title" />
-    <div class="flex flex-1">
+    <div class="flex flex-1 overflow-hidden">
       <aside class="editor">
         <AtelierHierarchy />
         <div class="whitespace"></div>

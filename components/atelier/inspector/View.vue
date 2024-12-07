@@ -23,6 +23,10 @@
 
 .view {
   @apply overflow-y-auto;
+
+  &::-webkit-scrollbar {
+    @apply hidden;
+  }
 }
 
 .placeholder {

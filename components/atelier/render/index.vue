@@ -12,6 +12,7 @@
 .render {
   @apply w-full border-rd aspect-video;
   @apply bg-light-200 text-dark-900;
+  @apply relative overflow-hidden;
 }
 </style>
 
