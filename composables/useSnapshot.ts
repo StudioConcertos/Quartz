@@ -11,9 +11,9 @@ export function useSnapshot() {
     const blob = await html2canvas(document.querySelector(".render")!, {
       scale: 1,
       useCORS: true,
-      onclone: (document, element) => {
-        element.style.width = "1920px";
-        element.style.height = "1080px";
+      onclone: (document, clone) => {
+        clone.style.width = "1920px";
+        clone.style.height = "1080px";
       },
     }).then(
       (canvas) =>

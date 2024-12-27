@@ -108,7 +108,7 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  async function fetchDeck(id: String | String[]) {
+  async function fetchDeck(id: string) {
     const { data, error } = await client
       .from("decks")
       .select("*")
@@ -149,7 +149,7 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  async function fetchAllSlides(deck: String | String[]) {
+  async function fetchAllSlides(deck: string) {
     const { data, error } = await client
       .from("slides")
       .select("*")
@@ -159,6 +159,19 @@ export const useDeckStore = defineStore("deck", () => {
     if (error) throw error;
 
     if (data) slides.value = data;
+
+    return data;
+  }
+
+  async function fetchSlides(deck: string, index: number) {
+    const { data, error } = await client
+      .from("slides")
+      .select("*")
+      .eq("deck", deck)
+      .eq("index", index)
+      .single();
+
+    if (error) throw error;
 
     return data;
   }
@@ -177,11 +190,20 @@ export const useDeckStore = defineStore("deck", () => {
     return data;
   }
 
-  async function fetchAllNodes(index: number = currentSlidesIndex.value) {
+  async function fetchAllNodes(
+    index: number = currentSlidesIndex.value,
+    deck?: string
+  ) {
+    const id = deck
+      ? (await fetchSlides(deck, index))?.id
+      : slides.value?.[index]?.id;
+
+    if (!id) return [];
+
     const { data, error } = await client
       .from("nodes")
       .select("*")
-      .eq("slides", slides.value[index].id)
+      .eq("slides", id)
       .order("path", { ascending: true });
 
     if (error) throw error;
@@ -194,9 +216,11 @@ export const useDeckStore = defineStore("deck", () => {
       components.value[index] = fetchedComponents.flat();
 
       trees.value[index] = buildTree(data);
+
+      return trees.value[index].children;
     }
 
-    return data;
+    return [];
   }
 
   async function insertNewNode(slides: string, name: string, type: NodeType) {
@@ -219,6 +243,7 @@ export const useDeckStore = defineStore("deck", () => {
       reference: "",
     };
 
+    // TODO: Move this to a separate function.
     // Create default components
     const defaultComponents: ComponentModel[] = [
       {
@@ -244,7 +269,7 @@ export const useDeckStore = defineStore("deck", () => {
         node: id,
         data: {
           content: "New Text",
-          size: 16,
+          size: 30,
           weight: 300,
           colour: "#151515",
         },
@@ -411,6 +436,8 @@ export const useDeckStore = defineStore("deck", () => {
 
       if (error) throw error;
     }
+
+    useSnapshot().capture();
 
     pendingChanges.value = {
       nodes: [],

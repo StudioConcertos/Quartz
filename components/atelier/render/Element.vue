@@ -6,7 +6,9 @@
       render.style,
       {
         position: 'absolute',
-        transformOrigin: 'left',
+        transformOrigin: 'top left',
+        whiteSpace: 'nowrap',
+        aspectRatio: '16 / 9',
       },
     ]"
   >
@@ -22,12 +24,9 @@
 <script setup lang="ts">
 const { renderer } = useElementRenderer();
 
-const props = defineProps({
-  node: {
-    type: Object as PropType<Tree>,
-    required: true,
-  },
-});
+const props = defineProps<{
+  node: Tree;
+}>();
 
 const render = computed(() => {
   const result = renderer[props.node.type];

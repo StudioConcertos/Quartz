@@ -23,7 +23,7 @@ export function useElementRenderer() {
             top: `${yPercent}%`,
             left: `${xPercent}%`,
             zIndex: transform.z,
-            scale: transform.scale,
+            transform: `scale(${transform.scale / (1920 / 1080)})`,
             fontSize: `${text.size}px`,
             fontWeight: text.weight,
             color: text.colour,

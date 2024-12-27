@@ -1,6 +1,6 @@
 export interface RenderResult {
   content?: string;
-  style?: Record<string, string>;
+  style?: Record<string, string | number>;
 }
 
 export interface ElementRenderer {
