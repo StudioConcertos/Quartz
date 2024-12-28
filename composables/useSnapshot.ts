@@ -3,7 +3,7 @@ import html2canvas from "html2canvas";
 export function useSnapshot() {
   const client = useSupabaseClient<Database>();
 
-  const { currentSlides } = storeToRefs(useDeckStore());
+  const { slides, currentSlides, trees } = storeToRefs(useDeckStore());
 
   const bucket = "snapshots";
 
@@ -48,11 +48,11 @@ export function useSnapshot() {
 
   const fetch = async (
     deck: string = currentSlides.value.deck,
-    slides: string = currentSlides.value.id
+    slidesId: string = currentSlides.value.id
   ) => {
-    if (!deck || !slides) return;
+    if (!deck || !slidesId) return;
 
-    const key = `snapshot-${deck}-${slides}`;
+    const key = `snapshot-${deck}-${slidesId}`;
     const expires = 60 * 60; // 1 hour.
 
     if (localStorage.getItem(key)) {
@@ -62,6 +62,12 @@ export function useSnapshot() {
 
       localStorage.removeItem(key);
     }
+
+    if (
+      !trees.value[slides.value.findIndex((slide) => slide.id === slidesId)]
+        .children.length
+    )
+      return;
 
     const { data, error } = await client.storage
       .from(bucket)

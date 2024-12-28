@@ -11,10 +11,10 @@
 
 <style scoped lang="postcss">
 .snapshot {
-  @apply relative w-full aspect-video;
+  @apply relative w-full aspect-video border-rd;
 
   img {
-    @apply absolute inset-0;
+    @apply absolute inset-0 p-0.5;
   }
 }
 </style>
@@ -29,12 +29,6 @@ const props = defineProps<{
 }>();
 
 const url = asyncComputed(async () => {
-  const slideIndex = slides.value.findIndex(
-    (slide) => slide.id === props.slides
-  );
-
-  if (!trees.value[slideIndex].children.length) return;
-
   return await useSnapshot().fetch(
     props.deck,
     props.slides ?? (await fetchSlides(props.deck, 0)).id

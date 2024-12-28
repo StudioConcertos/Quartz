@@ -17,7 +17,9 @@
       {{ new Date(props.last_modified).toLocaleString() }}
     </p>
     <div class="whitespace"></div>
-    <AtelierRenderSnapshot :deck="props.id" />
+    <div class="preview">
+      <AtelierRenderSnapshot :deck="props.id" />
+    </div>
   </NuxtLink>
 </template>
 
