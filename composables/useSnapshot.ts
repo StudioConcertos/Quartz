@@ -8,7 +8,13 @@ export function useSnapshot() {
   const bucket = "snapshots";
 
   const capture = async () => {
-    if (!currentSlides.value) return;
+    if (!trees.value[currentSlides.value.index].children.length) return;
+    if (
+      localStorage.getItem(
+        `snapshot-${currentSlides.value.deck}-${currentSlides.value.id}.png`
+      )
+    )
+      return;
 
     const blob = await html2canvas(document.querySelector(".render")!, {
       width: 192,
@@ -71,7 +77,7 @@ export function useSnapshot() {
 
     const { data, error } = await client.storage
       .from(bucket)
-      .createSignedUrl(`${deck}/${slides}.png`, expires);
+      .createSignedUrl(`${deck}/${slidesId}.png`, expires);
 
     if (error) throw error;
 

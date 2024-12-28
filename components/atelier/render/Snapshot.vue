@@ -21,7 +21,6 @@
 
 <script setup lang="ts">
 const { fetchSlides } = useDeckStore();
-const { slides, trees } = storeToRefs(useDeckStore());
 
 const props = defineProps<{
   deck: string;
