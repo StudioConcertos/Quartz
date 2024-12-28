@@ -7,6 +7,7 @@ export function useElementRenderer() {
     );
   }
 
+  // TODO: Use another method to get the element.
   const renderEl = document.querySelector(".render") as HTMLElement;
   const { width, height } = useElementSize(renderEl);
 

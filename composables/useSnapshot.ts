@@ -18,6 +18,7 @@ export function useSnapshot() {
       onclone: (document, clone) => {
         clone.style.borderRadius = "0px";
 
+        // TODO: Use another method to get the elements.
         const elements = document.querySelectorAll(".element");
 
         elements.forEach((element) => {

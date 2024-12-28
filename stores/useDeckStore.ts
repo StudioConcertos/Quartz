@@ -368,6 +368,7 @@ export const useDeckStore = defineStore("deck", () => {
     return lookup["root"];
   }
 
+  // TODO: Too complex, find a better way to do this.
   async function saveChanges() {
     const nodesToUpsert = pendingChanges.value.nodes.filter(
       (node) => node.id && !node._deleted
