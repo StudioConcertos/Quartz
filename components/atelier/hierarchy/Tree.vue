@@ -1,7 +1,7 @@
 <template>
   <ul class="tree">
     <Node
-      v-if="currentTree"
+      v-if="currentTree.id"
       :id="currentTree.id"
       data-path="root"
       data-type="group"

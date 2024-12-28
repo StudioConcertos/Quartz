@@ -7,6 +7,13 @@ export function useElementRenderer() {
     );
   }
 
+  const renderEl = document.querySelector(".render") as HTMLElement;
+  const { width, height } = useElementSize(renderEl);
+
+  const scale = computed(() => {
+    return Math.min(width.value / 1920, height.value / 1080);
+  });
+
   const renderer: Record<NodeType, ElementRenderer> = {
     text: {
       element: "p",
@@ -23,7 +30,7 @@ export function useElementRenderer() {
             top: `${yPercent}%`,
             left: `${xPercent}%`,
             zIndex: transform.z,
-            transform: `scale(${transform.scale / (1920 / 1080)})`,
+            transform: `scale(${transform.scale * scale.value})`,
             fontSize: `${text.size}px`,
             fontWeight: text.weight,
             color: text.colour,

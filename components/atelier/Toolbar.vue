@@ -10,7 +10,7 @@
       @change="updateSlidesTitle($event)"
       :style="{ width: `${titleInput.length + 4}ch` }"
     />
-    <NuxtLink to="/atelier">
+    <NuxtLink :to="`/live/${useRoute().params.id}`">
       <div class="i-carbon-run"></div>
     </NuxtLink>
   </header>
@@ -41,12 +41,9 @@
 <script setup lang="ts">
 const client = useSupabaseClient<Database>();
 
-const props = defineProps({
-  title: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  title: string;
+}>();
 
 const titleInput = ref(props.title);
 

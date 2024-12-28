@@ -8,9 +8,9 @@
         position: 'absolute',
         transformOrigin: 'top left',
         whiteSpace: 'nowrap',
-        aspectRatio: '16 / 9',
       },
     ]"
+    class="element"
   >
     {{ render.content }}
     <AtelierRenderElement

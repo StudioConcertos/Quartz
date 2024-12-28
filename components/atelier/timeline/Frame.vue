@@ -6,6 +6,10 @@
     }"
     class="frame"
   >
+    <AtelierRenderSnapshot
+      :deck="currentSlides.deck"
+      :slides="slides[props.index].id"
+    />
     <div class="overlay">
       <div
         v-if="isSelected"
@@ -48,7 +52,9 @@
 </style>
 
 <script setup lang="ts">
-const { currentSlidesIndex } = storeToRefs(useDeckStore());
+const { slides, currentSlides, currentSlidesIndex } = storeToRefs(
+  useDeckStore()
+);
 
 const props = defineProps<{
   index: number;

@@ -489,6 +489,7 @@ export const useDeckStore = defineStore("deck", () => {
     insertNewDeck,
     deleteDeck,
     fetchAllSlides,
+    fetchSlides,
     insertNewSlides,
     fetchAllNodes,
     insertNewNode,

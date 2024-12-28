@@ -47,11 +47,12 @@ const client = useSupabaseClient<Database>();
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
 const { data: deck, refresh: refreshDeck } = await useAsyncData(
-  async () => await useDeckStore().fetchDeck(useRoute().params.id)
+  async () => await useDeckStore().fetchDeck(useRoute().params.id as string)
 );
 
 const { refresh: refreshSlides } = await useAsyncData(
-  async () => await useDeckStore().fetchAllSlides(useRoute().params.id)
+  async () =>
+    await useDeckStore().fetchAllSlides(useRoute().params.id as string)
 );
 
 onMounted(() => {
