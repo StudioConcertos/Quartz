@@ -70,6 +70,7 @@ export function useSnapshot() {
     }
 
     if (
+      trees.value[0] === EMPTY_TREE &&
       !trees.value[slides.value.findIndex((slide) => slide.id === slidesId)]
         .children.length
     )

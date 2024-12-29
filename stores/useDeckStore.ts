@@ -3,16 +3,6 @@
 export const useDeckStore = defineStore("deck", () => {
   const client = useSupabaseClient<Database>();
 
-  const EMPTY_TREE: Tree = {
-    id: "",
-    slides: "",
-    name: "",
-    path: "",
-    type: "group",
-    reference: "",
-    children: [],
-  };
-
   const slides = ref<SlidesModel[]>([]);
   const currentSlides = computed(() => slides.value[currentSlidesIndex.value]);
 
