@@ -27,10 +27,10 @@ const props = defineProps<{
   slides?: string;
 }>();
 
+// TODO: Replace with useAsyncData.
 const url = asyncComputed(async () => {
-  return await useSnapshot().fetch(
-    props.deck,
-    props.slides ?? (await fetchSlides(props.deck, 0)).id
-  );
+  const slideId = props.slides ?? (await fetchSlides(props.deck, 0)).id;
+
+  return await useSnapshot().fetch(props.deck, slideId);
 });
 </script>

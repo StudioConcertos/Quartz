@@ -33,4 +33,10 @@ export default defineNuxtConfig({
     glsl: true,
   },
   compatibilityDate: "2024-08-15",
+  runtimeConfig: {
+    public: {
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
 });

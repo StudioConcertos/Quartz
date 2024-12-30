@@ -87,8 +87,6 @@ onMounted(() => {
       () => refreshSlides()
     )
     .subscribe();
-
-  useSnapshot().capture();
 });
 
 onUnmounted(() => {

@@ -1,20 +1,13 @@
 import html2canvas from "html2canvas";
 
 export function useSnapshot() {
+  const config = useRuntimeConfig();
   const client = useSupabaseClient<Database>();
 
-  const { slides, currentSlides, trees } = storeToRefs(useDeckStore());
-
-  const bucket = "snapshots";
+  const { currentSlides, trees } = storeToRefs(useDeckStore());
 
   const capture = async () => {
-    if (!trees.value[currentSlides.value.index].children.length) return;
-    if (
-      localStorage.getItem(
-        `snapshot-${currentSlides.value.deck}-${currentSlides.value.id}.png`
-      )
-    )
-      return;
+    if (isEmptyTree(trees.value[currentSlides.value.index])) return;
 
     const blob = await html2canvas(document.querySelector(".render")!, {
       width: 192,
@@ -39,7 +32,7 @@ export function useSnapshot() {
     );
 
     const { error } = await client.storage
-      .from(bucket)
+      .from("snapshots")
       .upload(
         `${currentSlides.value.deck}/${currentSlides.value.id}.png`,
         blob,
@@ -54,43 +47,39 @@ export function useSnapshot() {
 
   const fetch = async (
     deck: string = currentSlides.value.deck,
-    slidesId: string = currentSlides.value.id
+    slides: string = currentSlides.value.id
   ) => {
-    if (!deck || !slidesId) return;
-
-    const key = `snapshot-${deck}-${slidesId}`;
-    const expires = 60 * 60; // 1 hour.
-
-    if (localStorage.getItem(key)) {
-      const item = JSON.parse(localStorage.getItem(key)!);
-
-      if (item.expires > Date.now()) return item.url;
-
-      localStorage.removeItem(key);
+    if (currentSlides.value?.id === slides) {
+      if (isEmptyTree(trees.value[currentSlides.value.index])) {
+        return;
+      }
     }
 
-    if (
-      trees.value[0] === EMPTY_TREE &&
-      !trees.value[slides.value.findIndex((slide) => slide.id === slidesId)]
-        .children.length
-    )
-      return;
+    const { data, error } = await client.storage.from("snapshots").list(deck, {
+      search: `${slides}.png`,
+    });
 
-    const { data, error } = await client.storage
-      .from(bucket)
-      .createSignedUrl(`${deck}/${slidesId}.png`, expires);
+    if (!data?.length || error) return;
 
-    if (error) throw error;
-
-    localStorage.setItem(
-      key,
-      JSON.stringify({
-        url: data.signedUrl,
-        expires: Date.now() + expires * 1000,
-      })
+    const url = new URL(
+      `${config.public.supabaseUrl}/storage/v1/object/authenticated/snapshots/${deck}/${slides}.png`
     );
 
-    return data.signedUrl;
+    url.searchParams.append("timestamp", Date.now().toString());
+
+    const {
+      data: { session },
+    } = await client.auth.getSession();
+
+    const response = await globalThis.fetch(url, {
+      method: "GET",
+      headers: {
+        authorization: `Bearer ${session?.access_token}`,
+        accept: "image/png",
+      },
+    });
+
+    return url.toString();
   };
 
   return {

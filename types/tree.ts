@@ -3,6 +3,12 @@ export interface Tree extends NodeModel {
   children: Tree[];
 }
 
+export const isEmptyTree = (tree: Tree) => {
+  return !Object.values(tree).some(
+    (value) => value !== "" && value !== "group" && !Array.isArray(value)
+  );
+};
+
 export const EMPTY_TREE: Tree = {
   id: "",
   slides: "",

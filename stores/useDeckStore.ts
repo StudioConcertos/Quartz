@@ -428,7 +428,8 @@ export const useDeckStore = defineStore("deck", () => {
       if (error) throw error;
     }
 
-    useSnapshot().capture();
+    await useSnapshot().capture();
+    // await useSnapshot().fetch(currentSlides.value.deck, currentSlides.value.id);
 
     pendingChanges.value = {
       nodes: [],
