@@ -10,26 +10,26 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@iconify-json/carbon": "^1.2.1",
+    "@iconify-json/carbon": "^1.2.5",
     "@nuxt/image": "^1.8.1",
-    "@nuxtjs/supabase": "^1.4.0",
-    "@pinia/nuxt": "^0.5.4",
-    "@supabase/supabase-js": "^2.45.4",
+    "@nuxtjs/supabase": "^1.4.5",
+    "@pinia/nuxt": "^0.5.5",
+    "@supabase/supabase-js": "^2.47.10",
     "@tresjs/nuxt": "^3.0.7",
     "@types/sortablejs": "^1.15.8",
     "@unocss/nuxt": "^0.58.9",
-    "@vee-validate/nuxt": "^4.14.7",
-    "@vee-validate/zod": "^4.14.7",
+    "@vee-validate/nuxt": "^4.15.0",
+    "@vee-validate/zod": "^4.15.0",
     "@vueuse/core": "^10.11.1",
     "@vueuse/nuxt": "^10.11.1",
     "html2canvas": "^1.4.1",
-    "nuxt": "^3.13.2",
+    "nuxt": "^3.15.0",
     "nuxt-resend": "^0.0.2",
-    "sortablejs": "^1.15.3",
-    "supabase": "^1.192.5",
+    "sortablejs": "^1.15.6",
+    "supabase": "^1.226.4",
     "three": "^0.167.1",
-    "vue": "^3.5.7",
-    "vue-router": "^4.4.5",
-    "zod": "^3.23.8"
+    "vue": "^3.5.13",
+    "vue-router": "^4.5.0",
+    "zod": "^3.24.1"
   }
 }
