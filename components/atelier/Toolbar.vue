@@ -3,14 +3,8 @@
     <NuxtLink to="/atelier">
       <div class="i-carbon-switcher"></div>
     </NuxtLink>
-    <input
-      type="text"
-      maxlength="30"
-      v-model="titleInput"
-      @change="updateSlidesTitle($event)"
-      :style="{ width: `${titleInput.length + 4}ch` }"
-    />
-    <NuxtLink :to="`/live/${useRoute().params.id}`">
+    <input type="text" maxlength="30" v-model.lazy="title" />
+    <NuxtLink :to="`/live/${useRoute().params.id}`" target="_blank">
       <div class="i-carbon-run"></div>
     </NuxtLink>
   </header>
@@ -32,38 +26,28 @@
   }
 
   input {
-    @apply text-center border-none text-4;
+    @apply w-sm text-4;
+    @apply text-center border-none;
     @apply hover-underline focus-underline;
   }
 }
 </style>
 
 <script setup lang="ts">
-const client = useSupabaseClient<Database>();
+const { updateDeckTitle } = useDeckStore();
 
 const props = defineProps<{
   title: string;
 }>();
 
-const titleInput = ref(props.title);
+const title = computed({
+  get() {
+    return props.title;
+  },
+  async set(value) {
+    if (!value.length) return;
 
-watch(titleInput, () => {
-  if (titleInput.value.length > 0) return;
-
-  titleInput.value = props.title[0];
+    await updateDeckTitle(value);
+  },
 });
-
-async function updateSlidesTitle(event: Event) {
-  const title = event.target as HTMLInputElement;
-
-  if (!title.value) return;
-
-  title.value = title.value.trimStart();
-  title.value = title.value.trimEnd();
-
-  await client
-    .from("decks")
-    .update({ title: title.value })
-    .eq("id", useRoute().params.id);
-}
 </script>

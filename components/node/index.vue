@@ -115,7 +115,7 @@ const nodeName = computed({
     return props.node.name;
   },
   set(value) {
-    if (value.length > 30 || !value.length) return props.node.name;
+    if (value.length > 30 || !value.length) return;
 
     updateNode({
       ...props.node,

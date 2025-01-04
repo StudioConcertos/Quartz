@@ -131,6 +131,15 @@ export const useDeckStore = defineStore("deck", () => {
     });
   }
 
+  async function updateDeckTitle(value: string) {
+    if (!value.length) return;
+
+    await client
+      .from("decks")
+      .update({ title: value })
+      .eq("id", useRoute().params.id);
+  }
+
   async function deleteDeck(id: string) {
     const { data, error } = await client.from("decks").delete().eq("id", id);
 
@@ -480,6 +489,7 @@ export const useDeckStore = defineStore("deck", () => {
     fetchDeck,
     insertNewDeck,
     deleteDeck,
+    updateDeckTitle,
     fetchAllSlides,
     fetchSlides,
     insertNewSlides,
