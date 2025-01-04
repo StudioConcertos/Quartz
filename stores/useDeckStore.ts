@@ -476,6 +476,18 @@ export const useDeckStore = defineStore("deck", () => {
     ...tree.children.flatMap(flattenTree),
   ];
 
+  function nextSlides() {
+    if (currentSlidesIndex.value >= slides.value.length - 1) return;
+
+    currentSlidesIndex.value++;
+  }
+
+  function prevSlides() {
+    if (currentSlidesIndex.value <= 0) return;
+
+    currentSlidesIndex.value--;
+  }
+
   return {
     slides,
     currentSlides,
@@ -499,5 +511,7 @@ export const useDeckStore = defineStore("deck", () => {
     fetchNodeComponents,
     updateNode,
     updateNodeComponent,
+    nextSlides,
+    prevSlides,
   };
 });
