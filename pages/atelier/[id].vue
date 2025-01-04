@@ -1,5 +1,5 @@
 <template>
-  <Title v-if="deck">{{ deck?.title ?? "404" }} | Quartz</Title>
+  <Title>{{ deck?.title ?? "404" }} | Quartz</Title>
   <div v-if="!deck">
     <p>Either the deck does not exist or you do not have access.</p>
     <NuxtLink to="/atelier">Return</NuxtLink>
@@ -44,15 +44,16 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 
 const client = useSupabaseClient<Database>();
 
+const { fetchDeck, fetchAllSlides } = useDeckStore();
+
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
 const { data: deck, refresh: refreshDeck } = await useAsyncData(
-  async () => await useDeckStore().fetchDeck(useRoute().params.id as string)
+  async () => await fetchDeck(useRoute().params.id as string)
 );
 
 const { refresh: refreshSlides } = await useAsyncData(
-  async () =>
-    await useDeckStore().fetchAllSlides(useRoute().params.id as string)
+  async () => await fetchAllSlides(useRoute().params.id as string)
 );
 
 onMounted(() => {
