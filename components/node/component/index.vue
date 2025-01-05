@@ -41,10 +41,6 @@
     > *:not(label) {
       @apply p-0 flex-1;
     }
-
-    select {
-      @apply appearance-none;
-    }
   }
 }
 </style>
