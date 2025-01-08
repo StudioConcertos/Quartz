@@ -2,6 +2,7 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <Analytics />
 </template>
 
 <style lang="postcss">
@@ -129,3 +130,7 @@ textarea {
   @apply my-6;
 }
 </style>
+
+<script setup lang="ts">
+import { Analytics } from "@vercel/analytics/nuxt";
+</script>
