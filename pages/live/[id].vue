@@ -6,10 +6,12 @@
   </div>
   <div
     @click="nextSlides()"
+    @contextmenu.prevent="prevSlides()"
     @keydown.enter.space.right="nextSlides()"
     @keydown.left="prevSlides()"
     @mousemove="onCursorMoved"
     tabindex="0"
+    autofocus
     class="live"
   >
     <AtelierRender />
