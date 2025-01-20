@@ -5,12 +5,22 @@
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
   <div
+    @click="nextSlides()"
     @keydown.enter.space.right="nextSlides()"
     @keydown.left="prevSlides()"
+    @mousemove="onCursorMoved"
     tabindex="0"
     class="live"
   >
     <AtelierRender />
+    <div
+      :class="{
+        'opacity-0': !cursorMoved,
+      }"
+      class="overlay"
+    >
+      <p>Page {{ currentSlidesIndex + 1 }} / {{ slides.length }}</p>
+    </div>
   </div>
 </template>
 
@@ -18,6 +28,11 @@
 .live {
   @apply h-screen select-none;
   @apply flex justify-center items-center;
+
+  .overlay {
+    @apply fixed bottom-18 bg-dark-900 p-3 rounded-6 text-3;
+    @apply transition-opacity duration-300;
+  }
 }
 </style>
 
@@ -27,6 +42,19 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 const client = useSupabaseClient<Database>();
 
 const { fetchDeck, fetchAllSlides, nextSlides, prevSlides } = useDeckStore();
+const { slides, currentSlidesIndex } = storeToRefs(useDeckStore());
+
+const cursorMoved = ref(false);
+
+function onCursorMoved() {
+  if (cursorMoved.value) return;
+
+  cursorMoved.value = true;
+
+  setTimeout(() => {
+    cursorMoved.value = false;
+  }, 5000);
+}
 
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
