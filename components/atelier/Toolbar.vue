@@ -115,5 +115,7 @@ const title = computed({
 
 function onSubmit() {
   navigateTo(`/live/${useRoute().params.id}`, { open: { target: "_blank" } });
+
+  modal.value?.close();
 }
 </script>

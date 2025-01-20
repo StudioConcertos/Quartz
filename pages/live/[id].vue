@@ -5,8 +5,8 @@
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
   <div
-    @click="nextSlides()"
-    @contextmenu.prevent="prevSlides()"
+    @click="prevSlides()"
+    @contextmenu.prevent="nextSlides()"
     @keydown.enter.space.right="nextSlides()"
     @keydown.left="prevSlides()"
     @mousemove="onCursorMoved"
