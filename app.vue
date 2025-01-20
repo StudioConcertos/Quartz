@@ -116,6 +116,6 @@ textarea {
 }
 
 .whitespace {
-  @apply my-6;
+  @apply h-6;
 }
 </style>

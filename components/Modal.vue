@@ -1,7 +1,7 @@
 <template>
   <dialog ref="modal">
     <h4>{{ props.title }}:</h4>
-    <div class="whitespace"></div>
+    <div class="h-8"></div>
     <slot />
   </dialog>
 </template>
