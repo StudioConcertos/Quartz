@@ -1,3 +1,5 @@
+// TODO: Optimise the amount of calls.
+
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
 
