@@ -5,6 +5,7 @@
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
   <div
+    v-else
     @click="prevSlides()"
     @contextmenu.prevent="nextSlides()"
     @keydown.enter.space.right="nextSlides()"
@@ -46,6 +47,14 @@ const client = useSupabaseClient<Database>();
 const { fetchDeck, fetchAllSlides, nextSlides, prevSlides } = useDeckStore();
 const { slides, currentSlidesIndex } = storeToRefs(useDeckStore());
 
+const { isFullscreen } = useFullscreen();
+
+watch(isFullscreen, (isFullscreen) => {
+  if (!isFullscreen) {
+    leavePresentation();
+  }
+});
+
 const cursorMoved = ref(false);
 
 function onCursorMoved() {
@@ -56,6 +65,10 @@ function onCursorMoved() {
   setTimeout(() => {
     cursorMoved.value = false;
   }, 5000);
+}
+
+function leavePresentation() {
+  navigateTo(`/atelier/${deck.value?.id}`);
 }
 
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
@@ -107,8 +120,6 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.exitFullscreen();
-
   client.removeAllChannels();
 });
 </script>
