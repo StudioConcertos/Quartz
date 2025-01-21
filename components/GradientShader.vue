@@ -5,7 +5,7 @@
       :position="[0, 0, 0.1]"
     />
     <TresMesh>
-      <TresPlaneGeometry :args="[1.5, 1.5, 300, 300]" />
+      <TresPlaneGeometry :args="[1.2, 1.2, 150, 150]" />
       <TresShaderMaterial
         :vertex-shader="vertexShader"
         :fragment-shader="fragmentShader"
@@ -19,8 +19,6 @@
 import vertexShader from "~/assets/shaders/hero/vertex.glsl?raw";
 import fragmentShader from "~/assets/shaders/hero/fragment.glsl?raw";
 
-import { useRenderLoop } from "@tresjs/core";
-
 import { Color } from "three";
 
 const palette = [
@@ -33,17 +31,17 @@ const palette = [
 const uniforms = {
   uTime: { value: 0 },
   uColor: { value: palette },
+  uGrainSize: { value: 500 },
+  uGrainIntensity: { value: 0.1 },
 };
 
 const { onLoop } = useRenderLoop();
 
+onLoop(({ delta }) => {
+  uniforms.uTime.value += 0.01 * delta;
+});
+
 onMounted(async () => {
   uniforms.uTime.value = Math.random();
-
-  await nextTick();
-
-  onLoop(() => {
-    uniforms.uTime.value += 0.00006;
-  });
 });
 </script>
