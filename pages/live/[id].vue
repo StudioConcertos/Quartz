@@ -61,14 +61,18 @@ function onCursorMoved() {
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
 const { data: deck, refresh: refreshDeck } = await useAsyncData(
+  "deck",
   async () => await fetchDeck(useRoute().params.id as string)
 );
 
 const { refresh: refreshSlides } = await useAsyncData(
+  "slides",
   async () => await fetchAllSlides(useRoute().params.id as string)
 );
 
 onMounted(() => {
+  document.documentElement.requestFullscreen();
+
   deckRC = client
     .channel("public:decks")
     .on(
@@ -103,6 +107,8 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
+  document.exitFullscreen();
+
   client.removeAllChannels();
 });
 </script>

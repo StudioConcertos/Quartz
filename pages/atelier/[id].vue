@@ -49,10 +49,12 @@ const { fetchDeck, fetchAllSlides } = useDeckStore();
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
 const { data: deck, refresh: refreshDeck } = await useAsyncData(
+  "deck",
   async () => await fetchDeck(useRoute().params.id as string)
 );
 
 const { refresh: refreshSlides } = await useAsyncData(
+  "slides",
   async () => await fetchAllSlides(useRoute().params.id as string)
 );
 
