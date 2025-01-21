@@ -1,3 +1,5 @@
+// TODO: Optimise the amount of calls.
+
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
 
@@ -7,8 +9,13 @@ export function useElementRenderer() {
     );
   }
 
+  const renderEl = ref<HTMLDivElement>();
+
   // TODO: Use another method to get the element.
-  const renderEl = document.querySelector(".render") as HTMLElement;
+  onMounted(() => {
+    renderEl.value = document.querySelector(".render") as HTMLDivElement;
+  });
+
   const { width, height } = useElementSize(renderEl);
 
   const scale = computed(() => {

@@ -10,7 +10,7 @@
     </div>
     <div class="field">
       <label>font</label>
-      <select class="w-full p-0 border-neutral-500">
+      <select class="border-neutral-500">
         <option value="azeret-mono">Azeret Mono</option>
       </select>
     </div>

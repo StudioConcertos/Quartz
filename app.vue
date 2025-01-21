@@ -21,17 +21,6 @@ button {
   @apply text-light-200 cursor-pointer select-none;
 }
 
-dialog {
-  @apply absolute top-1/2 left-1/2 px-8 py-12;
-  @apply translate-x-[-50%] translate-y-[-50%];
-  @apply border-2 border-dark-200 border-rd;
-  @apply bg-dark-900 text-light-200 select-none;
-}
-
-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.6);
-}
-
 img {
   @apply select-none;
 }
@@ -78,9 +67,10 @@ section {
 }
 
 select {
-  @apply bg-transparent text-light-200;
+  @apply bg-transparent appearance-none;
   @apply border-0! border-b-1! border-light-200;
-  @apply text-sm py-4 cursor-pointer;
+  @apply text-sm text-light-200
+  @apply py-4 cursor-pointer;
 
   option {
     @apply bg-dark-500 text-light-200;
@@ -127,7 +117,7 @@ textarea {
 }
 
 .whitespace {
-  @apply my-6;
+  @apply h-6;
 }
 </style>
 

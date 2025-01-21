@@ -4,7 +4,7 @@
       Hierarchy
       <div class="actions">
         <Tooltip description="New node">
-          <button @click="dialog?.showModal()">
+          <button @click="modal?.open()">
             <div class="i-carbon-new-tab"></div>
           </button>
         </Tooltip>
@@ -17,9 +17,7 @@
     </h3>
     <div class="whitespace"></div>
     <AtelierHierarchyTree />
-    <dialog ref="dialog">
-      <h4>Create new node:</h4>
-      <div class="whitespace" />
+    <Modal ref="modal" title="Node creation">
       <form @submit="onSubmit">
         <FormInput name="name" type="text" placeholder="Name" :maxlength="20" />
         <Field name="type" v-slot="{ field }">
@@ -39,7 +37,7 @@
         <div v-if="error" class="whitespace"></div>
         <p v-if="error" class="text-center text-red-500">ERROR: {{ error }}</p>
       </form>
-    </dialog>
+    </Modal>
   </div>
 </template>
 
@@ -74,9 +72,11 @@
 <script setup lang="ts">
 import zod from "zod";
 
+import type Modal from "@/components/Modal.vue";
+
 const { currentSlides, selectedNode } = storeToRefs(useDeckStore());
 
-const dialog = ref<HTMLDialogElement>();
+const modal = ref<typeof Modal>();
 
 const types = zod.enum(["text", "group"]);
 
@@ -106,7 +106,7 @@ const onSubmit = handleSubmit(async (values) => {
       values.type
     );
 
-    dialog.value?.close();
+    modal.value?.close();
 
     resetForm();
   } catch (err) {

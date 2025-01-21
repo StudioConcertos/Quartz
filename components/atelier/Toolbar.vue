@@ -3,16 +3,33 @@
     <NuxtLink to="/atelier">
       <div class="i-carbon-switcher"></div>
     </NuxtLink>
-    <input
-      type="text"
-      maxlength="30"
-      v-model="titleInput"
-      @change="updateSlidesTitle($event)"
-      :style="{ width: `${titleInput.length + 4}ch` }"
-    />
-    <NuxtLink :to="`/live/${useRoute().params.id}`">
+    <input type="text" maxlength="30" v-model.lazy="title" />
+    <button @click="modal?.open()">
       <div class="i-carbon-run"></div>
-    </NuxtLink>
+    </button>
+    <Modal ref="modal" title="Presentation mode">
+      <form @submit.prevent="onSubmit">
+        <div class="side">
+          <div>
+            <h5>Local</h5>
+            <div class="whitespace"></div>
+            <p>Your regular presentation experience.</p>
+          </div>
+          <button type="submit" class="primaryButton">Confirm</button>
+        </div>
+        <div class="divider">
+          <span>OR</span>
+        </div>
+        <div class="side">
+          <div>
+            <h5>Online (WIP)</h5>
+            <div class="whitespace"></div>
+            <p>Audience can join the presentation, and interact with you.</p>
+          </div>
+          <button class="primaryButton disabled">Confirm</button>
+        </div>
+      </form>
+    </Modal>
   </header>
 </template>
 
@@ -22,7 +39,8 @@
   @apply bg-dark-500 w-full h-20;
   @apply border-solid border-0 border-b-2 border-dark-200;
 
-  a {
+  a,
+  button {
     @apply h-full px-6 flex items-center transition-colors;
     @apply hover-bg-light-200 hover-text-dark-500;
 
@@ -31,39 +49,73 @@
     }
   }
 
+  form {
+    @apply flex flex-row gap-4;
+
+    .side {
+      @apply flex flex-col flex-1 m-0 gap-40 justify-between;
+
+      h5 {
+        @apply text-lg text-center;
+      }
+
+      p {
+        @apply text-center opacity-60;
+      }
+
+      button {
+        @apply h-auto! text-sm w-1/2 mx-auto;
+      }
+    }
+
+    .divider {
+      @apply relative mx-4;
+
+      &::before {
+        content: "";
+        @apply absolute w-px h-full bg-dark-200;
+      }
+
+      span {
+        @apply absolute left-1/2 top-1/2 bg-dark-900 py-6;
+        @apply translate-x-[-50%] translate-y-[-50%];
+      }
+    }
+  }
+
   input {
-    @apply text-center border-none text-4;
+    @apply w-sm text-4;
+    @apply text-center border-none;
     @apply hover-underline focus-underline;
   }
 }
 </style>
 
 <script setup lang="ts">
-const client = useSupabaseClient<Database>();
+import type Modal from "@/components/Modal.vue";
+
+const { updateDeckTitle } = useDeckStore();
 
 const props = defineProps<{
   title: string;
 }>();
 
-const titleInput = ref(props.title);
+const modal = ref<typeof Modal>();
 
-watch(titleInput, () => {
-  if (titleInput.value.length > 0) return;
+const title = computed({
+  get() {
+    return props.title;
+  },
+  async set(value) {
+    if (!value.length) return;
 
-  titleInput.value = props.title[0];
+    await updateDeckTitle(value);
+  },
 });
 
-async function updateSlidesTitle(event: Event) {
-  const title = event.target as HTMLInputElement;
+function onSubmit() {
+  modal.value?.close();
 
-  if (!title.value) return;
-
-  title.value = title.value.trimStart();
-  title.value = title.value.trimEnd();
-
-  await client
-    .from("decks")
-    .update({ title: title.value })
-    .eq("id", useRoute().params.id);
+  navigateTo(`/live/${useRoute().params.id}`);
 }
 </script>

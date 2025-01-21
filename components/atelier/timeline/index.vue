@@ -102,7 +102,9 @@ async function insertNewSlides() {
 onMounted(() => {
   if (!timeline.value) return;
 
-  Sortable.mount(new Swap());
+  try {
+    Sortable.mount(new Swap());
+  } catch (error) {}
 
   Sortable.create(timeline.value, {
     draggable: ".frame",
