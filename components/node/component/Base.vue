@@ -1,17 +1,10 @@
 <template>
   <NodeComponent name="base">
-    <div class="field">
-      <label>reference</label>
-      <input
-        v-model.lazy="reference"
-        :class="{
-          'cursor-not-allowed opacity-60': isRoot,
-        }"
-        type="text"
-        maxlength="20"
-        :disabled="isRoot"
-      />
-    </div>
+    <NodeComponentFieldText
+      name="reference"
+      :disabled="isRoot"
+      v-model:value="reference"
+    />
   </NodeComponent>
 </template>
 
@@ -23,7 +16,7 @@ const isRoot = computed(() => selectedNode.value?.path === "root");
 
 const reference = computed({
   get() {
-    return selectedNode.value?.reference;
+    return selectedNode.value?.reference ?? "";
   },
   set(value) {
     if (isRoot.value) return;
