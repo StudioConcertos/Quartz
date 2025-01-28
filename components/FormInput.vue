@@ -16,19 +16,10 @@
 </template>
 
 <script setup lang="ts">
-const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-  },
-  placeholder: {
-    type: String,
-    required: true,
-  },
-  maxlength: Number,
-});
+const props = defineProps<{
+  name: string;
+  type: string;
+  placeholder: string;
+  maxlength?: number;
+}>();
 </script>

@@ -23,12 +23,9 @@
 </style>
 
 <script setup lang="ts">
-const props = defineProps({
-  description: {
-    type: String,
-    required: true,
-  },
-});
+const props = defineProps<{
+  description: string;
+}>();
 
 const el = ref<HTMLSpanElement>();
 const width = useElementSize(el).width;
