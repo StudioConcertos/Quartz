@@ -43,12 +43,12 @@ const { currentTree, selectedNode, currentComponents } = storeToRefs(
   useDeckStore()
 );
 
-// TODO: Refactor this, if possible.
+// https://github.com/nuxt/nuxt/issues/14036
 const resolvedComponents = {
-  animation: resolveComponent("NodeComponentAnimation"),
-  base: resolveComponent("NodeComponentBase"),
-  typography: resolveComponent("NodeComponentTypography"),
-  transform: resolveComponent("NodeComponentTransform"),
+  animation: resolveComponent("LazyNodeComponentAnimation"),
+  base: resolveComponent("LazyNodeComponentBase"),
+  transform: resolveComponent("LazyNodeComponentTransform"),
+  typography: resolveComponent("LazyNodeComponentTypography"),
 };
 
 const nodeComponents = computed<ComponentModel[]>(() => {
