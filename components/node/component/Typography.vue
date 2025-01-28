@@ -1,68 +1,47 @@
 <template>
   <NodeComponent name="typography">
-    <div class="field">
-      <label>content</label>
-      <textarea
-        @keydown.enter.exact.prevent="handleEnter"
-        v-model.lazy="props.component.data.content"
-        rows="5"
-      />
-    </div>
-    <div class="field">
-      <label>font</label>
-      <select class="border-neutral-500">
-        <option value="azeret-mono">Azeret Mono</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>size</label>
-      <input type="number" v-model.lazy="props.component.data.size" />
-    </div>
-    <div class="field">
-      <label>weight</label>
-      <input
-        type="number"
-        min="100"
-        max="900"
-        step="100"
-        v-model.lazy="props.component.data.weight"
-      />
-    </div>
-    <div class="field">
-      <label>colour</label>
-      <input v-model.lazy="props.component.data.colour" type="color" />
-    </div>
-    <div class="field">
-      <label>style</label>
-      <div class="flex items-center gap-6">
-        <button>
-          <div class="i-carbon-text-italic" />
-        </button>
-        <button>
-          <div class="i-carbon-text-underline" />
-        </button>
-        <button>
-          <div class="i-carbon-text-strikethrough" />
-        </button>
-      </div>
-    </div>
-    <div class="field">
-      <label>alignment</label>
-      <div class="flex items-center gap-6">
-        <button>
-          <div class="i-carbon-text-align-left" />
-        </button>
-        <button>
-          <div class="i-carbon-text-align-center" />
-        </button>
-        <button>
-          <div class="i-carbon-text-align-right" />
-        </button>
-        <button>
-          <div class="i-carbon-text-align-justify" />
-        </button>
-      </div>
-    </div>
+    <NodeComponentFieldText
+      name="content"
+      isParagraph
+      v-model:value="props.component.data.content"
+    />
+    <NodeComponentFieldSelect
+      name="font"
+      :options="['Azeret Mono']"
+      v-model:value="props.component.data.font"
+    />
+    <NodeComponentFieldNumber
+      name="size"
+      v-model:value="props.component.data.size"
+    />
+    <NodeComponentFieldNumber
+      name="weight"
+      :min="100"
+      :max="900"
+      :step="100"
+      v-model:value="props.component.data.weight"
+    />
+    <NodeComponentFieldColour
+      name="colour"
+      v-model:value="props.component.data.colour"
+    />
+    <NodeComponentFieldRadio
+      name="style"
+      :options="[
+        { value: 'italic', icon: 'i-carbon-text-italic' },
+        { value: 'underline', icon: 'i-carbon-text-underline' },
+        { value: 'strikethrough', icon: 'i-carbon-text-strikethrough' },
+      ]"
+    />
+    <NodeComponentFieldRadio
+      name="alignment"
+      :options="[
+        { value: 'left', icon: 'i-carbon-text-align-left' },
+        { value: 'center', icon: 'i-carbon-text-align-center' },
+        { value: 'right', icon: 'i-carbon-text-align-right' },
+        { value: 'justify', icon: 'i-carbon-text-align-justify' },
+      ]"
+    />
   </NodeComponent>
 </template>
 
@@ -76,8 +55,4 @@ const props = defineProps<{
 watch(props.component.data, () => {
   updateNodeComponent(props.component);
 });
-
-function handleEnter(event: KeyboardEvent) {
-  (event.target as HTMLTextAreaElement).blur();
-}
 </script>

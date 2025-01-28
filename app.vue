@@ -45,6 +45,10 @@ input[type="color"] {
   }
 }
 
+fieldset {
+  @apply border-none;
+}
+
 form {
   @apply flex flex-col;
 

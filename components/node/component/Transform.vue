@@ -1,25 +1,14 @@
 <template>
   <NodeComponent name="transform">
-    <div class="field">
-      <label>x:</label>
-      <input type="number" step="0.01" v-model.lazy="props.component.data.x" />
-    </div>
-    <div class="field">
-      <label>y:</label>
-      <input type="number" step="0.01" v-model.lazy="props.component.data.y" />
-    </div>
-    <div class="field">
-      <label>z:</label>
-      <input type="number" step="0.01" v-model.lazy="props.component.data.z" />
-    </div>
-    <div class="field">
-      <label>scale:</label>
-      <input
-        type="number"
-        step="0.01"
-        v-model.lazy="props.component.data.scale"
-      />
-    </div>
+    <NodeComponentFieldNumber name="x" v-model:value="props.component.data.x" />
+    <NodeComponentFieldNumber name="y" v-model:value="props.component.data.y" />
+    <NodeComponentFieldNumber name="z" v-model:value="props.component.data.z" />
+    <NodeComponentFieldNumber
+      name="scale"
+      :min="0.01"
+      :step="0.01"
+      v-model:value="props.component.data.scale"
+    />
   </NodeComponent>
 </template>
 

@@ -71,7 +71,7 @@ export function useSnapshot() {
       data: { session },
     } = await client.auth.getSession();
 
-    const response = await globalThis.fetch(url, {
+    await globalThis.fetch(url, {
       method: "GET",
       headers: {
         authorization: `Bearer ${session?.access_token}`,

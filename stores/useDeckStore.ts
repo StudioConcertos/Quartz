@@ -137,7 +137,7 @@ export const useDeckStore = defineStore("deck", () => {
     await client
       .from("decks")
       .update({ title: value })
-      .eq("id", useRoute().params.id);
+      .eq("id", useRoute().params.id as string);
   }
 
   async function deleteDeck(id: string) {
@@ -438,7 +438,7 @@ export const useDeckStore = defineStore("deck", () => {
     }
 
     await useSnapshot().capture();
-    // await useSnapshot().fetch(currentSlides.value.deck, currentSlides.value.id);
+    await useSnapshot().fetch(currentSlides.value.deck, currentSlides.value.id);
 
     pendingChanges.value = {
       nodes: [],
