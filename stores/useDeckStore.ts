@@ -227,10 +227,9 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (error) throw error;
 
-    const path =
-      selectedNode.value?.type === "group"
-        ? `${selectedNode.value.path}.${name}`
-        : `root.${name}`;
+    const path = selectedNode.value
+      ? `${selectedNode.value?.path}.${name}`
+      : `root.${name}`;
 
     // Add node to pending changes.
     const node: PendingNode = {
@@ -262,17 +261,29 @@ export const useDeckStore = defineStore("deck", () => {
       },
     ];
 
-    if (type === "text") {
-      defaultComponents.push({
-        type: "typography",
-        node: id,
-        data: {
-          content: "New Text",
-          size: 30,
-          weight: 300,
-          colour: "#151515",
-        },
-      });
+    switch (type) {
+      case "group":
+        defaultComponents.push({
+          type: "layout",
+          node: id,
+          data: {},
+        });
+
+        break;
+
+      case "text":
+        defaultComponents.push({
+          type: "typography",
+          node: id,
+          data: {
+            content: "New Text",
+            size: 30,
+            weight: 300,
+            colour: "#151515",
+          },
+        });
+
+        break;
     }
 
     pendingChanges.value.nodes.push(node);

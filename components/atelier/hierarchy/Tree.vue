@@ -1,12 +1,13 @@
 <template>
   <ul class="tree">
     <Node
-      v-if="currentTree.id"
+      v-if="!isEmptyTree(currentTree)"
       :id="currentTree.id"
       data-path="root"
       data-type="group"
       :node="currentTree"
     />
+    <div v-else>Loading...</div>
   </ul>
 </template>
 

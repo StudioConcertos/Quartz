@@ -1,16 +1,18 @@
 <template>
   <Component
     :is="render.element"
-    :key="props.node.id"
+    :key="props.node.path"
     :style="[
       render.style,
       {
         position: 'absolute',
         transformOrigin: 'top left',
         whiteSpace: 'nowrap',
+        cursor: 'move',
       },
     ]"
-    class="element"
+    :id="props.node.path"
+    :class="props.node.path === 'root' ? 'root' : 'element'"
   >
     {{ render.content }}
     <AtelierRenderElement

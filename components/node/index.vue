@@ -34,7 +34,7 @@
         {{ props.node.reference }}
       </p>
     </button>
-    <ul ref="nested" v-if="isGroup && node.children">
+    <ul ref="nested" v-if="node.children">
       <Node
         v-for="child in node.children"
         :node="child"
