@@ -166,6 +166,8 @@ export type Database = {
       componenttype:
         | "animation"
         | "base"
+        | "camera"
+        | "scene"
         | "transform"
         | "typography";
       nodetype: "group" | "text" | "webgl_canvas";

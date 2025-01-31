@@ -1,5 +1,3 @@
-// TODO: Optimise the amount of calls.
-
 // ! = Required component; ? = Optional component.
 
 import {
@@ -23,6 +21,10 @@ export function useElementRenderer() {
   const renderEl = ref<HTMLDivElement>(
     document.querySelector(".render") as HTMLDivElement
   );
+
+  onMounted(() => {
+    renderEl.value = document.querySelector(".render") as HTMLDivElement;
+  });
 
   const { width, height } = useElementSize(renderEl);
 
@@ -70,33 +72,65 @@ export function useElementRenderer() {
       },
     },
     webgl_canvas: {
-      element: "canvas",
+      element: "div",
       render: (node: Tree) => {
+        const transform = findComponent(node, "transform")!.data;
+
+        const sceneComponent = findComponent(node, "scene")!.data;
+        const cameraComponent = findComponent(node, "camera")!.data;
+
+        const xPercent = (transform.x / 1920) * 100;
+        const yPercent = (transform.y / 1080) * 100;
+
         const scene = new Scene();
         const camera = new PerspectiveCamera(
           75,
-          width.value / height.value,
+          transform.width / transform.height,
           0.1,
           1000
         );
         const renderer = new WebGLRenderer({ antialias: true });
 
-        renderer.setSize(width.value, height.value);
-        renderEl.value!.appendChild(renderer.domElement);
-        camera.position.z = 5;
+        const existingCanvases = renderEl.value.querySelectorAll("canvas");
+        existingCanvases.forEach((canvas) => canvas.remove());
+
+        renderer.setSize(transform.width, transform.height);
+        renderer.setClearColor(sceneComponent.background);
+
+        document.getElementById(node.id)?.appendChild(renderer.domElement);
+
+        camera.position.set(
+          cameraComponent.x,
+          cameraComponent.y,
+          cameraComponent.z
+        );
 
         var geometry = new BoxGeometry(1, 1, 1);
-        var material = new MeshBasicMaterial({ color: "#433F81" });
+        var material = new MeshBasicMaterial({ color: "#FF0000" });
         var cube = new Mesh(geometry, material);
 
         scene.add(cube);
 
-        renderer.render(scene, camera);
+        var render = function () {
+          requestAnimationFrame(render);
+
+          cube.rotation.x += 0.005;
+          cube.rotation.y += 0.005;
+
+          // Render the scene
+          renderer.render(scene, camera);
+        };
+
+        render();
 
         return {
           style: {
-            width: `${width.value}px`,
-            height: `${height.value}px`,
+            top: `${yPercent}%`,
+            left: `${xPercent}%`,
+            zIndex: transform.z,
+            width: `${transform.width}px`,
+            height: `${transform.height}px`,
+            transform: `scale(${transform.scale * scale.value})`,
           },
         };
       },

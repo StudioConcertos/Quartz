@@ -47,6 +47,8 @@ const { currentTree, selectedNode, currentComponents } = storeToRefs(
 const resolvedComponents = {
   animation: resolveComponent("LazyNodeComponentAnimation"),
   base: resolveComponent("LazyNodeComponentBase"),
+  camera: resolveComponent("LazyNodeComponentCamera"),
+  scene: resolveComponent("LazyNodeComponentScene"),
   transform: resolveComponent("LazyNodeComponentTransform"),
   typography: resolveComponent("LazyNodeComponentTypography"),
 };

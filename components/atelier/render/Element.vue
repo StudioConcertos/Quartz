@@ -11,7 +11,7 @@
         cursor: 'move',
       },
     ]"
-    :id="props.node.path"
+    :id="props.node.id"
     :class="props.node.path === 'root' ? 'root' : 'element'"
   >
     {{ render.content }}
@@ -30,6 +30,7 @@ const props = defineProps<{
   node: Tree;
 }>();
 
+// TOFIX: Nodes will render three times on initial load somehow.
 const render = computed(() => {
   const result = renderer[props.node.type];
 

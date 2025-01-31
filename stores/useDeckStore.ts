@@ -284,6 +284,27 @@ export const useDeckStore = defineStore("deck", () => {
         });
 
         break;
+
+      case "webgl_canvas":
+        defaultComponents.push({
+          type: "scene",
+          node: id,
+          data: {
+            background: "#151515",
+          },
+        });
+
+        defaultComponents.push({
+          type: "camera",
+          node: id,
+          data: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
+        });
+
+        break;
     }
 
     pendingChanges.value.nodes.push(node);
