@@ -1,5 +1,6 @@
 <template>
   <Component
+    v-if="render?.element"
     :is="render.element"
     :key="props.node.path"
     :style="[
@@ -24,19 +25,35 @@
 </template>
 
 <script setup lang="ts">
-const { renderer } = useElementRenderer();
+const { renderer, animate, setupCanvas } = useElementRenderer();
 
 const props = defineProps<{
   node: Tree;
 }>();
 
-// TOFIX: Nodes will render three times on initial load somehow.
+const isMounted = ref(false);
+
 const render = computed(() => {
+  if (!isMounted.value) return;
+
+  console.log("Rendering", props.node.type);
+
   const result = renderer[props.node.type];
 
   return {
     element: result.element,
     ...result.render(props.node),
   };
+});
+
+onMounted(() => {
+  isMounted.value = true;
+
+  if (props.node.type === "webgl_canvas") {
+    nextTick(() => {
+      setupCanvas();
+      animate();
+    });
+  }
 });
 </script>

@@ -1,3 +1,5 @@
+// TODO: Refactor this whole mess.
+
 // ! = Required component; ? = Optional component.
 
 import {
@@ -8,6 +10,34 @@ import {
   MeshBasicMaterial,
   Mesh,
 } from "three";
+
+const canvasContext = new Map<
+  string,
+  {
+    scene: Scene;
+    camera: PerspectiveCamera;
+    renderer: WebGLRenderer;
+  }
+>();
+
+function setupCanvas() {
+  document
+    .getElementById("c115e1c6-cf92-4345-93a5-4bfdcad3db44")
+    ?.appendChild(canvasContext.get("0")!.renderer.domElement);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  canvasContext.forEach((context) => {
+    context.scene.children.forEach((child) => {
+      child.rotation.x += 0.01;
+      child.rotation.y += 0.01;
+    });
+
+    context.renderer.render(context.scene, context.camera);
+  });
+}
 
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
@@ -82,46 +112,29 @@ export function useElementRenderer() {
         const xPercent = (transform.x / 1920) * 100;
         const yPercent = (transform.y / 1080) * 100;
 
-        const scene = new Scene();
-        const camera = new PerspectiveCamera(
-          75,
-          transform.width / transform.height,
-          0.1,
-          1000
-        );
-        const renderer = new WebGLRenderer({ antialias: true });
+        if (!canvasContext.has("0")) {
+          canvasContext.set("0", {
+            scene: new Scene(),
+            camera: new PerspectiveCamera(
+              75,
+              transform.width / transform.height,
+              0.1,
+              1000
+            ),
+            renderer: new WebGLRenderer({ antialias: true }),
+          });
+        }
 
-        const existingCanvases = renderEl.value.querySelectorAll("canvas");
-        existingCanvases.forEach((canvas) => canvas.remove());
+        const context = canvasContext.get("0");
 
-        renderer.setSize(transform.width, transform.height);
-        renderer.setClearColor(sceneComponent.background);
+        context?.renderer.setSize(transform.width, transform.height);
+        context?.renderer.setClearColor(sceneComponent.background);
 
-        document.getElementById(node.id)?.appendChild(renderer.domElement);
-
-        camera.position.set(
+        context?.camera.position.set(
           cameraComponent.x,
           cameraComponent.y,
           cameraComponent.z
         );
-
-        var geometry = new BoxGeometry(1, 1, 1);
-        var material = new MeshBasicMaterial({ color: "#FF0000" });
-        var cube = new Mesh(geometry, material);
-
-        scene.add(cube);
-
-        var render = function () {
-          requestAnimationFrame(render);
-
-          cube.rotation.x += 0.005;
-          cube.rotation.y += 0.005;
-
-          // Render the scene
-          renderer.render(scene, camera);
-        };
-
-        render();
 
         return {
           style: {
@@ -135,9 +148,27 @@ export function useElementRenderer() {
         };
       },
     },
+    webgl_object: {
+      element: "",
+      render: (node: Tree) => {
+        const mesh = findComponent(node, "mesh")!.data;
+
+        const geometry = new BoxGeometry(1, 1, 1);
+        const material = new MeshBasicMaterial({ color: "#FF0000" });
+        const cube = new Mesh(geometry, material);
+
+        const context = canvasContext.get("0");
+
+        context?.scene.add(cube);
+
+        return {};
+      },
+    },
   };
 
   return {
     renderer,
+    animate,
+    setupCanvas,
   };
 }

@@ -167,10 +167,11 @@ export type Database = {
         | "animation"
         | "base"
         | "camera"
+        | "mesh"
         | "scene"
         | "transform"
         | "typography";
-      nodetype: "group" | "text" | "webgl_canvas";
+      nodetype: "group" | "text" | "webgl_canvas" | "webgl_object";
     };
     CompositeTypes: {
       [_ in never]: never;

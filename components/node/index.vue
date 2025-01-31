@@ -34,7 +34,7 @@
         {{ props.node.reference }}
       </p>
     </button>
-    <ul ref="nested" v-if="node.children">
+    <ul ref="nested" v-if="node.children && isMounted">
       <Node
         v-for="child in node.children"
         :node="child"
@@ -110,6 +110,8 @@ const props = defineProps<{
   node: Tree;
 }>();
 
+const isMounted = ref(false);
+
 const nodeName = computed({
   get() {
     return props.node.name;
@@ -152,6 +154,8 @@ function handleDelete(event: KeyboardEvent) {
 }
 
 onMounted(() => {
+  isMounted.value = true;
+
   if (!nested.value) return;
 
   Sortable.create(nested.value, {

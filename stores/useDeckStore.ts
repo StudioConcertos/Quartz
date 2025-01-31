@@ -305,11 +305,20 @@ export const useDeckStore = defineStore("deck", () => {
         });
 
         break;
+
+      case "webgl_object":
+        defaultComponents.push({
+          type: "mesh",
+          node: id,
+          data: {},
+        });
+
+        break;
     }
 
     pendingChanges.value.nodes.push(node);
-    pendingChanges.value.components.push(...defaultComponents);
 
+    pendingChanges.value.components.push(...defaultComponents);
     components.value[currentSlidesIndex.value].push(...defaultComponents);
 
     selectedNode.value = node as Tree;

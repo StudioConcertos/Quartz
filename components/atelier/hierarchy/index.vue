@@ -78,7 +78,7 @@ const { currentSlides, selectedNode } = storeToRefs(useDeckStore());
 
 const modal = ref<typeof Modal>();
 
-const types = zod.enum(["group", "text", "webgl_canvas"]);
+const types = zod.enum(["group", "text", "webgl_canvas", "webgl_object"]);
 
 const nodeSchema = toTypedSchema(
   zod.object({
