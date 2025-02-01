@@ -17,6 +17,7 @@ const canvasContext = new Map<
     scene: Scene;
     camera: PerspectiveCamera;
     renderer: WebGLRenderer;
+    objects: Map<string, Mesh>;
   }
 >();
 
@@ -117,11 +118,13 @@ export function useElementRenderer() {
             scene: new Scene(),
             camera: new PerspectiveCamera(
               75,
+              // TOFIX: This is not reactive.
               transform.width / transform.height,
               0.1,
               1000
             ),
             renderer: new WebGLRenderer({ antialias: true }),
+            objects: new Map(),
           });
         }
 
@@ -151,17 +154,35 @@ export function useElementRenderer() {
     webgl_object: {
       element: "",
       render: (node: Tree) => {
-        const mesh = findComponent(node, "mesh")!.data;
-
-        const geometry = new BoxGeometry(1, 1, 1);
-        const material = new MeshBasicMaterial({ color: "#FF0000" });
-        const cube = new Mesh(geometry, material);
-
         const context = canvasContext.get("0");
 
-        context?.scene.add(cube);
+        const mesh = findComponent(node, "mesh")!.data;
 
-        return {};
+        console.log("adding cube");
+
+        if (context?.objects.has(node.id)) {
+          const cube = context?.objects.get(node.id);
+
+          (cube?.material as MeshBasicMaterial).color.set(mesh.colour);
+
+          return {};
+        } else {
+          const geometry = new BoxGeometry(1, 1, 1);
+          const material = new MeshBasicMaterial({ color: mesh.colour });
+          const cube = new Mesh(geometry, material);
+
+          if (context?.objects.has(node.id)) {
+            return {};
+          }
+
+          context?.objects.set(node.id, cube);
+
+          context?.scene.add(cube);
+
+          console.log(context?.scene.children);
+
+          return {};
+        }
       },
     },
   };

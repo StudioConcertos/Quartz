@@ -83,7 +83,7 @@ export const useDeckStore = defineStore("deck", () => {
 
       await saveChanges();
     },
-    { debounce: 5000, deep: true }
+    { debounce: 10000, deep: true }
   );
 
   async function fetchAllDecks() {
@@ -310,7 +310,9 @@ export const useDeckStore = defineStore("deck", () => {
         defaultComponents.push({
           type: "mesh",
           node: id,
-          data: {},
+          data: {
+            colour: "#FAFAFA",
+          },
         });
 
         break;
