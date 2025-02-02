@@ -113,12 +113,25 @@ export function useElementRenderer() {
         const xPercent = (transform.x / 1920) * 100;
         const yPercent = (transform.y / 1080) * 100;
 
+        watch(
+          () => transform.width / transform.height,
+          (newAspectRatio) => {
+            const context = canvasContext.get("0");
+
+            if (!context) return;
+
+            context.camera.aspect = newAspectRatio;
+            context.camera.updateProjectionMatrix();
+
+            context.renderer.setSize(transform.width, transform.height);
+          }
+        );
+
         if (!canvasContext.has("0")) {
           canvasContext.set("0", {
             scene: new Scene(),
             camera: new PerspectiveCamera(
               75,
-              // TOFIX: This is not reactive.
               transform.width / transform.height,
               0.1,
               1000
