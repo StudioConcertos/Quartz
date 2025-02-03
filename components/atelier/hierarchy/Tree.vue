@@ -7,7 +7,9 @@
       data-type="group"
       :node="currentTree"
     />
-    <div v-else>Loading...</div>
+    <div v-else class="loader">
+      <p>Loading...</p>
+    </div>
   </ul>
 </template>
 
@@ -21,6 +23,10 @@
     (100vh / Amount of views inside the inspector)
   */
   @apply list-none h-full max-h-[50vh] overflow-y-auto;
+
+  .loader {
+    @apply flex justify-center items-center h-full;
+  }
 }
 </style>
 

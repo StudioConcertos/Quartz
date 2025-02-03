@@ -6,7 +6,9 @@
       :key="node.id"
       :node="node"
     />
-    <div v-else>Loading...</div>
+    <div v-else class="loader">
+      <p>Loading...</p>
+    </div>
   </div>
 </template>
 
@@ -18,6 +20,10 @@
 
   .root {
     @apply w-full h-full;
+  }
+
+  .loader {
+    @apply flex justify-center items-center h-full;
   }
 }
 </style>
