@@ -167,6 +167,7 @@ export type Database = {
         | "animation"
         | "base"
         | "camera"
+        | "layout"
         | "mesh"
         | "scene"
         | "transform"
