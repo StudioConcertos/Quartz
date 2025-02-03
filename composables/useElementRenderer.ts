@@ -21,10 +21,18 @@ const canvasContext = new Map<
   }
 >();
 
+const hasAnimated = ref(false);
+
 function setupCanvas(canvas: string) {
   document
     .getElementById(canvas)
     ?.appendChild(canvasContext.get(canvas)!.renderer.domElement);
+
+  if (!hasAnimated.value) {
+    animate();
+
+    hasAnimated.value = true;
+  }
 }
 
 function animate() {
@@ -202,7 +210,6 @@ export function useElementRenderer() {
 
   return {
     renderer,
-    animate,
     setupCanvas,
   };
 }

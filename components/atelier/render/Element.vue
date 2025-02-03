@@ -25,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-const { renderer, animate, setupCanvas } = useElementRenderer();
+const { renderer, setupCanvas } = useElementRenderer();
 
 const props = defineProps<{
   node: Tree;
@@ -52,7 +52,6 @@ onMounted(() => {
   if (props.node.type === "webgl_canvas") {
     nextTick(() => {
       setupCanvas(props.node.id);
-      animate();
     });
   }
 });
