@@ -300,7 +300,7 @@ export const useDeckStore = defineStore("deck", () => {
           data: {
             x: 0,
             y: 0,
-            z: 0,
+            z: 5,
           },
         });
 
@@ -311,6 +311,7 @@ export const useDeckStore = defineStore("deck", () => {
           type: "mesh",
           node: id,
           data: {
+            type: "box",
             colour: "#FAFAFA",
           },
         });

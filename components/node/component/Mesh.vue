@@ -1,5 +1,10 @@
 <template>
   <NodeComponent name="mesh">
+    <NodeComponentFieldSelect
+      name="type"
+      v-model:value="props.component.data.type"
+      :options="['box', 'icosahedron', 'triangle', 'sphere']"
+    />
     <NodeComponentFieldColour
       name="colour"
       v-model:value="props.component.data.colour"

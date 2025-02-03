@@ -7,6 +7,9 @@ import {
   PerspectiveCamera,
   WebGLRenderer,
   BoxGeometry,
+  SphereGeometry,
+  IcosahedronGeometry,
+  TetrahedronGeometry,
   MeshBasicMaterial,
   Mesh,
 } from "three";
@@ -179,16 +182,40 @@ export function useElementRenderer() {
 
         const mesh = findComponent(node, "mesh")!.data;
 
-        console.log("adding cube");
+        const getGeometry = (type: string) => {
+          switch (type) {
+            case "box":
+              return new BoxGeometry(1, 1, 1);
+
+            case "icosahedron":
+              return new IcosahedronGeometry();
+
+            case "triangle":
+              return new TetrahedronGeometry();
+
+            case "sphere":
+              return new SphereGeometry(0.5, 32, 32);
+
+            default:
+              return new BoxGeometry(0, 0, 0);
+          }
+        };
+
+        console.log("adding object", mesh.type);
 
         if (context?.objects.has(node.id)) {
-          const cube = context?.objects.get(node.id);
+          const object = context?.objects.get(node.id);
 
-          (cube?.material as MeshBasicMaterial).color.set(mesh.colour);
+          if (object && object.geometry.type !== mesh.type) {
+            object.geometry.dispose();
+            object.geometry = getGeometry(mesh.type);
+          }
+
+          (object?.material as MeshBasicMaterial).color.set(mesh.colour);
 
           return {};
         } else {
-          const geometry = new BoxGeometry(1, 1, 1);
+          const geometry = getGeometry(mesh.type);
           const material = new MeshBasicMaterial({ color: mesh.colour });
           const cube = new Mesh(geometry, material);
 
