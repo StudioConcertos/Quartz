@@ -83,7 +83,7 @@ export const useDeckStore = defineStore("deck", () => {
 
       await saveChanges();
     },
-    { debounce: 5000, deep: true }
+    { debounce: 10000, deep: true }
   );
 
   async function fetchAllDecks() {
@@ -284,11 +284,44 @@ export const useDeckStore = defineStore("deck", () => {
         });
 
         break;
+
+      case "webgl_canvas":
+        defaultComponents.push({
+          type: "scene",
+          node: id,
+          data: {
+            background: "#151515",
+          },
+        });
+
+        defaultComponents.push({
+          type: "camera",
+          node: id,
+          data: {
+            x: 0,
+            y: 0,
+            z: 5,
+          },
+        });
+
+        break;
+
+      case "webgl_object":
+        defaultComponents.push({
+          type: "mesh",
+          node: id,
+          data: {
+            type: "box",
+            colour: "#FAFAFA",
+          },
+        });
+
+        break;
     }
 
     pendingChanges.value.nodes.push(node);
-    pendingChanges.value.components.push(...defaultComponents);
 
+    pendingChanges.value.components.push(...defaultComponents);
     components.value[currentSlidesIndex.value].push(...defaultComponents);
 
     selectedNode.value = node as Tree;
@@ -371,6 +404,8 @@ export const useDeckStore = defineStore("deck", () => {
       const parentNode = lookup[parentPath];
 
       if (parentNode) {
+        node.parent = parentNode;
+
         parentNode.children.push(node);
       }
     });
