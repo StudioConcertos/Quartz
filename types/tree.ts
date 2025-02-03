@@ -1,6 +1,7 @@
 export interface Tree extends NodeModel {
   type: NodeType;
   children: Tree[];
+  parent?: Tree;
 }
 
 export const isEmptyTree = (tree: Tree) => {

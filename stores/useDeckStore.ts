@@ -403,6 +403,8 @@ export const useDeckStore = defineStore("deck", () => {
       const parentNode = lookup[parentPath];
 
       if (parentNode) {
+        node.parent = parentNode;
+
         parentNode.children.push(node);
       }
     });

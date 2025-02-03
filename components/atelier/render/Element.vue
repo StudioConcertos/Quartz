@@ -51,7 +51,7 @@ onMounted(() => {
 
   if (props.node.type === "webgl_canvas") {
     nextTick(() => {
-      setupCanvas();
+      setupCanvas(props.node.id);
       animate();
     });
   }

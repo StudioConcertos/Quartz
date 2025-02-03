@@ -21,10 +21,10 @@ const canvasContext = new Map<
   }
 >();
 
-function setupCanvas() {
+function setupCanvas(canvas: string) {
   document
-    .getElementById("c115e1c6-cf92-4345-93a5-4bfdcad3db44")
-    ?.appendChild(canvasContext.get("0")!.renderer.domElement);
+    .getElementById(canvas)
+    ?.appendChild(canvasContext.get(canvas)!.renderer.domElement);
 }
 
 function animate() {
@@ -116,7 +116,7 @@ export function useElementRenderer() {
         watch(
           () => transform.width / transform.height,
           (newAspectRatio) => {
-            const context = canvasContext.get("0");
+            const context = canvasContext.get(node.id);
 
             if (!context) return;
 
@@ -127,8 +127,8 @@ export function useElementRenderer() {
           }
         );
 
-        if (!canvasContext.has("0")) {
-          canvasContext.set("0", {
+        if (!canvasContext.has(node.id)) {
+          canvasContext.set(node.id, {
             scene: new Scene(),
             camera: new PerspectiveCamera(
               75,
@@ -141,7 +141,7 @@ export function useElementRenderer() {
           });
         }
 
-        const context = canvasContext.get("0");
+        const context = canvasContext.get(node.id);
 
         context?.renderer.setSize(transform.width, transform.height);
         context?.renderer.setClearColor(sceneComponent.background);
@@ -167,7 +167,7 @@ export function useElementRenderer() {
     webgl_object: {
       element: "",
       render: (node: Tree) => {
-        const context = canvasContext.get("0");
+        const context = canvasContext.get(node.parent!.id);
 
         const mesh = findComponent(node, "mesh")!.data;
 
