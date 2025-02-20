@@ -3,9 +3,9 @@
     <button
       v-for="(tab, index) in tabs"
       :key="tab.name"
-      @click="selectedTab = index"
+      @click="setActiveTab(index)"
     >
-      <div :class="[tab.icon, { 'opacity-60': index !== selectedTab }]"></div>
+      <div :class="[tab.icon, { 'opacity-60': index !== activeTab }]"></div>
     </button>
   </aside>
 </template>
@@ -16,7 +16,8 @@ aside {
   @apply flex flex-col;
 
   button {
-    @apply w-full h-20 flex justify-center items-center transition-colors;
+    @apply w-full h-20;
+    @apply flex justify-center items-center transition-colors;
     @apply hover-bg-light-200 hover-text-dark-500;
 
     [class*="i-"] {
@@ -27,10 +28,6 @@ aside {
 </style>
 
 <script setup lang="ts">
-const tabs = [
-  { name: "Editor", icon: "i-carbon-legend" },
-  { name: "Assets", icon: "i-carbon-folders" },
-];
-
-const selectedTab = ref(0);
+const { tabs, activeTab } = storeToRefs(useAtelierStore());
+const { setActiveTab } = useAtelierStore();
 </script>

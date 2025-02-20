@@ -8,11 +8,7 @@
     <AtelierHeader :title="deck.title" />
     <div class="flex flex-1 overflow-hidden">
       <AtelierToolbar />
-      <div class="editor border-r">
-        <AtelierHierarchy />
-        <div class="whitespace"></div>
-        <AtelierInspector />
-      </div>
+      <AtelierEditor />
       <div class="flex flex-1 flex-col">
         <div class="px-40 h-[80vh] flex items-center">
           <AtelierRender />
@@ -23,21 +19,7 @@
   </div>
 </template>
 
-<style scoped lang="postcss">
-.editor {
-  @apply bg-dark-700 w-[30vw] p-[2.5ch];
-  @apply flex flex-col;
-
-  /*
-    The bottom padding offsets back the hidden overflow on the Y axis,
-    which prevents the last element not being scrollable.
-  */
-  .hierarchy,
-  .inspector {
-    @apply flex-1 overflow-y-hidden pb-10;
-  }
-}
-</style>
+<style scoped lang="postcss"></style>
 
 <script setup lang="ts">
 import { RealtimeChannel } from "@supabase/supabase-js";
