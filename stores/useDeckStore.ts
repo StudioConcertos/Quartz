@@ -379,7 +379,7 @@ export const useDeckStore = defineStore("deck", () => {
   function buildTree(nodes: NodeModel[] | PendingNode[]) {
     const lookup: Record<string, Tree> = {};
 
-    // Process database nodes.
+    // Process existing nodes.
     nodes.forEach((node) => {
       lookup[node.path] = {
         ...node,

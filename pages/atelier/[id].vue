@@ -5,13 +5,14 @@
     <NuxtLink to="/atelier">Return</NuxtLink>
   </div>
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
-    <AtelierToolbar :title="deck.title" />
+    <AtelierHeader :title="deck.title" />
     <div class="flex flex-1 overflow-hidden">
-      <aside class="editor">
+      <AtelierToolbar />
+      <div class="editor border-r">
         <AtelierHierarchy />
         <div class="whitespace"></div>
         <AtelierInspector />
-      </aside>
+      </div>
       <div class="flex flex-1 flex-col">
         <div class="px-40 h-[80vh] flex items-center">
           <AtelierRender />
@@ -24,8 +25,7 @@
 
 <style scoped lang="postcss">
 .editor {
-  @apply bg-dark-500 w-[30vw] p-[2.5ch];
-  @apply border-solid border-0 border-r-2 border-dark-200;
+  @apply bg-dark-700 w-[30vw] p-[2.5ch];
   @apply flex flex-col;
 
   /*
