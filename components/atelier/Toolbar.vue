@@ -1,9 +1,36 @@
 <template>
-  <aside class="toolbar border-r"></aside>
+  <aside class="toolbar border-r">
+    <button
+      v-for="(tab, index) in tabs"
+      :key="tab.name"
+      @click="selectedTab = index"
+    >
+      <div :class="[tab.icon, { 'opacity-60': index !== selectedTab }]"></div>
+    </button>
+  </aside>
 </template>
 
 <style scoped lang="postcss">
 aside {
   @apply bg-dark-500 w-[80px];
+  @apply flex flex-col;
+
+  button {
+    @apply w-full h-20 flex justify-center items-center transition-colors;
+    @apply hover-bg-light-200 hover-text-dark-500;
+
+    [class*="i-"] {
+      @apply text-2xl transition-opacity;
+    }
+  }
 }
 </style>
+
+<script setup lang="ts">
+const tabs = [
+  { name: "Editor", icon: "i-carbon-legend" },
+  { name: "Assets", icon: "i-carbon-folders" },
+];
+
+const selectedTab = ref(0);
+</script>
