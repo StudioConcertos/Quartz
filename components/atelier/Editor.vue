@@ -7,7 +7,7 @@
     </template>
 
     <template v-if="activeTab === 1">
-      <h3>Assets</h3>
+      <AtelierAssets />
     </template>
   </div>
 </template>

@@ -32,7 +32,7 @@
 .placeholder {
   @apply flex flex-col justify-center items-center text-4;
 
-  [class*="i-"] {
+  .i-carbon-error {
     @apply text-10 mb-6;
   }
 }
