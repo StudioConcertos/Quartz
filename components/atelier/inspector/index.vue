@@ -1,29 +1,25 @@
 <template>
-  <div class="editor border-r">
+  <div class="inspector border-r">
     <template v-if="activeTab === 0">
-      <AtelierHierarchy />
+      <AtelierInspectorViewHierarchy />
       <div class="whitespace"></div>
-      <AtelierProperties />
+      <AtelierInspectorViewProperties />
     </template>
 
     <template v-if="activeTab === 1">
-      <AtelierAssets />
+      <AtelierInspectorViewAssets />
     </template>
   </div>
 </template>
 
 <style scoped lang="postcss">
-.editor {
+.inspector {
   @apply bg-dark-700 w-[30vw] p-[2.5ch];
   @apply flex flex-col;
 
-  /*
-    The bottom padding offsets back the hidden overflow on the Y axis,
-    which prevents the last element not being scrollable.
-  */
   .hierarchy,
   .properties {
-    @apply flex-1 overflow-y-hidden pb-10;
+    @apply flex-1 overflow-y-hidden;
   }
 }
 </style>

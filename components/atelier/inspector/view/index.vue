@@ -1,21 +1,24 @@
 <template>
-  <div class="assets">
+  <div class="tab" :class="props.name.toLowerCase()">
     <h3>
-      Assets
+      {{ props.name }}
       <div class="actions">
-        <Tooltip description="Upload new asset">
-          <button @click="">
-            <div class="i-carbon-cloud-upload"></div>
+        <Tooltip v-for="action in props.actions" :description="action.tooltip">
+          <button @click="action.onClick">
+            <div :class="action.icon"></div>
           </button>
         </Tooltip>
       </div>
     </h3>
     <div class="whitespace"></div>
+    <slot />
   </div>
 </template>
 
 <style scoped lang="postcss">
-.assets {
+.tab {
+  @apply flex flex-col;
+
   h3 {
     @apply flex justify-between items-center;
 
@@ -42,4 +45,13 @@
 }
 </style>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const props = defineProps<{
+  name: string;
+  actions: {
+    icon: string;
+    tooltip: string;
+    onClick: () => void;
+  }[];
+}>();
+</script>

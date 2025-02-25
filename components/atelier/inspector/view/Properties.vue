@@ -1,16 +1,18 @@
 <template>
-  <div v-if="selectedNode" class="view" @contextmenu.prevent>
-    <Component
-      v-for="component in nodeComponents"
-      :key="component.type"
-      :is="resolvedComponents[component.type]"
-      :component="component"
-    />
-  </div>
-  <div v-else class="placeholder" @contextmenu.prevent>
-    <div class="i-carbon-error"></div>
-    <p>No node selected</p>
-  </div>
+  <AtelierInspectorView name="Properties" :actions="[]">
+    <div v-if="selectedNode" class="view" @contextmenu.prevent>
+      <Component
+        v-for="component in nodeComponents"
+        :key="component.type"
+        :is="resolvedComponents[component.type]"
+        :component="component"
+      />
+    </div>
+    <div v-else class="placeholder" @contextmenu.prevent>
+      <div class="i-carbon-error"></div>
+      <p>No node selected</p>
+    </div>
+  </AtelierInspectorView>
 </template>
 
 <style scoped lang="postcss">

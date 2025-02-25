@@ -8,7 +8,7 @@
     <AtelierHeader :title="deck.title" />
     <div class="flex flex-1 overflow-hidden">
       <AtelierToolbar />
-      <AtelierEditor />
+      <AtelierInspector />
       <div class="flex flex-1 flex-col">
         <div class="px-40 h-[80vh] flex items-center">
           <AtelierRender />
