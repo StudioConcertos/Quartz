@@ -1,7 +1,6 @@
 import html2canvas from "html2canvas";
 
 export function useSnapshot() {
-  const config = useRuntimeConfig();
   const client = useSupabaseClient<Database>();
 
   const { currentSlides, trees } = storeToRefs(useDeckStore());
@@ -61,23 +60,7 @@ export function useSnapshot() {
 
     if (!data?.length || error) return;
 
-    const url = new URL(
-      `${config.public.supabaseUrl}/storage/v1/object/authenticated/snapshots/${deck}/${slides}.png`
-    );
-
-    url.searchParams.append("timestamp", Date.now().toString());
-
-    const {
-      data: { session },
-    } = await client.auth.getSession();
-
-    await globalThis.fetch(url, {
-      method: "GET",
-      headers: {
-        authorization: `Bearer ${session?.access_token}`,
-        accept: "image/png",
-      },
-    });
+    const { url } = await getStorageObject("snapshots", deck, `${slides}.png`);
 
     return url.toString();
   };
