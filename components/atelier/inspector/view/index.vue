@@ -1,25 +1,24 @@
 <template>
-  <div class="properties">
+  <div class="tab" :class="props.name.toLowerCase()">
     <h3>
-      Properties
+      {{ props.name }}
       <div class="actions">
-        <Tooltip
-          :class="{ disabled: !useDeckStore().selectedNode }"
-          description="Add component"
-        >
-          <button @click="">
-            <div class="i-carbon-new-tab"></div>
+        <Tooltip v-for="action in props.actions" :description="action.tooltip">
+          <button @click="action.onClick">
+            <div :class="action.icon"></div>
           </button>
         </Tooltip>
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierPropertiesView />
+    <slot />
   </div>
 </template>
 
 <style scoped lang="postcss">
-.properties {
+.tab {
+  @apply flex flex-col;
+
   h3 {
     @apply flex justify-between items-center;
 
@@ -45,3 +44,14 @@
   }
 }
 </style>
+
+<script setup lang="ts">
+const props = defineProps<{
+  name: string;
+  actions?: {
+    icon: string;
+    tooltip: string;
+    onClick: () => void;
+  }[];
+}>();
+</script>

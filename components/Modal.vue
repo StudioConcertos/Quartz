@@ -1,7 +1,9 @@
 <template>
   <dialog ref="modal">
-    <h4>{{ props.title }}:</h4>
-    <div class="h-8"></div>
+    <div v-if="!props.isMinimal">
+      <h4>{{ props.title }}:</h4>
+      <div class="h-8"></div>
+    </div>
     <slot />
   </dialog>
 </template>
@@ -26,6 +28,7 @@ h4 {
 <script setup lang="ts">
 const props = defineProps<{
   title: string;
+  isMinimal?: boolean;
 }>();
 
 const modal = ref<HTMLDialogElement>();

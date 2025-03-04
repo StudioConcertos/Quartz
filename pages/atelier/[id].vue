@@ -8,7 +8,7 @@
     <AtelierHeader :title="deck.title" />
     <div class="flex flex-1 overflow-hidden">
       <AtelierToolbar />
-      <AtelierEditor />
+      <AtelierInspector />
       <div class="flex flex-1 flex-col">
         <div class="px-40 h-[80vh] flex items-center">
           <AtelierRender />
@@ -27,6 +27,7 @@ import { RealtimeChannel } from "@supabase/supabase-js";
 const client = useSupabaseClient<Database>();
 
 const { fetchDeck, fetchAllSlides } = useDeckStore();
+const { fetchAssets } = useAssetsStore();
 
 let deckRC: RealtimeChannel, slidesRC: RealtimeChannel;
 
@@ -40,7 +41,7 @@ const { refresh: refreshSlides } = await useAsyncData(
   async () => await fetchAllSlides(useRoute().params.id as string)
 );
 
-onMounted(() => {
+onMounted(async () => {
   deckRC = client
     .channel("public:decks")
     .on(
@@ -72,6 +73,8 @@ onMounted(() => {
       () => refreshSlides()
     )
     .subscribe();
+
+  await fetchAssets(deck.value?.id as string);
 });
 
 onUnmounted(() => {

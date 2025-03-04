@@ -1,22 +1,27 @@
 <template>
-  <div class="hierarchy" @keydown.esc="selectedNode = null">
-    <h3>
-      Hierarchy
-      <div class="actions">
-        <Tooltip description="New node">
-          <button @click="modal?.open()">
-            <div class="i-carbon-new-tab"></div>
-          </button>
-        </Tooltip>
-        <Tooltip description="Sort">
-          <button>
-            <div class="i-carbon-sort-ascending"></div>
-          </button>
-        </Tooltip>
+  <AtelierInspectorView
+    name="Hierarchy"
+    :actions="[
+      {
+        icon: 'i-carbon-new-tab',
+        tooltip: 'New node',
+        onClick: () => modal?.open(),
+      },
+    ]"
+    @keydown.esc="selectedNode = null"
+  >
+    <ul class="tree">
+      <Node
+        v-if="!isEmptyTree(currentTree)"
+        :id="currentTree.id"
+        data-path="root"
+        data-type="group"
+        :node="currentTree"
+      />
+      <div v-else class="loader">
+        <p>Loading...</p>
       </div>
-    </h3>
-    <div class="whitespace"></div>
-    <AtelierHierarchyTree />
+    </ul>
     <Modal ref="modal" title="Node creation">
       <form @submit="onSubmit">
         <FormInput name="name" type="text" placeholder="Name" :maxlength="20" />
@@ -38,43 +43,39 @@
         <p v-if="error" class="text-center text-red-500">ERROR: {{ error }}</p>
       </form>
     </Modal>
-  </div>
+  </AtelierInspectorView>
 </template>
 
 <style scoped lang="postcss">
-.hierarchy {
-  h3 {
-    @apply flex justify-between items-center;
+.tree {
+  /*
+    By setting the max height to the half of the screen's,
+    it prevents the tree to overflow,
+    and also makes it responsive to different screen heights.
 
-    .actions {
-      @apply flex justify-between items-center;
+    (100vh / Amount of views inside the inspector)
+  */
+  @apply list-none h-full max-h-[50vh] overflow-y-auto;
 
-      .tooltip {
-        @apply flex mx-2;
-
-        button {
-          @apply text-xl;
-        }
-      }
-
-      .tooltip:first-of-type {
-        @apply ml-0;
-      }
-
-      .tooltip:last-of-type {
-        @apply mr-0;
-      }
-    }
+  .loader {
+    @apply flex justify-center items-center h-full;
   }
 }
 </style>
 
 <script setup lang="ts">
+import { RealtimeChannel } from "@supabase/supabase-js";
 import zod from "zod";
 
 import type Modal from "@/components/Modal.vue";
 
-const { currentSlides, selectedNode } = storeToRefs(useDeckStore());
+const client = useSupabaseClient<Database>();
+
+let nodesRC: RealtimeChannel;
+
+const { currentTree, currentSlides, selectedNode } = storeToRefs(
+  useDeckStore()
+);
 
 const modal = ref<typeof Modal>();
 
@@ -112,5 +113,20 @@ const onSubmit = handleSubmit(async (values) => {
   } catch (err) {
     error.value = (err as Error).message;
   }
+});
+
+onMounted(() => {
+  nodesRC = client
+    .channel("public:nodes")
+    .on(
+      "postgres_changes",
+      { event: "*", schema: "public", table: "nodes" },
+      () => useDeckStore().fetchAllNodes()
+    )
+    .subscribe();
+});
+
+onUnmounted(() => {
+  client.removeChannel(nodesRC);
 });
 </script>
