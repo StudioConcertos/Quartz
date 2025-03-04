@@ -63,11 +63,11 @@ const client = useSupabaseClient<Database>();
 
 const { currentSlides } = storeToRefs(useDeckStore());
 
-const { deleteSelectedAsset } = useAssetsStore();
+const { fetchAssets, deleteSelectedAsset } = useAssetsStore();
 const { assets } = storeToRefs(useAssetsStore());
 
 const { open, onChange } = useFileDialog({
-  accept: "image/*, .fbx, .glb, .gltf, .obj",
+  accept: "image/*, .ttf, .otf, .woff, .woff2, .fbx, .glb, .gltf, .obj",
 });
 
 onChange(async (files) => {
@@ -82,6 +82,8 @@ onChange(async (files) => {
       console.error(error);
     }
   }
+
+  await fetchAssets(currentSlides.value.deck);
 });
 
 const isImage = (asset: string) => {

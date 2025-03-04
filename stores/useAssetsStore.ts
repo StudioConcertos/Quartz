@@ -13,6 +13,8 @@ export const useAssetsStore = defineStore("assets", () => {
     }
 
     if (data) {
+      assets.value = [];
+
       for (const asset of data) {
         const { url, response } = await getStorageObject(
           "assets",
@@ -36,8 +38,10 @@ export const useAssetsStore = defineStore("assets", () => {
       .remove([`${deck}/${asset.name}`]);
 
     if (error) {
-      console.error(error);
+      return console.error(error);
     }
+
+    await fetchAssets(deck);
   }
 
   return { assets, fetchAssets, deleteSelectedAsset };
