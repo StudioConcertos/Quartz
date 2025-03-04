@@ -30,5 +30,15 @@ export const useAssetsStore = defineStore("assets", () => {
     }
   }
 
-  return { assets, fetchAssets };
+  async function deleteSelectedAsset(deck: string, asset: FileObject) {
+    const { error } = await client.storage
+      .from("assets")
+      .remove([`${deck}/${asset.name}`]);
+
+    if (error) {
+      console.error(error);
+    }
+  }
+
+  return { assets, fetchAssets, deleteSelectedAsset };
 });
