@@ -1,7 +1,7 @@
 <template>
-  <div class="inspector">
+  <div class="properties">
     <h3>
-      Inspector
+      Properties
       <div class="actions">
         <Tooltip
           :class="{ disabled: !useDeckStore().selectedNode }"
@@ -14,12 +14,12 @@
       </div>
     </h3>
     <div class="whitespace"></div>
-    <AtelierInspectorView />
+    <AtelierPropertiesView />
   </div>
 </template>
 
 <style scoped lang="postcss">
-.inspector {
+.properties {
   h3 {
     @apply flex justify-between items-center;
 

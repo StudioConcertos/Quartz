@@ -19,7 +19,8 @@
     @apply flex items-center gap-6;
 
     .option {
-      @apply opacity-60;
+      @apply opacity-60 hover:opacity-100 transition-opacity;
+      @apply text-lg;
     }
   }
 }

@@ -6,7 +6,11 @@
       <div class="mb-12 md:mb-18">
         <h1>Pitch ambitiously</h1>
         <div class="whitespace"></div>
-        <p>Quartz is a open-source, component-based slides deck builder.</p>
+        <p>
+          Quartz is a open source
+          <span class="font-bold italic">slides engine</span>; built for
+          ambitious presentations.
+        </p>
         <p>Currently in heavy development.</p>
       </div>
       <div class="flex flex-col sm:flex-row gap-6 md:gap-12 justify-center">

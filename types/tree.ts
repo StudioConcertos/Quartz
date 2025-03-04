@@ -1,11 +1,17 @@
 export interface Tree extends NodeModel {
   type: NodeType;
   children: Tree[];
+  parent?: Tree;
 }
 
 export const isEmptyTree = (tree: Tree) => {
-  return !Object.values(tree).some(
-    (value) => value !== "" && value !== "group" && !Array.isArray(value)
+  return (
+    tree.slides === EMPTY_TREE.slides &&
+    tree.name === EMPTY_TREE.name &&
+    tree.path === EMPTY_TREE.path &&
+    tree.type === EMPTY_TREE.type &&
+    tree.reference === EMPTY_TREE.reference &&
+    tree.children.length === EMPTY_TREE.children.length
   );
 };
 

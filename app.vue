@@ -89,6 +89,10 @@ textarea {
   @apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
 }
 
+.border-r {
+  @apply border-solid border-0 border-r-2 border-dark-200;
+}
+
 .disabled {
   @apply opacity-50 pointer-events-none transition-opacity;
 }

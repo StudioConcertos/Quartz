@@ -83,7 +83,7 @@ export const useDeckStore = defineStore("deck", () => {
 
       await saveChanges();
     },
-    { debounce: 5000, deep: true }
+    { debounce: 10000, deep: true }
   );
 
   async function fetchAllDecks() {
@@ -227,10 +227,9 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (error) throw error;
 
-    const path =
-      selectedNode.value?.type === "group"
-        ? `${selectedNode.value.path}.${name}`
-        : `root.${name}`;
+    const path = selectedNode.value
+      ? `${selectedNode.value?.path}.${name}`
+      : `root.${name}`;
 
     // Add node to pending changes.
     const node: PendingNode = {
@@ -262,22 +261,67 @@ export const useDeckStore = defineStore("deck", () => {
       },
     ];
 
-    if (type === "text") {
-      defaultComponents.push({
-        type: "typography",
-        node: id,
-        data: {
-          content: "New Text",
-          size: 30,
-          weight: 300,
-          colour: "#151515",
-        },
-      });
+    switch (type) {
+      case "group":
+        defaultComponents.push({
+          type: "layout",
+          node: id,
+          data: {},
+        });
+
+        break;
+
+      case "text":
+        defaultComponents.push({
+          type: "typography",
+          node: id,
+          data: {
+            content: "New Text",
+            size: 30,
+            weight: 300,
+            colour: "#151515",
+          },
+        });
+
+        break;
+
+      case "webgl_canvas":
+        defaultComponents.push({
+          type: "scene",
+          node: id,
+          data: {
+            background: "#151515",
+          },
+        });
+
+        defaultComponents.push({
+          type: "camera",
+          node: id,
+          data: {
+            x: 0,
+            y: 0,
+            z: 5,
+          },
+        });
+
+        break;
+
+      case "webgl_object":
+        defaultComponents.push({
+          type: "mesh",
+          node: id,
+          data: {
+            type: "box",
+            colour: "#FAFAFA",
+          },
+        });
+
+        break;
     }
 
     pendingChanges.value.nodes.push(node);
-    pendingChanges.value.components.push(...defaultComponents);
 
+    pendingChanges.value.components.push(...defaultComponents);
     components.value[currentSlidesIndex.value].push(...defaultComponents);
 
     selectedNode.value = node as Tree;
@@ -335,7 +379,7 @@ export const useDeckStore = defineStore("deck", () => {
   function buildTree(nodes: NodeModel[] | PendingNode[]) {
     const lookup: Record<string, Tree> = {};
 
-    // Process database nodes.
+    // Process existing nodes.
     nodes.forEach((node) => {
       lookup[node.path] = {
         ...node,
@@ -360,6 +404,8 @@ export const useDeckStore = defineStore("deck", () => {
       const parentNode = lookup[parentPath];
 
       if (parentNode) {
+        node.parent = parentNode;
+
         parentNode.children.push(node);
       }
     });
