@@ -10,10 +10,23 @@
     ]"
   >
     <div v-if="assets.length" class="list">
-      <div v-for="asset in assets">
+      <div
+        v-for="asset in assets"
+        @contextmenu.prevent="
+          useContextMenu().open($event, [
+            {
+              label: 'Delete',
+              action: () => deleteSelectedAsset(currentSlides.deck, asset),
+            },
+          ])
+        "
+      >
         <button v-if="isImage(asset.name)" @click="openModal(asset)">
           <NuxtImg :src="asset.url.toString()" :alt="asset.name" />
         </button>
+        <div v-else-if="isFont(asset.name)">
+          <p>{{ asset.name }}</p>
+        </div>
         <div v-else>
           <p>Unsupported asset - {{ asset.name }}</p>
         </div>
@@ -49,6 +62,8 @@ import type Modal from "@/components/Modal.vue";
 const client = useSupabaseClient<Database>();
 
 const { currentSlides } = storeToRefs(useDeckStore());
+
+const { deleteSelectedAsset } = useAssetsStore();
 const { assets } = storeToRefs(useAssetsStore());
 
 const { open, onChange } = useFileDialog({
@@ -72,6 +87,15 @@ onChange(async (files) => {
 const isImage = (asset: string) => {
   return (
     asset.endsWith(".png") || asset.endsWith(".jpg") || asset.endsWith(".jpeg")
+  );
+};
+
+const isFont = (asset: string) => {
+  return (
+    asset.endsWith(".ttf") ||
+    asset.endsWith(".otf") ||
+    asset.endsWith(".woff") ||
+    asset.endsWith(".woff2")
   );
 };
 
