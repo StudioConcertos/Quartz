@@ -48,7 +48,7 @@
 <script setup lang="ts">
 const props = defineProps<{
   name: string;
-  actions: {
+  actions?: {
     icon: string;
     tooltip: string;
     onClick: () => void;

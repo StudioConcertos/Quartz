@@ -6,8 +6,6 @@ export default async (bucket: string, deck: string, name: string) => {
     `${config.public.supabaseUrl}/storage/v1/object/authenticated/${bucket}/${deck}/${name}`
   );
 
-  console.log(bucket, deck, name);
-
   url.searchParams.append("timestamp", Date.now().toString());
 
   const {
