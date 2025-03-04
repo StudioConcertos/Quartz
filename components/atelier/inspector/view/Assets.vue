@@ -90,6 +90,15 @@ const isImage = (asset: string) => {
   );
 };
 
+const isFont = (asset: string) => {
+  return (
+    asset.endsWith(".ttf") ||
+    asset.endsWith(".otf") ||
+    asset.endsWith(".woff") ||
+    asset.endsWith(".woff2")
+  );
+};
+
 const previewImage = ref<{ name: string; url: URL }>();
 const modal = ref<typeof Modal>();
 
