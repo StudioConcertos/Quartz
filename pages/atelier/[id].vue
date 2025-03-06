@@ -10,7 +10,7 @@
       <AtelierToolbar />
       <AtelierInspector />
       <div class="flex flex-1 flex-col">
-        <div class="px-40 h-[75vh] flex items-center">
+        <div class="render-container">
           <AtelierRender />
         </div>
         <AtelierTimeline />
@@ -19,7 +19,11 @@
   </div>
 </template>
 
-<style scoped lang="postcss"></style>
+<style scoped lang="postcss">
+.render-container {
+  @apply px-40 flex flex-1 items-center;
+}
+</style>
 
 <script setup lang="ts">
 import { RealtimeChannel } from "@supabase/supabase-js";
