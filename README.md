@@ -27,8 +27,9 @@
 
 ### Screenshots
 
-![Auth](https://github.com/user-attachments/assets/dcd485d0-33ec-4800-b340-ca68ed4d346e)
-![Atelier](https://github.com/user-attachments/assets/a6351b28-48ec-4501-82bd-b040bbdf1cb9)
+![Landing](https://github.com/user-attachments/assets/00878b15-f52b-409b-a691-3a19d242b7e1)
+![Auth](https://github.com/user-attachments/assets/b4cef768-f3b5-414e-a6e1-522399ee74fc)
+![Atelier](https://github.com/user-attachments/assets/1e24009f-9f86-4b60-bb02-ecc0da917380)
 
 <br />
 
