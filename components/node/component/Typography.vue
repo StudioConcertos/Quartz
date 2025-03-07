@@ -7,7 +7,7 @@
     />
     <NodeComponentFieldSelect
       name="font"
-      :options="['Azeret Mono']"
+      :options="fonts"
       v-model:value="props.component.data.font"
     />
     <NodeComponentFieldNumber
@@ -46,6 +46,8 @@
 </template>
 
 <script setup lang="ts">
+import { fonts } from "@/uno.config";
+
 const { updateNodeComponent } = useDeckStore();
 
 const props = defineProps<{
