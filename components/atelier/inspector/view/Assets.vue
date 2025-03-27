@@ -21,23 +21,34 @@
           ])
         "
       >
-        <button v-if="isImage(asset.name)" @click="openModal(asset)">
+        <button v-if="isImage(asset.name)" @click="openImageModal(asset)">
           <NuxtImg :src="asset.url.toString()" :alt="asset.name" />
         </button>
-        <div v-else-if="isFont(asset.name)">
+        <button v-else-if="isFont(asset.name)" @click="openFontModal(asset)">
           <p>{{ asset.name }}</p>
-        </div>
+        </button>
         <div v-else>
           <p>Unsupported asset - {{ asset.name }}</p>
         </div>
       </div>
     </div>
-    <Modal ref="modal" :title="`${previewImage?.name}`">
+    <Modal ref="imagePreviewModal" :title="`${selectedAsset?.name}`">
       <NuxtImg
-        @click="modal?.close()"
-        :src="previewImage?.url.toString()"
+        @click="imagePreviewModal?.close()"
+        :src="selectedAsset?.url.toString()"
         alt="preview"
       />
+    </Modal>
+    <Modal ref="fontPreviewModal" :title="`${selectedAsset?.name}`">
+      <p :style="{ fontFamily: currentFont }">
+        A lazy fox jumps over the lazy dog.
+      </p>
+      <br />
+      <p :style="{ fontFamily: currentFont }">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
+      <br />
+      <p :style="{ fontFamily: currentFont }">abcdefghijklmnopqrstuvwxyz</p>
+      <br />
+      <p :style="{ fontFamily: currentFont }">1234567890</p>
     </Modal>
   </AtelierInspectorView>
 </template>
@@ -70,6 +81,9 @@ const { open, onChange } = useFileDialog({
   accept: "image/*, .ttf, .otf, .woff, .woff2, .fbx, .glb, .gltf, .obj",
 });
 
+const imagePreviewModal = ref<typeof Modal>();
+const fontPreviewModal = ref<typeof Modal>();
+
 onChange(async (files) => {
   if (!files?.length) return;
 
@@ -101,12 +115,41 @@ const isFont = (asset: string) => {
   );
 };
 
-const previewImage = ref<{ name: string; url: URL }>();
-const modal = ref<typeof Modal>();
+const selectedAsset = ref<{ name: string; url: URL }>();
 
-function openModal(asset: { name: string; url: URL }) {
-  modal.value?.open();
+function openImageModal(asset: { name: string; url: URL }) {
+  imagePreviewModal.value?.open();
 
-  previewImage.value = asset;
+  selectedAsset.value = asset;
+}
+
+function openFontModal(asset: { name: string; url: URL }) {
+  fontPreviewModal.value?.open();
+
+  selectedAsset.value = asset;
+
+  loadFont();
+}
+
+const currentFont = ref<string>();
+
+async function loadFont() {
+  if (!selectedAsset.value) return;
+
+  try {
+    const fontName = selectedAsset.value?.name.split(".")[0];
+
+    const font = new FontFace(fontName, `url(${selectedAsset.value?.url})`);
+
+    await font.load();
+
+    document.fonts.add(font);
+
+    currentFont.value = fontName;
+
+    console.log("font", font);
+  } catch (error) {
+    console.error(error);
+  }
 }
 </script>
