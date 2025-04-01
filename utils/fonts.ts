@@ -1,4 +1,4 @@
-export const fonts = () => [
+export const staticFonts = [
   "Alpino",
   "Amulya",
   "Archivo",
@@ -81,3 +81,17 @@ export const fonts = () => [
   "Work Sans",
   "Zodiak",
 ];
+
+export const fonts = () => {
+  const uploadedFonts = useAssetsStore()
+    .assets.filter(
+      (asset) =>
+        asset.name.endsWith(".ttf") ||
+        asset.name.endsWith(".otf") ||
+        asset.name.endsWith(".woff") ||
+        asset.name.endsWith(".woff2")
+    )
+    .map((asset) => asset.name.split(".")[0]);
+
+  return [...uploadedFonts, ...staticFonts];
+};

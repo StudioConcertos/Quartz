@@ -6,7 +6,7 @@ import {
   transformerDirectives,
 } from "unocss";
 
-import { fonts } from "./utils/fonts";
+import { staticFonts } from "./utils/fonts";
 
 const createFontConfig = (fonts: readonly string[]) => {
   return fonts.reduce((map, font) => {
@@ -24,7 +24,7 @@ export default defineConfig({
     presetUno(),
     presetWebFonts({
       provider: "fontshare",
-      fonts: createFontConfig(fonts()),
+      fonts: createFontConfig(staticFonts),
     }),
   ],
   transformers: [transformerDirectives()],

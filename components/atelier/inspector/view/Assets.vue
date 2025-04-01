@@ -34,21 +34,16 @@
     </div>
     <Modal ref="imagePreviewModal" :title="`${selectedAsset?.name}`">
       <NuxtImg
+        class="w-full h-full"
         @click="imagePreviewModal?.close()"
         :src="selectedAsset?.url.toString()"
         alt="preview"
       />
     </Modal>
     <Modal ref="fontPreviewModal" :title="`${selectedAsset?.name}`">
-      <p :style="{ fontFamily: currentFont }">
+      <p class="text-3xl" :style="{ fontFamily: currentFont }">
         A lazy fox jumps over the lazy dog.
       </p>
-      <br />
-      <p :style="{ fontFamily: currentFont }">ABCDEFGHIJKLMNOPQRSTUVWXYZ</p>
-      <br />
-      <p :style="{ fontFamily: currentFont }">abcdefghijklmnopqrstuvwxyz</p>
-      <br />
-      <p :style="{ fontFamily: currentFont }">1234567890</p>
     </Modal>
   </AtelierInspectorView>
 </template>
