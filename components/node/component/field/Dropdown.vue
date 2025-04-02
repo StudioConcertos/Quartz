@@ -9,6 +9,7 @@
         @input="
           $emit('update:value', ($event.target as HTMLInputElement).value)
         "
+        spellcheck="false"
       />
       <div
         v-if="focused && filteredOptions.length > 0"
