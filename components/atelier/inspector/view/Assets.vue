@@ -12,6 +12,7 @@
     <div v-if="assets.length" class="list">
       <div
         v-for="asset in assets"
+        class="item"
         @contextmenu.prevent="
           useContextMenu().open($event, [
             {
@@ -27,9 +28,9 @@
         <button v-else-if="isFont(asset.name)" @click="openFontModal(asset)">
           <p>{{ asset.name }}</p>
         </button>
-        <div v-else>
-          <p>Unsupported asset - {{ asset.name }}</p>
-        </div>
+        <button v-else>
+          <p>Unsupported asset: {{ asset.name }}</p>
+        </button>
       </div>
     </div>
     <Modal ref="imagePreviewModal" :title="`${selectedAsset?.name}`">
@@ -52,11 +53,17 @@
 .list {
   @apply grid grid-cols-4 gap-4;
 
-  button {
-    @apply relative aspect-square overflow-hidden rounded-lg;
+  .item {
+    @apply border-solid border-2 rounded-lg;
+    @apply border-dark-200 hover:border-light-200;
+    @apply transition-colors;
 
-    img {
-      @apply w-full h-full object-cover;
+    button {
+      @apply w-full h-full overflow-hidden rounded-lg;
+
+      img {
+        @apply w-full h-full object-cover;
+      }
     }
   }
 }
