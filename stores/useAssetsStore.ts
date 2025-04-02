@@ -5,6 +5,16 @@ export const useAssetsStore = defineStore("assets", () => {
 
   const assets = ref<(FileObject & { url: URL })[]>([]);
 
+  const fonts = computed(() => {
+    return assets.value.filter(
+      (asset) =>
+        asset.name.endsWith(".ttf") ||
+        asset.name.endsWith(".otf") ||
+        asset.name.endsWith(".woff") ||
+        asset.name.endsWith(".woff2")
+    );
+  });
+
   async function fetchAssets(deck: string) {
     const { data, error } = await client.storage.from("assets").list(deck);
 
@@ -29,6 +39,8 @@ export const useAssetsStore = defineStore("assets", () => {
           });
         }
       }
+
+      serveAllFonts();
     }
   }
 
@@ -44,5 +56,20 @@ export const useAssetsStore = defineStore("assets", () => {
     await fetchAssets(deck);
   }
 
-  return { assets, fetchAssets, deleteSelectedAsset };
+  async function serveAllFonts() {
+    for (const font of fonts.value) {
+      try {
+        const fontName = font.name.split(".")[0];
+        const fontFace = new FontFace(fontName, `url(${font.url})`);
+
+        await fontFace.load();
+
+        document.fonts.add(fontFace);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  }
+
+  return { assets, fonts, fetchAssets, deleteSelectedAsset };
 });

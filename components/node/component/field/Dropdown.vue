@@ -38,13 +38,13 @@
 
     .dropdown {
       @apply absolute z-99 w-full;
-      @apply flex flex-col gap-4;
-      @apply bg-dark-900 px-2 py-4;
+      @apply flex flex-col;
+      @apply bg-dark-900 px-2 py-2;
       @apply border-rd border-solid border-1 border-dark-200;
       @apply overflow-y-scroll max-h-[12vh];
 
       button {
-        @apply text-left;
+        @apply text-left py-2;
       }
     }
   }

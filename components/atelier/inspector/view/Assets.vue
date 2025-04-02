@@ -41,7 +41,7 @@
       />
     </Modal>
     <Modal ref="fontPreviewModal" :title="`${selectedAsset?.name}`">
-      <p class="text-3xl" :style="{ fontFamily: currentFont }">
+      <p class="text-3xl" :style="{ fontFamily: selectedAsset?.name }">
         A lazy fox jumps over the lazy dog.
       </p>
     </Modal>
@@ -122,29 +122,5 @@ function openFontModal(asset: { name: string; url: URL }) {
   fontPreviewModal.value?.open();
 
   selectedAsset.value = asset;
-
-  loadFont();
-}
-
-const currentFont = ref<string>();
-
-async function loadFont() {
-  if (!selectedAsset.value) return;
-
-  try {
-    const fontName = selectedAsset.value?.name.split(".")[0];
-
-    const font = new FontFace(fontName, `url(${selectedAsset.value?.url})`);
-
-    await font.load();
-
-    document.fonts.add(font);
-
-    currentFont.value = fontName;
-
-    console.log("font", font);
-  } catch (error) {
-    console.error(error);
-  }
 }
 </script>

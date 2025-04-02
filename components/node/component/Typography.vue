@@ -7,7 +7,12 @@
     />
     <NodeComponentFieldDropdown
       name="font"
-      :options="fonts()"
+      :options="
+        [
+          ...fonts,
+          ...useAssetsStore().fonts.map((font) => font.name.split('.')[0]),
+        ].sort()
+      "
       v-model:value="props.component.data.font"
     />
     <NodeComponentFieldNumber
