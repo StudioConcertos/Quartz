@@ -5,7 +5,7 @@
       isParagraph
       v-model:value="props.component.data.content"
     />
-    <NodeComponentFieldSelect
+    <NodeComponentFieldDropdown
       name="font"
       :options="fonts()"
       v-model:value="props.component.data.font"
