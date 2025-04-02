@@ -19,8 +19,8 @@
 
 <style scoped lang="postcss">
 .timeline {
-  @apply flex flex-1 scroll-smooth;
-  @apply bg-dark-800 w-full p-8;
+  @apply flex scroll-smooth;
+  @apply bg-dark-800 h-[15vh] w-full p-[2.5ch];
   @apply overflow-x-auto overflow-y-hidden;
   @apply border-solid border-0 border-t-2 border-dark-200;
 

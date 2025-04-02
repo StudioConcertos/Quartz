@@ -2,7 +2,7 @@
 
 export const useAtelierStore = defineStore("atelier", () => {
   const tabs = ref([
-    { name: "Inspector", icon: "i-carbon-legend" },
+    { name: "Editor", icon: "i-carbon-legend" },
     { name: "Assets", icon: "i-carbon-folders" },
   ]);
 

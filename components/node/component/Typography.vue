@@ -5,9 +5,14 @@
       isParagraph
       v-model:value="props.component.data.content"
     />
-    <NodeComponentFieldSelect
+    <NodeComponentFieldDropdown
       name="font"
-      :options="['Azeret Mono']"
+      :options="
+        [
+          ...fonts,
+          ...useAssetsStore().fonts.map((font) => font.name.split('.')[0]),
+        ].sort()
+      "
       v-model:value="props.component.data.font"
     />
     <NodeComponentFieldNumber

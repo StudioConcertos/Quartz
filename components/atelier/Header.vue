@@ -88,8 +88,8 @@ header {
   }
 
   input {
-    @apply w-sm text-4;
-    @apply text-center border-none!;
+    @apply w-sm text-4 appearence-none;
+    @apply text-center border-none;
     @apply hover-underline focus-underline;
   }
 }
