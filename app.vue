@@ -12,7 +12,7 @@
 
 * {
   @apply m-0 p-0 box-border;
-  @apply font-sans outline-none;
+  @apply font-azeret-mono outline-none;
 }
 
 a,

@@ -106,6 +106,7 @@ export function useElementRenderer() {
             left: `${xPercent}%`,
             zIndex: transform.z,
             transform: `scale(${transform.scale * scale.value})`,
+            fontFamily: typography.font,
             fontSize: `${typography.size}px`,
             fontWeight: typography.weight,
             color: typography.colour,
