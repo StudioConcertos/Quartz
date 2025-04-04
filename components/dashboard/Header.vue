@@ -1,5 +1,5 @@
 <template>
-  <div class="header">
+  <div class="dashboard-header">
     <p>Decks:</p>
     <button @click="useDeckStore().insertNewDeck()" class="primaryButton">
       New Deck
@@ -9,7 +9,7 @@
 </template>
 
 <style scoped lang="postcss">
-.header {
+.dashboard-header {
   @apply bg-dark-500 w-full h-24 p-6 select-none;
   @apply border-solid border-0 border-b-2 border-dark-200;
   @apply flex flex-row justify-between items-center;

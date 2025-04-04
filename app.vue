@@ -62,7 +62,7 @@ form {
 }
 
 main {
-  @apply bg-dark-900 text-light-200 h-screen;
+  @apply bg-dark-900 text-light-200;
   @apply overflow-x-hidden;
 }
 
