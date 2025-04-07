@@ -214,21 +214,27 @@ export function useElementRenderer() {
 
           (object?.material as MeshBasicMaterial).color.set(mesh.colour);
 
+          object?.position.set(mesh.x, mesh.y, mesh.z);
+
           return {};
         } else {
           const geometry = getGeometry(mesh.type);
           const material = new MeshBasicMaterial({ color: mesh.colour });
-          const cube = new Mesh(geometry, material);
+          const object = new Mesh(geometry, material);
 
           if (context?.objects.has(node.id)) {
             return {};
           }
 
-          context?.objects.set(node.id, cube);
+          context?.objects.set(node.id, object);
 
-          context?.scene.add(cube);
+          context?.scene.add(object);
 
           console.log(context?.scene.children);
+
+          object.position.set(mesh.x, mesh.y, mesh.z);
+
+          console.log(mesh.x);
 
           return {};
         }

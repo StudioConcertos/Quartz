@@ -313,6 +313,9 @@ export const useDeckStore = defineStore("deck", () => {
           data: {
             type: "box",
             colour: "#FAFAFA",
+            x: 0,
+            y: 0,
+            z: 0,
           },
         });
 

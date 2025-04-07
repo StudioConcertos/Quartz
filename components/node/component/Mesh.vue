@@ -9,6 +9,9 @@
       name="colour"
       v-model:value="props.component.data.colour"
     />
+    <NodeComponentFieldNumber name="x" v-model:value="props.component.data.x" />
+    <NodeComponentFieldNumber name="y" v-model:value="props.component.data.y" />
+    <NodeComponentFieldNumber name="z" v-model:value="props.component.data.z" />
   </NodeComponent>
 </template>
 
