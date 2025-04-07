@@ -8,7 +8,10 @@
     alt="product"
     class="product"
   />
-  <section class="h-screen"></section>
+  <section class="h-screen flex items-center justify-center">
+    <p>...</p>
+  </section>
+  <LandingFooter />
 </template>
 
 <style scoped lang="postcss">
