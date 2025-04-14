@@ -15,6 +15,16 @@ export const useAssetsStore = defineStore("assets", () => {
     );
   });
 
+  const meshes = computed(() => {
+    return assets.value.filter(
+      (asset) =>
+        asset.name.endsWith(".fbx") ||
+        asset.name.endsWith(".glb") ||
+        asset.name.endsWith(".gltf") ||
+        asset.name.endsWith(".obj")
+    );
+  });
+
   async function fetchAssets(deck: string) {
     const { data, error } = await client.storage.from("assets").list(deck);
 
@@ -71,5 +81,5 @@ export const useAssetsStore = defineStore("assets", () => {
     }
   }
 
-  return { assets, fonts, fetchAssets, deleteSelectedAsset };
+  return { assets, fonts, meshes, fetchAssets, deleteSelectedAsset };
 });

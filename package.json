@@ -17,6 +17,7 @@
     "@supabase/supabase-js": "^2.48.0",
     "@tresjs/nuxt": "^3.0.7",
     "@types/sortablejs": "^1.15.8",
+    "@types/three": "^0.175.0",
     "@unocss/nuxt": "^0.58.9",
     "@vee-validate/nuxt": "^4.15.0",
     "@vee-validate/zod": "^4.15.0",

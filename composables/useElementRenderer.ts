@@ -12,24 +12,35 @@ import {
   TetrahedronGeometry,
   MeshBasicMaterial,
   Mesh,
+  BufferGeometry,
+  Group,
 } from "three";
 
-const canvasContext = new Map<
-  string,
-  {
-    scene: Scene;
-    camera: PerspectiveCamera;
-    renderer: WebGLRenderer;
-    objects: Map<string, Mesh>;
-  }
->();
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
+
+interface CanvasContext {
+  scene: Scene;
+  camera: PerspectiveCamera;
+  renderer: WebGLRenderer;
+  loaders: {
+    fbx: FBXLoader;
+    gltf: GLTFLoader;
+    obj: OBJLoader;
+  };
+  objects: Map<string, Mesh | Group>;
+  cache: Map<string, BufferGeometry | Group>;
+}
+
+const contexts = new Map<string, CanvasContext>();
 
 const hasAnimated = ref(false);
 
 function setupCanvas(canvas: string) {
   document
     .getElementById(canvas)
-    ?.appendChild(canvasContext.get(canvas)!.renderer.domElement);
+    ?.appendChild(contexts.get(canvas)!.renderer.domElement);
 
   if (!hasAnimated.value) {
     animate();
@@ -41,7 +52,7 @@ function setupCanvas(canvas: string) {
 function animate() {
   requestAnimationFrame(animate);
 
-  canvasContext.forEach((context) => {
+  contexts.forEach((context) => {
     context.scene.children.forEach((child) => {
       child.rotation.x += 0.01;
       child.rotation.y += 0.01;
@@ -51,8 +62,73 @@ function animate() {
   });
 }
 
+async function loadMesh(
+  context: CanvasContext,
+  name: string
+): Promise<BufferGeometry | Group> {
+  const { meshes } = storeToRefs(useAssetsStore());
+
+  if (context.cache.has(name)) {
+    return context.cache.get(name)!;
+  }
+
+  const mesh = meshes.value.find((asset) => asset.name === name);
+
+  if (!mesh) {
+    console.error(`Model ${name} not found in assets`);
+    return new BoxGeometry(0, 0, 0);
+  }
+
+  const extension = name.split(".").pop()?.toLowerCase();
+  const url = mesh.url.toString();
+
+  try {
+    let result: BufferGeometry | Group;
+
+    switch (extension) {
+      case "glb":
+      case "gltf":
+        result = await new Promise((resolve, reject) => {
+          context.loaders.gltf.load(
+            url,
+            (gltf) => resolve(gltf.scene),
+            undefined,
+            reject
+          );
+        });
+        break;
+
+      case "fbx":
+        result = await new Promise((resolve, reject) => {
+          context.loaders.fbx.load(url, resolve, undefined, reject);
+        });
+        break;
+
+      case "obj":
+        result = await new Promise((resolve, reject) => {
+          context.loaders.obj.load(url, resolve, undefined, reject);
+        });
+        break;
+
+      default:
+        console.error(`Unsupported file format: ${extension}`);
+
+        return new BoxGeometry(0, 0, 0);
+    }
+
+    context.cache.set(name, result);
+
+    return result;
+  } catch (error) {
+    console.error(`Error loading model ${name}:`, error);
+
+    return new BoxGeometry(0, 0, 0);
+  }
+}
+
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
+  const { meshes } = storeToRefs(useAssetsStore());
 
   function findComponent(node: Tree, type: ComponentType) {
     return currentComponents.value.find(
@@ -128,7 +204,7 @@ export function useElementRenderer() {
         watch(
           () => transform.width / transform.height,
           (newAspectRatio) => {
-            const context = canvasContext.get(node.id);
+            const context = contexts.get(node.id);
 
             if (!context) return;
 
@@ -139,8 +215,8 @@ export function useElementRenderer() {
           }
         );
 
-        if (!canvasContext.has(node.id)) {
-          canvasContext.set(node.id, {
+        if (!contexts.has(node.id)) {
+          contexts.set(node.id, {
             scene: new Scene(),
             camera: new PerspectiveCamera(
               75,
@@ -149,11 +225,17 @@ export function useElementRenderer() {
               1000
             ),
             renderer: new WebGLRenderer({ antialias: true }),
+            loaders: {
+              fbx: new FBXLoader(),
+              gltf: new GLTFLoader(),
+              obj: new OBJLoader(),
+            },
             objects: new Map(),
+            cache: new Map(),
           });
         }
 
-        const context = canvasContext.get(node.id);
+        const context = contexts.get(node.id);
 
         context?.renderer.setSize(transform.width, transform.height);
         context?.renderer.setClearColor(sceneComponent.background);
@@ -179,7 +261,7 @@ export function useElementRenderer() {
     webgl_object: {
       element: "",
       render: (node: Tree) => {
-        const context = canvasContext.get(node.parent!.id);
+        const context = contexts.get(node.parent!.id);
 
         const mesh = findComponent(node, "mesh")!.data;
 
@@ -207,36 +289,147 @@ export function useElementRenderer() {
         if (context?.objects.has(node.id)) {
           const object = context?.objects.get(node.id);
 
-          if (object && object.geometry.type !== mesh.type) {
-            object.geometry.dispose();
-            object.geometry = getGeometry(mesh.type);
-          }
+          console.log("Existing object:", object);
 
-          (object?.material as MeshBasicMaterial).color.set(mesh.colour);
+          if (
+            (object instanceof Mesh &&
+              object.geometry.type.toLowerCase() !== mesh.type.toLowerCase()) ||
+            (object instanceof Group &&
+              !["box", "icosahedron", "triangle", "sphere"].includes(
+                object.type
+              ))
+          ) {
+            console.log(
+              "Type changed or switching between custom model and primitive"
+            );
 
-          object?.position.set(mesh.x, mesh.y, mesh.z);
+            context.scene.remove(object);
 
-          return {};
-        } else {
-          const geometry = getGeometry(mesh.type);
-          const material = new MeshBasicMaterial({ color: mesh.colour });
-          const object = new Mesh(geometry, material);
+            if (
+              ["box", "icosahedron", "triangle", "sphere"].includes(mesh.type)
+            ) {
+              console.log("Switching to primitive:", mesh.type);
 
-          if (context?.objects.has(node.id)) {
+              const geometry = getGeometry(mesh.type);
+              const material = new MeshBasicMaterial({ color: mesh.colour });
+              const newObject = new Mesh(geometry, material);
+
+              newObject.position.set(mesh.x, mesh.y, mesh.z);
+              context.objects.set(node.id, newObject);
+              context.scene.add(newObject);
+            } else if (meshes.value.some((asset) => asset.name === mesh.type)) {
+              console.log("Switching to custom model:", mesh.type);
+
+              loadMesh(context, mesh.type).then((geometry) => {
+                console.log("Custom model loaded:", geometry);
+
+                let newObject: Mesh | Group;
+
+                if (geometry instanceof BufferGeometry) {
+                  const material = new MeshBasicMaterial({
+                    color: mesh.colour,
+                  });
+
+                  newObject = new Mesh(geometry, material);
+                } else if (geometry instanceof Group) {
+                  newObject = geometry;
+
+                  geometry.traverse((child) => {
+                    if (child instanceof Mesh) {
+                      child.material = new MeshBasicMaterial({
+                        color: mesh.colour,
+                      });
+                    }
+                  });
+                } else {
+                  const material = new MeshBasicMaterial({
+                    color: mesh.colour,
+                  });
+
+                  newObject = new Mesh(new BoxGeometry(0, 0, 0), material);
+                }
+
+                newObject.position.set(mesh.x, mesh.y, mesh.z);
+
+                context.objects.set(node.id, newObject);
+                context.scene.add(newObject);
+              });
+            }
             return {};
           }
 
-          context?.objects.set(node.id, object);
+          if (object instanceof Mesh) {
+            (object.material as MeshBasicMaterial).color.set(mesh.colour);
+          } else if (object instanceof Group) {
+            object.traverse((child) => {
+              if (child instanceof Mesh) {
+                (child.material as MeshBasicMaterial).color.set(mesh.colour);
+              }
+            });
+          }
 
-          context?.scene.add(object);
-
-          console.log(context?.scene.children);
-
-          object.position.set(mesh.x, mesh.y, mesh.z);
-
-          console.log(mesh.x);
-
+          object?.position.set(mesh.x, mesh.y, mesh.z);
           return {};
+        } else {
+          if (
+            ["box", "icosahedron", "triangle", "sphere"].includes(mesh.type)
+          ) {
+            const geometry = getGeometry(mesh.type);
+            const material = new MeshBasicMaterial({ color: mesh.colour });
+            const object = new Mesh(geometry, material);
+
+            object.position.set(mesh.x, mesh.y, mesh.z);
+
+            context?.objects.set(node.id, object);
+            context?.scene.add(object);
+
+            return {};
+          } else if (
+            meshes.value.some((asset) => asset.name === mesh.type) &&
+            context
+          ) {
+            loadMesh(context, mesh.type).then((geometry) => {
+              let object: Mesh | Group;
+
+              if (geometry instanceof BufferGeometry) {
+                const material = new MeshBasicMaterial({ color: mesh.colour });
+
+                object = new Mesh(geometry, material);
+              } else if (geometry instanceof Group) {
+                object = geometry;
+
+                geometry.traverse((child) => {
+                  if (child instanceof Mesh) {
+                    child.material = new MeshBasicMaterial({
+                      color: mesh.colour,
+                    });
+                  }
+                });
+              } else {
+                const material = new MeshBasicMaterial({ color: mesh.colour });
+
+                object = new Mesh(new BoxGeometry(0, 0, 0), material);
+              }
+
+              object.position.set(mesh.x, mesh.y, mesh.z);
+
+              context?.objects.set(node.id, object);
+              context?.scene.add(object);
+            });
+
+            return {};
+          } else {
+            const geometry = new BoxGeometry(1, 1, 1);
+            const material = new MeshBasicMaterial({ color: mesh.colour });
+            const object = new Mesh(geometry, material);
+
+            object.position.set(mesh.x, mesh.y, mesh.z);
+
+            context?.objects.set(node.id, object);
+            context?.scene.add(object);
+
+            return {};
+          }
         }
       },
     },

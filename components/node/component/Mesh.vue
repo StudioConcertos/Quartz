@@ -3,7 +3,13 @@
     <NodeComponentFieldSelect
       name="type"
       v-model:value="props.component.data.type"
-      :options="['box', 'icosahedron', 'triangle', 'sphere']"
+      :options="[
+        'box',
+        'icosahedron',
+        'triangle',
+        'sphere',
+        ...useAssetsStore().meshes.map((mesh) => mesh.name),
+      ]"
     />
     <NodeComponentFieldColour
       name="colour"
