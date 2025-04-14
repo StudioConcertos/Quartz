@@ -3,35 +3,22 @@
 // ! = Required component; ? = Optional component.
 
 import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
   BoxGeometry,
-  SphereGeometry,
-  IcosahedronGeometry,
-  TetrahedronGeometry,
-  MeshBasicMaterial,
-  Mesh,
   BufferGeometry,
   Group,
+  IcosahedronGeometry,
+  Mesh,
+  MeshBasicMaterial,
+  PerspectiveCamera,
+  Scene,
+  SphereGeometry,
+  TetrahedronGeometry,
+  WebGLRenderer,
 } from "three";
 
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
-
-interface CanvasContext {
-  scene: Scene;
-  camera: PerspectiveCamera;
-  renderer: WebGLRenderer;
-  loaders: {
-    fbx: FBXLoader;
-    gltf: GLTFLoader;
-    obj: OBJLoader;
-  };
-  objects: Map<string, Mesh | Group>;
-  cache: Map<string, BufferGeometry | Group>;
-}
 
 const contexts = new Map<string, CanvasContext>();
 
@@ -53,6 +40,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   contexts.forEach((context) => {
+    // Animate the scene (for testing)
     context.scene.children.forEach((child) => {
       child.rotation.x += 0.01;
       child.rotation.y += 0.01;
@@ -62,73 +50,8 @@ function animate() {
   });
 }
 
-async function loadMesh(
-  context: CanvasContext,
-  name: string
-): Promise<BufferGeometry | Group> {
-  const { meshes } = storeToRefs(useAssetsStore());
-
-  if (context.cache.has(name)) {
-    return context.cache.get(name)!;
-  }
-
-  const mesh = meshes.value.find((asset) => asset.name === name);
-
-  if (!mesh) {
-    console.error(`Model ${name} not found in assets`);
-    return new BoxGeometry(0, 0, 0);
-  }
-
-  const extension = name.split(".").pop()?.toLowerCase();
-  const url = mesh.url.toString();
-
-  try {
-    let result: BufferGeometry | Group;
-
-    switch (extension) {
-      case "glb":
-      case "gltf":
-        result = await new Promise((resolve, reject) => {
-          context.loaders.gltf.load(
-            url,
-            (gltf) => resolve(gltf.scene),
-            undefined,
-            reject
-          );
-        });
-        break;
-
-      case "fbx":
-        result = await new Promise((resolve, reject) => {
-          context.loaders.fbx.load(url, resolve, undefined, reject);
-        });
-        break;
-
-      case "obj":
-        result = await new Promise((resolve, reject) => {
-          context.loaders.obj.load(url, resolve, undefined, reject);
-        });
-        break;
-
-      default:
-        console.error(`Unsupported file format: ${extension}`);
-
-        return new BoxGeometry(0, 0, 0);
-    }
-
-    context.cache.set(name, result);
-
-    return result;
-  } catch (error) {
-    console.error(`Error loading model ${name}:`, error);
-
-    return new BoxGeometry(0, 0, 0);
-  }
-}
-
 export function useElementRenderer() {
   const { currentComponents } = storeToRefs(useDeckStore());
-  const { meshes } = storeToRefs(useAssetsStore());
 
   function findComponent(node: Tree, type: ComponentType) {
     return currentComponents.value.find(
@@ -315,12 +238,13 @@ export function useElementRenderer() {
               const newObject = new Mesh(geometry, material);
 
               newObject.position.set(mesh.x, mesh.y, mesh.z);
+
               context.objects.set(node.id, newObject);
               context.scene.add(newObject);
-            } else if (meshes.value.some((asset) => asset.name === mesh.type)) {
+            } else {
               console.log("Switching to custom model:", mesh.type);
 
-              loadMesh(context, mesh.type).then((geometry) => {
+              loadModel(context, mesh.type).then((geometry) => {
                 console.log("Custom model loaded:", geometry);
 
                 let newObject: Mesh | Group;
@@ -384,11 +308,8 @@ export function useElementRenderer() {
             context?.scene.add(object);
 
             return {};
-          } else if (
-            meshes.value.some((asset) => asset.name === mesh.type) &&
-            context
-          ) {
-            loadMesh(context, mesh.type).then((geometry) => {
+          } else if (context) {
+            loadModel(context, mesh.type).then((geometry) => {
               let object: Mesh | Group;
 
               if (geometry instanceof BufferGeometry) {
@@ -413,8 +334,8 @@ export function useElementRenderer() {
 
               object.position.set(mesh.x, mesh.y, mesh.z);
 
-              context?.objects.set(node.id, object);
-              context?.scene.add(object);
+              context.objects.set(node.id, object);
+              context.scene.add(object);
             });
 
             return {};
@@ -425,8 +346,10 @@ export function useElementRenderer() {
 
             object.position.set(mesh.x, mesh.y, mesh.z);
 
-            context?.objects.set(node.id, object);
-            context?.scene.add(object);
+            if (context) {
+              (context as CanvasContext).objects.set(node.id, object);
+              (context as CanvasContext).scene.add(object);
+            }
 
             return {};
           }

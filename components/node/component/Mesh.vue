@@ -8,7 +8,7 @@
         'icosahedron',
         'triangle',
         'sphere',
-        ...useAssetsStore().meshes.map((mesh) => mesh.name),
+        ...useAssetsStore().models.map((model) => model.name),
       ]"
     />
     <NodeComponentFieldColour

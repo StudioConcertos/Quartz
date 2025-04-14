@@ -15,7 +15,7 @@ export const useAssetsStore = defineStore("assets", () => {
     );
   });
 
-  const meshes = computed(() => {
+  const models = computed(() => {
     return assets.value.filter(
       (asset) =>
         asset.name.endsWith(".fbx") ||
@@ -81,5 +81,5 @@ export const useAssetsStore = defineStore("assets", () => {
     }
   }
 
-  return { assets, fonts, meshes, fetchAssets, deleteSelectedAsset };
+  return { assets, fonts, models, fetchAssets, deleteSelectedAsset };
 });
