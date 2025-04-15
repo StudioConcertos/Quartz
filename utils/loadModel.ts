@@ -4,8 +4,22 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
-export default async (context: CanvasContext, name: string) => {
+import { primitiveGeometries } from "@/composables/useElementRenderer";
+
+export default async (
+  context: CanvasContext,
+  name: string,
+  fallback: string
+) => {
   const { models } = storeToRefs(useAssetsStore());
+
+  const getFallback = () => {
+    if (fallback !== "none") {
+      return primitiveGeometries[fallback as keyof typeof primitiveGeometries];
+    }
+
+    return;
+  };
 
   if (context.cache.has(name)) {
     const cached = context.cache.get(name);
@@ -18,7 +32,7 @@ export default async (context: CanvasContext, name: string) => {
   if (!model) {
     console.error(`Model ${name} not found in assets`);
 
-    return null;
+    return getFallback();
   }
 
   const extension = name.split(".").pop()?.toLowerCase();
@@ -62,6 +76,6 @@ export default async (context: CanvasContext, name: string) => {
   } catch (error) {
     console.error(`Error loading model ${name}: ${error}`);
 
-    return null;
+    return getFallback();
   }
 };

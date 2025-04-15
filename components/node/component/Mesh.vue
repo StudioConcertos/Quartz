@@ -4,12 +4,14 @@
       name="type"
       v-model:value="props.component.data.type"
       :options="[
-        'box',
-        'icosahedron',
-        'triangle',
-        'sphere',
+        ...primitiveTypes,
         ...useAssetsStore().models.map((model) => model.name),
       ]"
+    />
+    <NodeComponentFieldSelect
+      name="fallback"
+      v-model:value="props.component.data.fallback"
+      :options="['none', ...primitiveTypes]"
     />
     <NodeComponentFieldColour
       name="colour"

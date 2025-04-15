@@ -24,6 +24,19 @@ const contexts = new Map<string, CanvasContext>();
 
 const hasAnimated = ref(false);
 
+export const primitiveGeometries = {
+  box: new BoxGeometry(1, 1, 1),
+  icosahedron: new IcosahedronGeometry(),
+  triangle: new TetrahedronGeometry(),
+  sphere: new SphereGeometry(0.5, 32, 32),
+};
+
+export const primitiveTypes = Object.keys(primitiveGeometries);
+
+function getPrimitiveGeometry(type: string) {
+  return primitiveGeometries[type as keyof typeof primitiveGeometries];
+}
+
 function setupCanvas(canvas: string) {
   document
     .getElementById(canvas)
@@ -188,25 +201,6 @@ export function useElementRenderer() {
 
         const mesh = findComponent(node, "mesh")!.data;
 
-        const getGeometry = (type: string) => {
-          switch (type) {
-            case "box":
-              return new BoxGeometry(1, 1, 1);
-
-            case "icosahedron":
-              return new IcosahedronGeometry();
-
-            case "triangle":
-              return new TetrahedronGeometry();
-
-            case "sphere":
-              return new SphereGeometry(0.5, 32, 32);
-
-            default:
-              return new BoxGeometry(0, 0, 0);
-          }
-        };
-
         console.log("adding object", mesh.type);
 
         if (context?.objects.has(node.id)) {
@@ -217,10 +211,7 @@ export function useElementRenderer() {
           if (
             (object instanceof Mesh &&
               object.geometry.type.toLowerCase() !== mesh.type.toLowerCase()) ||
-            (object instanceof Group &&
-              !["box", "icosahedron", "triangle", "sphere"].includes(
-                object.type
-              ))
+            (object instanceof Group && !primitiveTypes.includes(mesh.type))
           ) {
             console.log(
               "Type changed or switching between custom model and primitive"
@@ -228,12 +219,10 @@ export function useElementRenderer() {
 
             context.scene.remove(object);
 
-            if (
-              ["box", "icosahedron", "triangle", "sphere"].includes(mesh.type)
-            ) {
+            if (primitiveTypes.includes(mesh.type)) {
               console.log("Switching to primitive:", mesh.type);
 
-              const geometry = getGeometry(mesh.type);
+              const geometry = getPrimitiveGeometry(mesh.type);
               const material = new MeshBasicMaterial({ color: mesh.colour });
               const newObject = new Mesh(geometry, material);
 
@@ -244,7 +233,7 @@ export function useElementRenderer() {
             } else {
               console.log("Switching to custom model:", mesh.type);
 
-              loadModel(context, mesh.type).then((geometry) => {
+              loadModel(context, mesh.type, mesh.fallback).then((geometry) => {
                 console.log("Custom model loaded:", geometry);
 
                 let newObject: Mesh | Group;
@@ -295,10 +284,8 @@ export function useElementRenderer() {
           object?.position.set(mesh.x, mesh.y, mesh.z);
           return {};
         } else {
-          if (
-            ["box", "icosahedron", "triangle", "sphere"].includes(mesh.type)
-          ) {
-            const geometry = getGeometry(mesh.type);
+          if (primitiveTypes.includes(mesh.type)) {
+            const geometry = getPrimitiveGeometry(mesh.type);
             const material = new MeshBasicMaterial({ color: mesh.colour });
             const object = new Mesh(geometry, material);
 
@@ -309,7 +296,7 @@ export function useElementRenderer() {
 
             return {};
           } else if (context) {
-            loadModel(context, mesh.type).then((geometry) => {
+            loadModel(context, mesh.type, mesh.fallback).then((geometry) => {
               let object: Mesh | Group;
 
               if (geometry instanceof BufferGeometry) {
@@ -340,7 +327,7 @@ export function useElementRenderer() {
 
             return {};
           } else {
-            const geometry = new BoxGeometry(1, 1, 1);
+            const geometry = getPrimitiveGeometry("box");
             const material = new MeshBasicMaterial({ color: mesh.colour });
             const object = new Mesh(geometry, material);
 
