@@ -17,7 +17,7 @@
 <style scoped lang="postcss">
 .field {
   select {
-    @apply border-neutral-500;
+    @apply border-neutral-500 w-full;
   }
 }
 </style>

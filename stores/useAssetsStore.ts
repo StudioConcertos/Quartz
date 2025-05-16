@@ -5,6 +5,15 @@ export const useAssetsStore = defineStore("assets", () => {
 
   const assets = ref<(FileObject & { url: URL })[]>([]);
 
+  const images = computed(() => {
+    return assets.value.filter(
+      (asset) =>
+        asset.name.endsWith(".png") ||
+        asset.name.endsWith(".jpg") ||
+        asset.name.endsWith(".jpeg")
+    );
+  });
+
   const fonts = computed(() => {
     return assets.value.filter(
       (asset) =>
@@ -81,5 +90,5 @@ export const useAssetsStore = defineStore("assets", () => {
     }
   }
 
-  return { assets, fonts, models, fetchAssets, deleteSelectedAsset };
+  return { assets, images, fonts, models, fetchAssets, deleteSelectedAsset };
 });

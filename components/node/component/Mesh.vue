@@ -17,9 +17,21 @@
       name="colour"
       v-model:value="props.component.data.colour"
     />
+    <NodeComponentFieldSelect
+      name="texture"
+      v-model:value="props.component.data.texture"
+      :options="[
+        'default',
+        ...useAssetsStore().images.map((image) => image.name),
+      ]"
+    />
     <NodeComponentFieldNumber name="x" v-model:value="props.component.data.x" />
     <NodeComponentFieldNumber name="y" v-model:value="props.component.data.y" />
     <NodeComponentFieldNumber name="z" v-model:value="props.component.data.z" />
+    <NodeComponentFieldNumber
+      name="scale"
+      v-model:value="props.component.data.scale"
+    />
   </NodeComponent>
 </template>
 
