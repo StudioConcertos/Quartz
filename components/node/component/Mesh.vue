@@ -1,5 +1,5 @@
 <template>
-  <NodeComponent name="mesh">
+  <NodeComponent name="model">
     <NodeComponentFieldSelect
       name="type"
       v-model:value="props.component.data.type"

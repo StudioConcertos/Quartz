@@ -4,7 +4,7 @@ import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
-import { primitiveGeometries } from "@/composables/useElementRenderer";
+import { primitiveGeometries } from "~/composables/useElementRenderer";
 
 export default async (
   context: CanvasContext,
