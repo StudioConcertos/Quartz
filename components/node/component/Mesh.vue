@@ -10,6 +10,7 @@
     />
     <NodeComponentFieldSelect
       name="fallback"
+      :disabled="primitiveTypes.includes(props.component.data.type)"
       v-model:value="props.component.data.fallback"
       :options="['none', ...primitiveTypes]"
     />
