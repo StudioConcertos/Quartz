@@ -15,6 +15,7 @@
     "@nuxtjs/supabase": "^1.5.1",
     "@pinia/nuxt": "^0.5.5",
     "@supabase/supabase-js": "^2.49.4",
+    "@tresjs/cientos": "^4.3.1",
     "@tresjs/nuxt": "^3.0.8",
     "@types/sortablejs": "^1.15.8",
     "@types/three": "^0.175.0",
