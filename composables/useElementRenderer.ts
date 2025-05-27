@@ -16,7 +16,6 @@ import {
   Scene,
   SphereGeometry,
   TetrahedronGeometry,
-  Texture,
   TextureLoader,
   WebGLRenderer,
 } from "three";
@@ -68,6 +67,17 @@ function createPrimitiveMesh(type: string, color: string) {
   return new Mesh(geometry, new MeshBasicMaterial({ color }));
 }
 
+function createCustomMaterial(textureUrl: string, color: string) {
+  const texture = new TextureLoader().load(textureUrl);
+  return new MeshPhongMaterial({ map: texture, color });
+}
+
+function updateMaterialColor(material: any, color: string) {
+  if (material.color) {
+    material.color.set(color);
+  }
+}
+
 function createModel(
   geometry: BufferGeometry | Group | null,
   color: string,
@@ -77,18 +87,11 @@ function createModel(
     return new Mesh(new BoxGeometry(0, 0, 0), new MeshBasicMaterial({ color }));
   }
 
-  const createMaterial = () => {
-    if (!textureUrl) {
-      return new MeshBasicMaterial({ color });
-    }
-
-    const texture = new TextureLoader().load(textureUrl);
-
-    return new MeshPhongMaterial({ map: texture, color });
-  };
-
   if (geometry instanceof BufferGeometry) {
-    return new Mesh(geometry.clone(), createMaterial());
+    const material = textureUrl
+      ? createCustomMaterial(textureUrl, color)
+      : new MeshBasicMaterial({ color });
+    return new Mesh(geometry.clone(), material);
   }
 
   if (geometry instanceof Group) {
@@ -96,7 +99,11 @@ function createModel(
 
     clonedGroup.traverse((child) => {
       if (child instanceof Mesh) {
-        child.material = createMaterial();
+        if (textureUrl) {
+          child.material = createCustomMaterial(textureUrl, color);
+        } else {
+          updateMaterialColor(child.material, color);
+        }
       }
     });
 
@@ -138,21 +145,101 @@ function getTextureUrl(texture: string | undefined): string | undefined {
   return undefined;
 }
 
+function getCurrentTextureSrc(
+  material: MeshBasicMaterial | MeshPhongMaterial
+): string | undefined {
+  return material.map?.image?.src || material.map?.source?.data?.src;
+}
+
+function hasTextureChanged(
+  currentSrc: string | undefined,
+  newTextureUrl: string | undefined,
+  hasMap: boolean
+): boolean {
+  if (!newTextureUrl && hasMap) {
+    return true;
+  }
+
+  if (newTextureUrl && !hasMap) {
+    return true;
+  }
+
+  if (newTextureUrl && hasMap && currentSrc !== newTextureUrl) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkTextureChanged(object: Mesh | Group, texture?: string): boolean {
+  const textureUrl = getTextureUrl(texture);
+
+  if (object instanceof Mesh) {
+    const material = object.material as MeshBasicMaterial | MeshPhongMaterial;
+    const currentTextureSrc = getCurrentTextureSrc(material);
+
+    return hasTextureChanged(currentTextureSrc, textureUrl, !!material.map);
+  }
+
+  if (object instanceof Group) {
+    let textureChanged = false;
+
+    object.traverse((child) => {
+      if (child instanceof Mesh && !textureChanged) {
+        const material = child.material as
+          | MeshBasicMaterial
+          | MeshPhongMaterial;
+        const currentTextureSrc = getCurrentTextureSrc(material);
+
+        if (hasTextureChanged(currentTextureSrc, textureUrl, !!material.map)) {
+          textureChanged = true;
+          return;
+        }
+      }
+    });
+
+    return textureChanged;
+  }
+
+  return false;
+}
+
+interface ObjectUserData {
+  modelType?: string;
+}
+
+function setObjectMetadata(object: Mesh | Group, modelType: string): void {
+  if (!object.userData) {
+    object.userData = {};
+  }
+
+  (object.userData as ObjectUserData).modelType = modelType;
+}
+
+function getObjectModelType(object: Mesh | Group): string | undefined {
+  return (object.userData as ObjectUserData)?.modelType;
+}
+
 async function instantiateObject(
   context: CanvasContext,
   node: Tree,
   mesh: any
 ) {
   const isPrimitive = primitiveTypes.includes(mesh.type);
+  const textureUrl = getTextureUrl(mesh.texture);
 
   const newObject = isPrimitive
     ? createPrimitiveMesh(mesh.type, mesh.colour)
     : await loadModel(context, mesh.type, mesh.fallback).then((geometry) =>
-        createModel(geometry ?? null, mesh.colour, getTextureUrl(mesh.texture))
+        createModel(geometry ?? null, mesh.colour, textureUrl)
       );
 
   if (!newObject) {
     return console.error("Failed to create object");
+  }
+
+  if (!isPrimitive) {
+    setObjectMetadata(newObject, mesh.type);
   }
 
   newObject.position.set(mesh.x, mesh.y, mesh.z);
@@ -162,23 +249,50 @@ async function instantiateObject(
   context.scene.add(newObject);
 }
 
+function hasTypeConflict(
+  existingObject: Mesh | Group,
+  isPrimitive: boolean
+): boolean {
+  return (
+    (existingObject instanceof Mesh && !isPrimitive) ||
+    (existingObject instanceof Group && isPrimitive)
+  );
+}
+
+function hasPrimitiveGeometryChanged(
+  existingObject: Mesh | Group,
+  mesh: any,
+  isPrimitive: boolean
+): boolean {
+  return (
+    existingObject instanceof Mesh &&
+    isPrimitive &&
+    existingObject.geometry.type.toLowerCase() !== mesh.type.toLowerCase()
+  );
+}
+
+function hasModelTypeChanged(
+  existingObject: Mesh | Group,
+  mesh: any,
+  isPrimitive: boolean
+): boolean {
+  return !isPrimitive && getObjectModelType(existingObject) !== mesh.type;
+}
+
 function shouldRecreateObject(
   existingObject: Mesh | Group,
   mesh: any,
   isPrimitive: boolean
 ): boolean {
-  if (
-    (existingObject instanceof Mesh && !isPrimitive) ||
-    (existingObject instanceof Group && isPrimitive)
-  ) {
+  if (hasTypeConflict(existingObject, isPrimitive)) {
     return true;
   }
 
-  if (
-    existingObject instanceof Mesh &&
-    isPrimitive &&
-    existingObject.geometry.type.toLowerCase() !== mesh.type.toLowerCase()
-  ) {
+  if (hasPrimitiveGeometryChanged(existingObject, mesh, isPrimitive)) {
+    return true;
+  }
+
+  if (hasModelTypeChanged(existingObject, mesh, isPrimitive)) {
     return true;
   }
 
@@ -193,61 +307,6 @@ function disposeObject(object: Mesh | Group) {
       ? object.material.forEach((material) => material.dispose())
       : object.material.dispose();
   }
-}
-
-function checkTextureChanged(object: Mesh | Group, texture?: string): boolean {
-  const textureUrl = getTextureUrl(texture);
-  const hasTextureValue = texture && texture !== "default";
-
-  if (object instanceof Mesh) {
-    const material = object.material as MeshBasicMaterial | MeshPhongMaterial;
-
-    if (!hasTextureValue && material.map) {
-      return true;
-    }
-
-    if (textureUrl && !material.map) {
-      return true;
-    }
-
-    return Boolean(
-      textureUrl && material.map && material.map.source.data.src !== textureUrl
-    );
-  }
-
-  if (object instanceof Group) {
-    let textureChanged = false;
-
-    object.traverse((child) => {
-      if (child instanceof Mesh && !textureChanged) {
-        const material = child.material as
-          | MeshBasicMaterial
-          | MeshPhongMaterial;
-
-        if (!hasTextureValue && material.map) {
-          textureChanged = true;
-
-          return;
-        }
-
-        if (textureUrl && !material.map) {
-          textureChanged = true;
-
-          return;
-        }
-
-        textureChanged = Boolean(
-          textureUrl &&
-            material.map &&
-            material.map.source.data.src !== textureUrl
-        );
-      }
-    });
-
-    return textureChanged;
-  }
-
-  return false;
 }
 
 function updateObject(object: Mesh | Group, mesh: any) {
