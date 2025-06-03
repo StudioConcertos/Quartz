@@ -80,4 +80,4 @@ export const fonts = [
   "Trench Slab",
   "Work Sans",
   "Zodiak",
-];
+] as const;
