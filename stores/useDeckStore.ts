@@ -312,7 +312,13 @@ export const useDeckStore = defineStore("deck", () => {
           node: id,
           data: {
             type: "box",
+            fallback: "none",
             colour: "#FAFAFA",
+            texture: "default",
+            x: 0,
+            y: 0,
+            z: 0,
+            scale: 1,
           },
         });
 

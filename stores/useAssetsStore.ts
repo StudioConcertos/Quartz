@@ -5,15 +5,41 @@ export const useAssetsStore = defineStore("assets", () => {
 
   const assets = ref<(FileObject & { url: URL })[]>([]);
 
-  const fonts = computed(() => {
-    return assets.value.filter(
-      (asset) =>
-        asset.name.endsWith(".ttf") ||
-        asset.name.endsWith(".otf") ||
-        asset.name.endsWith(".woff") ||
-        asset.name.endsWith(".woff2")
-    );
+  const images = computed(() => {
+    return assets.value.filter((asset) => isImage(asset.name));
   });
+
+  const fonts = computed(() => {
+    return assets.value.filter((asset) => isFont(asset.name));
+  });
+
+  const models = computed(() => {
+    return assets.value.filter((asset) => isModel(asset.name));
+  });
+
+  const isImage = (name: string) => {
+    return (
+      name.endsWith(".png") || name.endsWith(".jpg") || name.endsWith(".jpeg")
+    );
+  };
+
+  const isFont = (name: string) => {
+    return (
+      name.endsWith(".ttf") ||
+      name.endsWith(".otf") ||
+      name.endsWith(".woff") ||
+      name.endsWith(".woff2")
+    );
+  };
+
+  const isModel = (name: string) => {
+    return (
+      name.endsWith(".fbx") ||
+      name.endsWith(".glb") ||
+      name.endsWith(".gltf") ||
+      name.endsWith(".obj")
+    );
+  };
 
   async function fetchAssets(deck: string) {
     const { data, error } = await client.storage.from("assets").list(deck);
@@ -71,5 +97,15 @@ export const useAssetsStore = defineStore("assets", () => {
     }
   }
 
-  return { assets, fonts, fetchAssets, deleteSelectedAsset };
+  return {
+    assets,
+    images,
+    fonts,
+    models,
+    isImage,
+    isFont,
+    isModel,
+    fetchAssets,
+    deleteSelectedAsset,
+  };
 });

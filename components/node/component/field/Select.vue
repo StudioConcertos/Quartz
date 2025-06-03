@@ -2,6 +2,10 @@
   <div class="field">
     <label>{{ props.name }}</label>
     <select
+      :class="{
+        'cursor-not-allowed': props.disabled,
+      }"
+      :disabled="props.disabled"
       :value="props.value"
       @change="
         $emit('update:value', ($event.target as HTMLSelectElement).value)
@@ -17,7 +21,7 @@
 <style scoped lang="postcss">
 .field {
   select {
-    @apply border-neutral-500;
+    @apply border-neutral-500 w-full;
   }
 }
 </style>
@@ -27,6 +31,7 @@ const props = defineProps<{
   name: string;
   value: string;
   options: string[];
+  disabled?: boolean;
 }>();
 
 defineEmits<{

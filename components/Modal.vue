@@ -1,5 +1,5 @@
 <template>
-  <dialog ref="modal">
+  <dialog ref="modal" @close="emit('close')">
     <div v-if="!props.isMinimal">
       <h4>{{ props.title }}:</h4>
       <div class="h-8"></div>
@@ -33,8 +33,16 @@ const props = defineProps<{
 
 const modal = ref<HTMLDialogElement>();
 
+const emit = defineEmits<{
+  close: [];
+}>();
+
 defineExpose({
   open: () => modal.value?.showModal(),
-  close: () => modal.value?.close(),
+  close: () => {
+    emit("close");
+
+    modal.value?.close();
+  },
 });
 </script>
