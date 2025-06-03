@@ -34,7 +34,7 @@
   @apply border-solid border-0 border-b-2 border-dark-200;
 
   .info {
-    @apply absolute opacity-80 select-none;
+    @apply absolute opacity-90 select-none;
     @apply top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
     @apply w-full text-center px-6;
 
