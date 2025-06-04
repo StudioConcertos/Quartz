@@ -99,6 +99,7 @@
 import type Modal from "@/components/Modal.vue";
 
 const { updateDeckTitle } = useDeckStore();
+const { selectedNode } = storeToRefs(useDeckStore());
 
 const props = defineProps<{
   title: string;
@@ -119,6 +120,8 @@ const title = computed({
 
 function onSubmit() {
   modal.value?.close();
+
+  selectedNode.value = null;
 
   navigateTo(`/live/${useRoute().params.id}`);
 }
