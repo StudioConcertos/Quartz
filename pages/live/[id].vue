@@ -15,7 +15,7 @@
     autofocus
     class="live"
   >
-    <AtelierRender />
+    <AtelierRender class="select-none pointer-events-none" />
     <div
       :class="{
         'opacity-0': !cursorMoved,

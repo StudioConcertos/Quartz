@@ -1,7 +1,7 @@
 import {
   defineConfig,
   presetIcons,
-  presetUno,
+  presetWind3,
   presetWebFonts,
   transformerDirectives,
 } from "unocss";
@@ -21,10 +21,14 @@ const createFontConfig = (fonts: readonly string[]) => {
 export default defineConfig({
   presets: [
     presetIcons(),
-    presetUno(),
+    presetWind3(),
     presetWebFonts({
       provider: "fontshare",
       fonts: createFontConfig(fonts),
+      timeouts: {
+        warning: 30000,
+        failure: 60000,
+      },
     }),
   ],
   transformers: [transformerDirectives()],

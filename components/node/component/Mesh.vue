@@ -1,13 +1,37 @@
 <template>
-  <NodeComponent name="mesh">
+  <NodeComponent name="model">
     <NodeComponentFieldSelect
       name="type"
       v-model:value="props.component.data.type"
-      :options="['box', 'icosahedron', 'triangle', 'sphere']"
+      :options="[
+        ...primitiveTypes,
+        ...useAssetsStore().models.map((model) => model.name),
+      ]"
+    />
+    <NodeComponentFieldSelect
+      name="fallback"
+      :disabled="primitiveTypes.includes(props.component.data.type)"
+      v-model:value="props.component.data.fallback"
+      :options="['none', ...primitiveTypes]"
     />
     <NodeComponentFieldColour
       name="colour"
       v-model:value="props.component.data.colour"
+    />
+    <NodeComponentFieldSelect
+      name="texture"
+      v-model:value="props.component.data.texture"
+      :options="[
+        'default',
+        ...useAssetsStore().images.map((image) => image.name),
+      ]"
+    />
+    <NodeComponentFieldNumber name="x" v-model:value="props.component.data.x" />
+    <NodeComponentFieldNumber name="y" v-model:value="props.component.data.y" />
+    <NodeComponentFieldNumber name="z" v-model:value="props.component.data.z" />
+    <NodeComponentFieldNumber
+      name="scale"
+      v-model:value="props.component.data.scale"
     />
   </NodeComponent>
 </template>

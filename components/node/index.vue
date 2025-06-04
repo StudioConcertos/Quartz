@@ -7,13 +7,7 @@
       @dblclick="toggleGroup"
     >
       <div class="flex items-center w-full">
-        <div
-          ref="icon"
-          :class="
-            isGroup ? 'i-carbon-caret-down' : 'i-carbon-text-short-paragraph'
-          "
-          class="flex-shrink-0"
-        ></div>
+        <div ref="icon" :class="nodeIcon" class="flex-shrink-0"></div>
         <input
           maxlength="30"
           @keydown.enter.esc="($event.target as HTMLInputElement).blur()"
@@ -57,7 +51,7 @@
 <style scoped lang="postcss">
 .node {
   button {
-    @apply px-2 mb-2 justify-between;
+    @apply px-2 mb-3 justify-between;
     @apply w-full border-none pointer-events-auto;
 
     div p,
@@ -66,7 +60,7 @@
     }
 
     div [class*="i-"] {
-      @apply text-xl mr-2;
+      @apply text-xl mr-3;
     }
 
     .name {
@@ -124,6 +118,22 @@ const nodeName = computed({
       name: value,
     });
   },
+});
+
+const nodeIcon = computed(() => {
+  switch (props.node.type) {
+    case "group":
+      return "i-carbon-caret-down";
+
+    case "text":
+      return "i-carbon-text-short-paragraph";
+
+    case "webgl_canvas":
+      return "i-carbon-assembly-cluster";
+
+    case "webgl_object":
+      return "i-carbon-cube";
+  }
 });
 
 const isSelected = computed(() => {

@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="atelier-header">
     <NuxtLink class="border-r" to="/atelier">
       <div class="i-carbon-switcher"></div>
     </NuxtLink>
@@ -34,7 +34,7 @@
 </template>
 
 <style scoped lang="postcss">
-header {
+.atelier-header {
   @apply flex justify-between items-center;
   @apply bg-dark-500 h-20;
   @apply border-solid border-0 border-b-2 border-dark-200;
@@ -99,6 +99,7 @@ header {
 import type Modal from "@/components/Modal.vue";
 
 const { updateDeckTitle } = useDeckStore();
+const { selectedNode } = storeToRefs(useDeckStore());
 
 const props = defineProps<{
   title: string;
@@ -119,6 +120,8 @@ const title = computed({
 
 function onSubmit() {
   modal.value?.close();
+
+  selectedNode.value = null;
 
   navigateTo(`/live/${useRoute().params.id}`);
 }

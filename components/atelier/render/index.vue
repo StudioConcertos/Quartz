@@ -1,5 +1,9 @@
 <template>
-  <div class="render">
+  <div
+    @click="selectedNode = null"
+    @click.right="selectedNode = null"
+    class="render"
+  >
     <AtelierRenderElement
       v-if="!isEmptyTree(currentTree)"
       v-for="node in currentTree.children"
@@ -29,5 +33,5 @@
 </style>
 
 <script setup lang="ts">
-const { currentTree } = storeToRefs(useDeckStore());
+const { currentTree, selectedNode } = storeToRefs(useDeckStore());
 </script>

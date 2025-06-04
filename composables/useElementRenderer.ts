@@ -3,52 +3,316 @@
 // ! = Required component; ? = Optional component.
 
 import {
-  Scene,
-  PerspectiveCamera,
-  WebGLRenderer,
+  AmbientLight,
   BoxGeometry,
-  SphereGeometry,
+  BufferGeometry,
+  DirectionalLight,
+  Group,
   IcosahedronGeometry,
-  TetrahedronGeometry,
-  MeshBasicMaterial,
   Mesh,
+  MeshBasicMaterial,
+  MeshPhongMaterial,
+  PerspectiveCamera,
+  Scene,
+  SphereGeometry,
+  TetrahedronGeometry,
+  TextureLoader,
+  WebGLRenderer,
 } from "three";
 
-const canvasContext = new Map<
-  string,
-  {
-    scene: Scene;
-    camera: PerspectiveCamera;
-    renderer: WebGLRenderer;
-    objects: Map<string, Mesh>;
-  }
->();
+import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader.js";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader.js";
+import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader.js";
 
-const hasAnimated = ref(false);
+const contexts = new Map<string, CanvasContext>();
+
+const isAnimating = ref(false);
+
+export const primitiveGeometries = {
+  box: new BoxGeometry(1, 1, 1),
+  icosahedron: new IcosahedronGeometry(),
+  triangle: new TetrahedronGeometry(),
+  sphere: new SphereGeometry(0.5, 32, 32),
+};
+
+export const primitiveTypes = Object.keys(primitiveGeometries);
+
+function getPrimitiveGeometry(type: string) {
+  return primitiveGeometries[type as keyof typeof primitiveGeometries];
+}
 
 function setupCanvas(canvas: string) {
   document
     .getElementById(canvas)
-    ?.appendChild(canvasContext.get(canvas)!.renderer.domElement);
+    ?.appendChild(contexts.get(canvas)!.renderer.domElement);
 
-  if (!hasAnimated.value) {
+  if (!isAnimating.value) {
     animate();
 
-    hasAnimated.value = true;
+    isAnimating.value = true;
   }
 }
 
 function animate() {
   requestAnimationFrame(animate);
 
-  canvasContext.forEach((context) => {
-    context.scene.children.forEach((child) => {
-      child.rotation.x += 0.01;
-      child.rotation.y += 0.01;
-    });
-
+  contexts.forEach((context) => {
     context.renderer.render(context.scene, context.camera);
   });
+}
+
+function createPrimitiveMesh(type: string, color: string) {
+  const geometry = getPrimitiveGeometry(type);
+
+  return new Mesh(geometry, new MeshBasicMaterial({ color }));
+}
+
+function createCustomMaterial(textureUrl: string, color: string) {
+  const texture = new TextureLoader().load(textureUrl);
+  return new MeshPhongMaterial({ map: texture, color });
+}
+
+function updateMaterialColor(material: any, color: string) {
+  if (material.color) {
+    material.color.set(color);
+  }
+}
+
+function createModel(
+  geometry: BufferGeometry | Group | null,
+  color: string,
+  textureUrl?: string
+) {
+  if (!geometry) {
+    return new Mesh(new BoxGeometry(0, 0, 0), new MeshBasicMaterial({ color }));
+  }
+
+  if (geometry instanceof BufferGeometry) {
+    const material = textureUrl
+      ? createCustomMaterial(textureUrl, color)
+      : new MeshBasicMaterial({ color });
+    return new Mesh(geometry.clone(), material);
+  }
+
+  if (geometry instanceof Group) {
+    const clonedGroup = geometry.clone();
+
+    clonedGroup.traverse((child) => {
+      if (child instanceof Mesh) {
+        if (textureUrl) {
+          child.material = createCustomMaterial(textureUrl, color);
+        } else {
+          updateMaterialColor(child.material, color);
+        }
+      }
+    });
+
+    return clonedGroup;
+  }
+}
+
+function updateObjectColour(object: Mesh | Group, color: string) {
+  if (object instanceof Mesh) {
+    const material = object.material as MeshBasicMaterial | MeshPhongMaterial;
+
+    material.color.set(color);
+  } else if (object instanceof Group) {
+    object.traverse((child) => {
+      if (child instanceof Mesh) {
+        const material = child.material as
+          | MeshBasicMaterial
+          | MeshPhongMaterial;
+
+        material.color.set(color);
+      }
+    });
+  }
+}
+
+function getTextureUrl(texture: string | undefined): string | undefined {
+  if (!texture || texture === "default") {
+    return undefined;
+  }
+
+  const selectedTexture = useAssetsStore().images.find(
+    (img: { name: string; url: URL }) => img.name === texture
+  );
+
+  if (selectedTexture) {
+    return selectedTexture.url.toString();
+  }
+
+  return undefined;
+}
+
+function getCurrentTextureSrc(
+  material: MeshBasicMaterial | MeshPhongMaterial
+): string | undefined {
+  return material.map?.image?.src || material.map?.source?.data?.src;
+}
+
+function hasTextureChanged(
+  currentSrc: string | undefined,
+  newTextureUrl: string | undefined,
+  hasMap: boolean
+): boolean {
+  if (!newTextureUrl && hasMap) {
+    return true;
+  }
+
+  if (newTextureUrl && !hasMap) {
+    return true;
+  }
+
+  if (newTextureUrl && hasMap && currentSrc !== newTextureUrl) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkTextureChanged(object: Mesh | Group, texture?: string): boolean {
+  const textureUrl = getTextureUrl(texture);
+
+  if (object instanceof Mesh) {
+    const material = object.material as MeshBasicMaterial | MeshPhongMaterial;
+    const currentTextureSrc = getCurrentTextureSrc(material);
+
+    return hasTextureChanged(currentTextureSrc, textureUrl, !!material.map);
+  }
+
+  if (object instanceof Group) {
+    let textureChanged = false;
+
+    object.traverse((child) => {
+      if (child instanceof Mesh && !textureChanged) {
+        const material = child.material as
+          | MeshBasicMaterial
+          | MeshPhongMaterial;
+        const currentTextureSrc = getCurrentTextureSrc(material);
+
+        if (hasTextureChanged(currentTextureSrc, textureUrl, !!material.map)) {
+          textureChanged = true;
+          return;
+        }
+      }
+    });
+
+    return textureChanged;
+  }
+
+  return false;
+}
+
+interface ObjectUserData {
+  modelType?: string;
+}
+
+function setObjectMetadata(object: Mesh | Group, modelType: string): void {
+  if (!object.userData) {
+    object.userData = {};
+  }
+
+  (object.userData as ObjectUserData).modelType = modelType;
+}
+
+function getObjectModelType(object: Mesh | Group): string | undefined {
+  return (object.userData as ObjectUserData)?.modelType;
+}
+
+async function instantiateObject(
+  context: CanvasContext,
+  node: Tree,
+  mesh: any
+) {
+  const isPrimitive = primitiveTypes.includes(mesh.type);
+  const textureUrl = getTextureUrl(mesh.texture);
+
+  const newObject = isPrimitive
+    ? createPrimitiveMesh(mesh.type, mesh.colour)
+    : await loadModel(context, mesh.type, mesh.fallback).then((geometry) =>
+        createModel(geometry ?? null, mesh.colour, textureUrl)
+      );
+
+  if (!newObject) {
+    return console.error("Failed to create object");
+  }
+
+  if (!isPrimitive) {
+    setObjectMetadata(newObject, mesh.type);
+  }
+
+  newObject.position.set(mesh.x, mesh.y, mesh.z);
+  newObject.scale.set(mesh.scale, mesh.scale, mesh.scale);
+
+  context.objects.set(node.id, newObject);
+  context.scene.add(newObject);
+}
+
+function hasTypeConflict(
+  existingObject: Mesh | Group,
+  isPrimitive: boolean
+): boolean {
+  return (
+    (existingObject instanceof Mesh && !isPrimitive) ||
+    (existingObject instanceof Group && isPrimitive)
+  );
+}
+
+function hasPrimitiveGeometryChanged(
+  existingObject: Mesh | Group,
+  mesh: any,
+  isPrimitive: boolean
+): boolean {
+  return (
+    existingObject instanceof Mesh &&
+    isPrimitive &&
+    existingObject.geometry.type.toLowerCase() !== mesh.type.toLowerCase()
+  );
+}
+
+function hasModelTypeChanged(
+  existingObject: Mesh | Group,
+  mesh: any,
+  isPrimitive: boolean
+): boolean {
+  return !isPrimitive && getObjectModelType(existingObject) !== mesh.type;
+}
+
+function shouldRecreateObject(
+  existingObject: Mesh | Group,
+  mesh: any,
+  isPrimitive: boolean
+): boolean {
+  if (hasTypeConflict(existingObject, isPrimitive)) {
+    return true;
+  }
+
+  if (hasPrimitiveGeometryChanged(existingObject, mesh, isPrimitive)) {
+    return true;
+  }
+
+  if (hasModelTypeChanged(existingObject, mesh, isPrimitive)) {
+    return true;
+  }
+
+  return checkTextureChanged(existingObject, mesh.texture);
+}
+
+function disposeObject(object: Mesh | Group) {
+  if (object instanceof Mesh) {
+    object.geometry.dispose();
+
+    Array.isArray(object.material)
+      ? object.material.forEach((material) => material.dispose())
+      : object.material.dispose();
+  }
+}
+
+function updateObject(object: Mesh | Group, mesh: any) {
+  updateObjectColour(object, mesh.colour);
+  object.position.set(mesh.x, mesh.y, mesh.z);
+  object.scale.set(mesh.scale, mesh.scale, mesh.scale);
 }
 
 export function useElementRenderer() {
@@ -128,7 +392,7 @@ export function useElementRenderer() {
         watch(
           () => transform.width / transform.height,
           (newAspectRatio) => {
-            const context = canvasContext.get(node.id);
+            const context = contexts.get(node.id);
 
             if (!context) return;
 
@@ -139,8 +403,8 @@ export function useElementRenderer() {
           }
         );
 
-        if (!canvasContext.has(node.id)) {
-          canvasContext.set(node.id, {
+        if (!contexts.has(node.id)) {
+          contexts.set(node.id, {
             scene: new Scene(),
             camera: new PerspectiveCamera(
               75,
@@ -149,11 +413,25 @@ export function useElementRenderer() {
               1000
             ),
             renderer: new WebGLRenderer({ antialias: true }),
+            loaders: {
+              fbx: new FBXLoader(),
+              gltf: new GLTFLoader(),
+              obj: new OBJLoader(),
+            },
             objects: new Map(),
+            cache: new Map(),
           });
+
+          const ambientLight = new AmbientLight(0xffffff, 0.5);
+          const directionalLight = new DirectionalLight(0xffffff, 1);
+
+          directionalLight.position.set(5, 5, 5);
+
+          contexts.get(node.id)!.scene.add(ambientLight);
+          contexts.get(node.id)!.scene.add(directionalLight);
         }
 
-        const context = canvasContext.get(node.id);
+        const context = contexts.get(node.id);
 
         context?.renderer.setSize(transform.width, transform.height);
         context?.renderer.setClearColor(sceneComponent.background);
@@ -179,59 +457,40 @@ export function useElementRenderer() {
     webgl_object: {
       element: "",
       render: (node: Tree) => {
-        const context = canvasContext.get(node.parent!.id);
+        const context = contexts.get(node.parent!.id);
+
+        if (!context) return {};
 
         const mesh = findComponent(node, "mesh")!.data;
 
-        const getGeometry = (type: string) => {
-          switch (type) {
-            case "box":
-              return new BoxGeometry(1, 1, 1);
+        const isPrimitive = primitiveTypes.includes(mesh.type);
+        const existingObject = context.objects.get(node.id);
 
-            case "icosahedron":
-              return new IcosahedronGeometry();
-
-            case "triangle":
-              return new TetrahedronGeometry();
-
-            case "sphere":
-              return new SphereGeometry(0.5, 32, 32);
-
-            default:
-              return new BoxGeometry(0, 0, 0);
-          }
-        };
-
-        console.log("adding object", mesh.type);
-
-        if (context?.objects.has(node.id)) {
-          const object = context?.objects.get(node.id);
-
-          if (object && object.geometry.type !== mesh.type) {
-            object.geometry.dispose();
-            object.geometry = getGeometry(mesh.type);
-          }
-
-          (object?.material as MeshBasicMaterial).color.set(mesh.colour);
-
-          return {};
-        } else {
-          const geometry = getGeometry(mesh.type);
-          const material = new MeshBasicMaterial({ color: mesh.colour });
-          const cube = new Mesh(geometry, material);
-
-          if (context?.objects.has(node.id)) {
-            return {};
-          }
-
-          context?.objects.set(node.id, cube);
-
-          context?.scene.add(cube);
-
-          console.log(context?.scene.children);
+        if (!existingObject) {
+          instantiateObject(context, node, mesh);
 
           return {};
         }
+
+        updateObject(existingObject, mesh);
+
+        const needsRecreation = shouldRecreateObject(
+          existingObject,
+          mesh,
+          isPrimitive
+        );
+
+        if (needsRecreation) {
+          disposeObject(existingObject);
+
+          context.scene.remove(existingObject);
+
+          instantiateObject(context, node, mesh);
+
+          return {};
+        }
+
+        return {};
       },
     },
   };

@@ -30,7 +30,8 @@
 
 <style scoped lang="postcss">
 .hero {
-  @apply flex relative h-screen;
+  @apply flex relative h-[90vh];
+  @apply border-solid border-0 border-b-2 border-dark-200;
 
   .info {
     @apply absolute opacity-90 select-none;

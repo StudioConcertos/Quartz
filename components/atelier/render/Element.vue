@@ -3,17 +3,17 @@
     v-if="render?.element"
     :is="render.element"
     :key="props.node.path"
-    :style="[
-      render.style,
-      {
-        position: 'absolute',
-        transformOrigin: 'top left',
-        whiteSpace: 'nowrap',
-        cursor: 'move',
-      },
-    ]"
+    :style="[render.style]"
     :id="props.node.id"
-    :class="props.node.path === 'root' ? 'root' : 'element'"
+    :class="[
+      props.node.path === 'root' ? 'root' : 'element',
+      selectedNode === props.node ? 'outline-dark-900!' : '',
+    ]"
+    class="element"
+    :tabindex="0"
+    @click="selectNode"
+    @click.right="cancelSelection"
+    @keydown.esc="cancelSelection"
   >
     {{ render.content }}
     <AtelierRenderElement
@@ -24,8 +24,17 @@
   </Component>
 </template>
 
+<style scoped lang="postcss">
+.element {
+  @apply absolute transform-origin-top-left whitespace-nowrap;
+  @apply outline outline-3 outline-dark-900/0 hover:outline-dark-900;
+  @apply border-rd transition-all duration-200;
+}
+</style>
+
 <script setup lang="ts">
 const { renderer, setupCanvas } = useElementRenderer();
+const { selectedNode } = storeToRefs(useDeckStore());
 
 const props = defineProps<{
   node: Tree;
@@ -45,6 +54,15 @@ const render = computed(() => {
     ...result.render(props.node),
   };
 });
+
+function selectNode(event: Event) {
+  event.stopPropagation();
+  selectedNode.value = props.node;
+}
+
+function cancelSelection() {
+  selectedNode.value = null;
+}
 
 onMounted(() => {
   isMounted.value = true;
