@@ -7,7 +7,7 @@
       :min="props.min"
       :max="props.max"
       :step="props.step"
-      @change="
+      @input="
         $emit('update:value', ($event.target as HTMLInputElement).valueAsNumber)
       "
     />
