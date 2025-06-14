@@ -15,7 +15,7 @@
 <style scoped lang="postcss">
 .inspector {
   @apply bg-dark-700 w-[30vw] p-[2.5ch];
-  @apply flex flex-col;
+  @apply flex flex-col flex-shrink-0;
 
   .hierarchy,
   .properties {

@@ -6,10 +6,10 @@
   </div>
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
     <AtelierHeader :title="deck.title" />
-    <div class="flex flex-1 overflow-hidden">
+    <div class="flex flex-1">
       <AtelierToolbar />
       <AtelierInspector />
-      <div class="flex flex-1 flex-col">
+      <div class="flex flex-1 flex-col min-w-0">
         <div class="render-container">
           <AtelierRender />
         </div>

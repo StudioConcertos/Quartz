@@ -1,5 +1,5 @@
 <template>
-  <div ref="timeline" class="timeline">
+  <div ref="timeline" @wheel="handleScroll" class="timeline">
     <TransitionGroup name="list">
       <AtelierTimelineFrame
         v-for="slide in slides"
@@ -23,6 +23,10 @@
   @apply bg-dark-800 h-[15vh] w-full p-[2.5ch];
   @apply overflow-x-auto overflow-y-hidden;
   @apply border-solid border-0 border-t-2 border-dark-200;
+
+  & > * {
+    @apply flex-shrink-0;
+  }
 
   .list-move,
   .list-enter-active,
@@ -81,9 +85,35 @@ import Sortable, { Swap } from "sortablejs";
 const deckStore = useDeckStore();
 const { slides } = storeToRefs(useDeckStore());
 
-const timeline = ref<HTMLElement | null>(null);
+const timeline = useTemplateRef<HTMLDivElement>("timeline");
 
 const isLoading = ref(false);
+
+const { x } = useScroll(timeline, { behavior: "smooth" });
+
+const wheelDelta = ref(0);
+
+const handleScroll = (event: WheelEvent) => {
+  if (event.deltaY !== 0) {
+    wheelDelta.value = event.deltaY * 10;
+  }
+};
+
+const throttle = computed(() => {
+  return Math.round(1000 / useFps().value);
+});
+
+watchThrottled(
+  wheelDelta,
+  (delta) => {
+    if (delta !== 0) {
+      x.value += delta;
+
+      wheelDelta.value = 0;
+    }
+  },
+  { throttle }
+);
 
 async function insertNewSlides() {
   if (isLoading.value) return;

@@ -13,7 +13,7 @@
 <style scoped lang="postcss">
 aside {
   @apply bg-dark-500 w-[80px];
-  @apply flex flex-col;
+  @apply flex flex-col flex-shrink-0;
 
   button {
     @apply w-full h-20;
