@@ -3,7 +3,7 @@
     <label>{{ props.name }}</label>
     <input
       type="color"
-      :value="props.value"
+      :value="props.value ?? '#000000'"
       @input="$emit('update:value', ($event.target as HTMLInputElement).value)"
     />
   </div>

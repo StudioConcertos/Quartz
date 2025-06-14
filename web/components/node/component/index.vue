@@ -1,5 +1,5 @@
 <template>
-  <div :class="{ 'opacity-100!': isOpen }" class="component" tabindex="0">
+  <div :class="{ 'opacity-100!': isOpen }" class="component">
     <header @click="toggleComponent">
       <h4>
         <div class="icon" :class="icon"></div>

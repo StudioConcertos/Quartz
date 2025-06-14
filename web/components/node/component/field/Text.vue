@@ -9,7 +9,7 @@
       @keydown.enter.exact.prevent="handleEnter"
       :rows="props.isParagraph ? 5 : 1"
       :maxlength="props.isParagraph ? 300 : 30"
-      :value="props.value"
+      :value="props.value ?? ''"
       @input="
         $emit('update:value', ($event.target as HTMLTextAreaElement).value)
       "

@@ -83,7 +83,7 @@ export const useDeckStore = defineStore("deck", () => {
 
       await saveChanges();
     },
-    { debounce: 10000, deep: true }
+    { debounce: 5000, deep: true }
   );
 
   async function fetchAllDecks() {
@@ -278,6 +278,7 @@ export const useDeckStore = defineStore("deck", () => {
           data: {
             content: "New Text",
             size: 30,
+            font: "Azeret Mono",
             weight: 300,
             colour: "#151515",
           },

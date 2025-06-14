@@ -5,7 +5,7 @@
       <input
         ref="input"
         type="text"
-        :value="props.value"
+        :value="props.value ?? ''"
         @input="
           $emit('update:value', ($event.target as HTMLInputElement).value)
         "

@@ -3,7 +3,7 @@
     <label>{{ props.name }}</label>
     <input
       type="number"
-      :value="props.value"
+      :value="props.value ?? 0"
       :min="props.min"
       :max="props.max"
       :step="props.step"

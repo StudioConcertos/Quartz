@@ -6,7 +6,7 @@
         'cursor-not-allowed': props.disabled,
       }"
       :disabled="props.disabled"
-      :value="props.value"
+      :value="props.value ?? ''"
       @change="
         $emit('update:value', ($event.target as HTMLSelectElement).value)
       "
