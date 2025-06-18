@@ -6,12 +6,12 @@
   </div>
   <div @contextmenu.prevent v-else class="flex flex-col h-screen select-none">
     <AtelierHeader :title="deck.title" />
-    <div class="flex flex-1">
+    <div class="flex flex-1 overflow-hidden">
       <AtelierToolbar />
       <AtelierInspector />
       <div class="flex flex-1 flex-col min-w-0">
         <div class="render-container">
-          <AtelierRender />
+          <AtelierRender canEdit />
         </div>
         <AtelierTimeline />
       </div>
@@ -21,7 +21,7 @@
 
 <style scoped lang="postcss">
 .render-container {
-  @apply px-40 flex flex-1 items-center;
+  @apply px-[6.28%] flex flex-1 items-center;
 }
 </style>
 

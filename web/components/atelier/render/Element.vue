@@ -13,6 +13,7 @@
     class="element"
     :tabindex="0"
     @click="selectNode"
+    @mousedown="selectNode"
     @click.right="cancelSelection"
     @keydown.esc="cancelSelection"
   >
@@ -21,6 +22,7 @@
       v-for="child in props.node.children"
       :key="child.id"
       :node="child"
+      :isLocked="props.isLocked"
     />
   </Component>
 </template>
@@ -37,18 +39,109 @@
 const { renderer, setupCanvas } = useElementRenderer();
 const { selectedNode, currentComponents } = storeToRefs(useDeckStore());
 
+const { setIsDragging } = useAtelierStore();
+const { canvasSize, snapThreshold } = storeToRefs(useAtelierStore());
+
 const element = useTemplateRef<HTMLElement>("element");
 
 const props = defineProps<{
   node: Tree;
+  isLocked?: boolean;
 }>();
 
 const isMounted = ref(false);
 
-const { x, y } = useDraggable(element);
+const { x, y, isDragging } = useDraggable(element);
 
 const startTransform = ref<{ x: number; y: number } | null>(null);
 const startDrag = ref<{ x: number; y: number } | null>(null);
+
+const canvasCentre = {
+  x: canvasSize.value.width / 2,
+  y: canvasSize.value.height / 2,
+};
+
+function getElementDimensions() {
+  const elementBounds = element.value?.getBoundingClientRect();
+
+  // TODO: document.querySelector is not a best practice.
+  // TODO: May need optimsations.
+  const canvasBounds = document
+    .querySelector(".render")
+    ?.getBoundingClientRect();
+
+  if (!elementBounds || !canvasBounds) return;
+
+  const scaleX = canvasSize.value.width / canvasBounds.width;
+  const scaleY = canvasSize.value.height / canvasBounds.height;
+
+  return {
+    width: elementBounds.width * scaleX,
+    height: elementBounds.height * scaleY,
+    scaleX,
+    scaleY,
+  };
+}
+
+function snapToCentre(x: number, y: number, width: number, height: number) {
+  const centreX = x + width / 2;
+  const centreY = y + height / 2;
+
+  return {
+    x:
+      Math.abs(centreX - canvasCentre.x) < snapThreshold.value
+        ? canvasCentre.x - width / 2
+        : x,
+    y:
+      Math.abs(centreY - canvasCentre.y) < snapThreshold.value
+        ? canvasCentre.y - height / 2
+        : y,
+  };
+}
+
+function snapToEdge(x: number, y: number, width: number, height: number) {
+  const edges = [
+    { condition: Math.abs(x) < snapThreshold.value, value: 0, axis: "x" },
+    { condition: Math.abs(y) < snapThreshold.value, value: 0, axis: "y" },
+    {
+      condition: Math.abs(x + width - 1920) < snapThreshold.value,
+      value: canvasSize.value.width - width,
+      axis: "x",
+    },
+    {
+      condition: Math.abs(y + height - 1080) < snapThreshold.value,
+      value: canvasSize.value.height - height,
+      axis: "y",
+    },
+  ];
+
+  let snappedX = x;
+  let snappedY = y;
+
+  edges.forEach((edge) => {
+    if (!edge.condition) return;
+
+    if (edge.axis === "x") {
+      snappedX = edge.value;
+    } else {
+      snappedY = edge.value;
+    }
+  });
+
+  return { x: snappedX, y: snappedY };
+}
+
+function applySnapping(x: number, y: number): { x: number; y: number } {
+  const dimensions = getElementDimensions();
+
+  if (!dimensions) return { x, y };
+
+  const { width, height } = dimensions;
+
+  const centreSnapped = snapToCentre(x, y, width, height);
+
+  return snapToEdge(centreSnapped.x, centreSnapped.y, width, height);
+}
 
 const throttle = computed(() => {
   return Math.round(1000 / useFps().value);
@@ -57,6 +150,8 @@ const throttle = computed(() => {
 watchThrottled(
   [x, y],
   ([newX, newY]) => {
+    if (props.isLocked) return;
+
     const transform = getTransformComponent();
 
     if (!transform) return;
@@ -71,17 +166,28 @@ watchThrottled(
     const deltaX = newX - startDrag.value.x;
     const deltaY = newY - startDrag.value.y;
 
-    const scaleX = 1920 / (element.value?.parentElement?.clientWidth || 1920);
-    const scaleY = 1080 / (element.value?.parentElement?.clientHeight || 1080);
+    const scaleX =
+      canvasSize.value.width /
+      (element.value?.parentElement?.clientWidth || canvasSize.value.width);
+    const scaleY =
+      canvasSize.value.height /
+      (element.value?.parentElement?.clientHeight || canvasSize.value.height);
 
-    transform.data.x = Math.round(startTransform.value.x + deltaX * scaleX);
-    transform.data.y = Math.round(startTransform.value.y + deltaY * scaleY);
+    const newPosX = startTransform.value.x + deltaX * scaleX;
+    const newPosY = startTransform.value.y + deltaY * scaleY;
+
+    const snappedPos = applySnapping(newPosX, newPosY);
+
+    transform.data.x = Math.round(snappedPos.x);
+    transform.data.y = Math.round(snappedPos.y);
   },
   { throttle }
 );
 
-watchEffect(() => {
-  if (x.value === 0 && y.value === 0) {
+watch(isDragging, (newState) => {
+  setIsDragging(newState);
+
+  if (!newState) {
     startTransform.value = null;
     startDrag.value = null;
   }
@@ -102,6 +208,9 @@ const render = computed(() => {
 
 function selectNode(event: Event) {
   event.stopPropagation();
+
+  if (selectedNode.value === props.node) return;
+
   selectedNode.value = props.node;
 }
 

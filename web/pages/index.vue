@@ -1,5 +1,4 @@
 <template>
-  <Title>Quartz</Title>
   <LandingNavbar />
   <LandingHero />
   <NuxtImg
@@ -21,3 +20,13 @@
   @apply rounded-lg w-[80vw];
 }
 </style>
+
+<script setup lang="ts">
+useSeoMeta({
+  title: "Quartz",
+  ogTitle: "Quartz",
+  description: "Open source slides engine; built for ambitious presenters.",
+  ogDescription: "Open source slides engine; built for ambitious presenters.",
+  ogUrl: "https://quartz.graphics/",
+});
+</script>
