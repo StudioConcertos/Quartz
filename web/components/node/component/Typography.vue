@@ -37,6 +37,8 @@
         { value: 'underline', icon: 'i-carbon-text-underline' },
         { value: 'strikethrough', icon: 'i-carbon-text-strikethrough' },
       ]"
+      toggleMode
+      v-model:value="props.component.data.style"
     />
     <NodeComponentFieldRadio
       name="alignment"
@@ -46,6 +48,7 @@
         { value: 'right', icon: 'i-carbon-text-align-right' },
         { value: 'justify', icon: 'i-carbon-text-align-justify' },
       ]"
+      v-model:value="props.component.data.alignment"
     />
   </NodeComponent>
 </template>

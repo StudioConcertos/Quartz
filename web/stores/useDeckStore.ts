@@ -276,11 +276,13 @@ export const useDeckStore = defineStore("deck", () => {
           type: "typography",
           node: id,
           data: {
-            content: "New Text",
-            size: 30,
-            font: "Azeret Mono",
-            weight: 300,
+            alignment: "left",
             colour: "#151515",
+            content: "New Text",
+            font: "Azeret Mono",
+            size: 30,
+            style: [],
+            weight: 300,
           },
         });
 

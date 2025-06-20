@@ -363,17 +363,42 @@ export function useElementRenderer() {
         const xPercent = (transform.x / 1920) * 100;
         const yPercent = (transform.y / 1080) * 100;
 
+        const textDecorations: string[] = [];
+
+        let fontStyle = "normal";
+
+        typography.style.forEach((style: string) => {
+          switch (style) {
+            case "italic":
+              fontStyle = "italic";
+
+              break;
+            case "underline":
+              textDecorations.push("underline");
+
+              break;
+            case "strikethrough":
+              textDecorations.push("line-through");
+
+              break;
+          }
+        });
+
         return {
           content: typography.content,
           style: {
-            top: `${yPercent}%`,
-            left: `${xPercent}%`,
-            zIndex: transform.z,
-            transform: `scale(${transform.scale * scale.value})`,
+            color: typography.colour,
             fontFamily: typography.font,
             fontSize: `${typography.size}px`,
             fontWeight: typography.weight,
-            color: typography.colour,
+            fontStyle,
+            textDecoration:
+              textDecorations.length > 0 ? textDecorations.join(" ") : "none",
+            left: `${xPercent}%`,
+            textAlign: typography.alignment,
+            top: `${yPercent}%`,
+            transform: `scale(${transform.scale * scale.value})`,
+            zIndex: transform.z,
           },
         };
       },
