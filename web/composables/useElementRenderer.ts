@@ -399,6 +399,7 @@ export function useElementRenderer() {
             top: `${yPercent}%`,
             transform: `scale(${transform.scale * scale.value})`,
             zIndex: transform.z,
+            whiteSpace: "pre-line",
           },
         };
       },
