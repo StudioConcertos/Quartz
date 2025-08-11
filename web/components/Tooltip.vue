@@ -11,7 +11,8 @@
 .tooltip {
   span {
     @apply absolute opacity-0 invisible;
-    @apply text-sm font-normal text-center;
+    @apply text-3 3xl:text-3.5;
+    @apply font-normal text-center;
     @apply bg-dark-200 border-rd;
     @apply p-2 mt-8 transition-opacity;
   }
