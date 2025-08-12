@@ -60,8 +60,8 @@
     }
 
     div [class*="i-"] {
-      @apply text-4.5 3xl:text-5;
-      @apply mr-2 3xl:mr-2.5;
+      @apply text-4 3xl:text-4.5;
+      @apply mr-2.5;
     }
 
     .name {

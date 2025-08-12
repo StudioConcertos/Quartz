@@ -32,10 +32,11 @@
 }
 
 .placeholder {
-  @apply flex flex-col justify-center items-center text-4;
+  @apply flex flex-col justify-center items-center
+  @apply text-3 3xl:text-3.5;
 
   .i-carbon-error {
-    @apply text-10 mb-6;
+    @apply text-7 3xl:text-7.5 mb-6;
   }
 }
 </style>

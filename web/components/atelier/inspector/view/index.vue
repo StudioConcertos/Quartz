@@ -30,7 +30,7 @@
         @apply flex mx-2;
 
         button {
-          @apply text-4.5 3xl:text-5;
+          @apply text-5 3xl:text-5.5;
         }
       }
 

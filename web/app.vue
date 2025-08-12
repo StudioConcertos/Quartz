@@ -28,7 +28,7 @@ img {
 input,
 textarea {
   @apply bg-transparent border-none transition-colors;
-  @apply text-light-200 py-4 text-sm;
+  @apply text-light-200 py-4 text-3 3xl:text-3.5;
   @apply border-solid border-0 border-b-1 border-neutral-500;
 }
 
@@ -73,7 +73,7 @@ section {
 select {
   @apply bg-transparent appearance-none;
   @apply border-0! border-b-1! border-light-200;
-  @apply text-sm text-light-200
+  @apply text-3 3xl:text-3.5 text-light-200
   @apply py-4 cursor-pointer;
 
   option {
