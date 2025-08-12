@@ -9,6 +9,10 @@
     <template v-if="activeTab === 1">
       <AtelierInspectorViewAssets />
     </template>
+
+    <template v-if="activeTab === 2">
+      <AtelierInspectorViewExports />
+    </template>
   </div>
 </template>
 

@@ -21,7 +21,7 @@ aside {
     @apply hover-bg-light-200 hover-text-dark-500;
 
     [class*="i-"] {
-      @apply text-2xl transition-opacity;
+      @apply text-5 3xl:text-5.5 transition-opacity;
     }
   }
 }

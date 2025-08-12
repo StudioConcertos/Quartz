@@ -57,6 +57,11 @@ function animate() {
   requestAnimationFrame(animate);
 
   contexts.forEach((context) => {
+    context.scene.children.forEach((child) => {
+      child.rotation.x += 0.01;
+      child.rotation.y += 0.01;
+    });
+    
     context.renderer.render(context.scene, context.camera);
   });
 }

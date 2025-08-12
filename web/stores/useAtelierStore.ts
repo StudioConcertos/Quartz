@@ -4,6 +4,7 @@ export const useAtelierStore = defineStore("atelier", () => {
   const tabs = ref([
     { name: "Editor", icon: "i-carbon-legend" },
     { name: "Assets", icon: "i-carbon-folders" },
+    { name: "Exports", icon: "i-carbon-export" },
   ]);
   const activeTab = ref<number>(0);
 

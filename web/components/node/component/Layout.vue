@@ -1,5 +1,9 @@
 <template>
   <NodeComponent name="layout">
+    <NodeComponentFieldColour
+      name="background"
+      v-model:value="props.component.data.background"
+    />
     <NodeComponentFieldNumber
       name="spacing"
       v-model:value="props.component.data.margin"
@@ -19,6 +23,7 @@
         { value: 'row', icon: 'i-carbon-align-horizontal-left' },
         { value: 'column', icon: 'i-carbon-align-horizontal-center' },
       ]"
+      v-model:value="props.component.data.direction"
     />
     <NodeComponentFieldNumber
       name="columns"
