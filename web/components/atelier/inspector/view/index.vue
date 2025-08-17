@@ -20,7 +20,7 @@
   @apply flex flex-col;
 
   h3 {
-    @apply text-4 3xl:text-4.5;
+    @apply ui-text-4;
     @apply flex justify-between items-center;
 
     .actions {
@@ -30,7 +30,7 @@
         @apply flex mx-2;
 
         button {
-          @apply text-5 3xl:text-5.5;
+          @apply ui-text-5;
         }
       }
 

@@ -27,17 +27,17 @@
     @apply flex items-center justify-between p-6 cursor-pointer;
 
     h4 {
-      @apply text-3 3xl:text-3.5;
+      @apply ui-text-3;
       @apply font-300 opacity-80;
       @apply flex items-center gap-2;
 
       .icon {
-        @apply text-4 3xl:text-4.5;
+        @apply ui-text-4;
       }
     }
 
     .arrow {
-      @apply text-5 3xl:text-5.5 opacity-80;
+      @apply ui-text-5 opacity-80;
     }
   }
 
@@ -52,11 +52,11 @@
       }
 
       label {
-        @apply text-3 3xl:text-3.5 w-1/3;
+        @apply ui-text-3 w-1/3;
       }
 
       > *:not(label) {
-        @apply p-0 flex-1 text-3 3xl:text-3.5;
+        @apply p-0 flex-1 ui-text-3;
       }
     }
   }

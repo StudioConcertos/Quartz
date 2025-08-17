@@ -28,7 +28,7 @@ img {
 input,
 textarea {
   @apply bg-transparent border-none transition-colors;
-  @apply text-light-200 py-4 text-3 3xl:text-3.5;
+  @apply text-light-200 py-4 ui-text-3;
   @apply border-solid border-0 border-b-1 border-neutral-500;
 }
 
@@ -73,7 +73,7 @@ section {
 select {
   @apply bg-transparent appearance-none;
   @apply border-0! border-b-1! border-light-200;
-  @apply text-3 3xl:text-3.5 text-light-200
+  @apply ui-text-3 text-light-200
   @apply py-4 cursor-pointer;
 
   option {
@@ -112,7 +112,7 @@ textarea {
 .primaryButton {
   @apply flex justify-center items-center;
   @apply border-solid border-1 border-light-200 border-rd;
-  @apply px-4 py-2 transition-all;
+  @apply px-4 py-2 ui-text-3 transition-all;
   @apply hover-bg-light-200 hover-text-dark-900;
 
   [class*="i-"] {

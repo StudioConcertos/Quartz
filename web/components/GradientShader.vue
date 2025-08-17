@@ -21,15 +21,10 @@ import fragmentShader from "~/assets/shaders/hero/fragment.glsl?raw";
 
 import { Color } from "three";
 
-const palette = [
-  new Color(0xd27685),
-  new Color(0x9e4784),
-  new Color(0xf5f5f5),
-  new Color(0x37306b),
-];
+const palette = [new Color(0x6b8a95), new Color(0x3a4a5f), new Color(0x1a2338)];
 
 const uniforms = {
-  uTime: { value: 0 },
+  uTime: { value: Math.random() },
   uColor: { value: palette },
   uGrainSize: { value: 500 },
   uGrainIntensity: { value: 0.1 },
@@ -39,9 +34,5 @@ const { onLoop } = useRenderLoop();
 
 onLoop(({ delta }) => {
   uniforms.uTime.value += 0.01 * delta;
-});
-
-onMounted(async () => {
-  uniforms.uTime.value = Math.random();
 });
 </script>

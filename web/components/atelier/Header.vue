@@ -45,7 +45,7 @@
     @apply hover-bg-light-200 hover-text-dark-500;
 
     [class*="i-"] {
-      @apply text-5 3xl:text-5.5 w-[80px];
+      @apply ui-text-5 w-[80px];
     }
 
     &:first-child {

@@ -60,17 +60,16 @@
     }
 
     div [class*="i-"] {
-      @apply text-4 3xl:text-4.5;
-      @apply mr-2.5;
+      @apply ui-text-4 mr-2.5;
     }
 
     .name {
       @apply p-0 border-none;
-      @apply text-3 3xl:text-3.5 text-nowrap;
+      @apply ui-text-3 text-nowrap;
     }
 
     .reference {
-      @apply text-3 3xl:text-3.5;
+      @apply ui-text-3;
       @apply italic text-dark-900 mx-2;
       @apply transition-opacity;
     }

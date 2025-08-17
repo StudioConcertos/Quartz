@@ -34,13 +34,19 @@ export default defineConfig({
   transformers: [transformerDirectives()],
   theme: {
     breakpoints: {
-      'sm': '640px',
-      'md': '768px',
-      'lg': '1024px',
-      'xl': '1280px',
-      '2xl': '1536px',
-      '3xl': '1920px',
-      '4xl': '2560px',
+      sm: "640px",
+      md: "768px",
+      lg: "1024px",
+      xl: "1280px",
+      "2xl": "1536px",
+      "3xl": "1920px",
+      "4xl": "2560px",
     },
+  },
+  shortcuts: {
+    "ui-text-3": "text-3 3xl:text-3.5",
+    "ui-text-4": "text-4 3xl:text-4.5",
+    "ui-text-5": "text-5 3xl:text-5.5",
+    "ui-text-6": "text-6 3xl:text-6.5",
   },
 });

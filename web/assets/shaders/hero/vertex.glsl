@@ -1,5 +1,5 @@
 uniform float uTime;
-uniform vec3 uColor[4];
+uniform vec3 uColor[3];
 
 varying vec2 vUv;
 varying vec3 vColor;
@@ -10,6 +10,7 @@ varying vec3 vColor;
 vec4 permute(vec4 x) {
   return mod(((x * 34.0) + 1.0) * x, 289.0);
 }
+
 vec4 taylorInvSqrt(vec4 r) {
   return 1.79284291400159 - 0.85373472095314 * r;
 }
@@ -68,6 +69,7 @@ float snoise(vec3 v) {
 
   //Normalise gradients
   vec4 norm = taylorInvSqrt(vec4(dot(p0, p0), dot(p1, p1), dot(p2, p2), dot(p3, p3)));
+
   p0 *= norm.x;
   p1 *= norm.y;
   p2 *= norm.z;
@@ -75,31 +77,33 @@ float snoise(vec3 v) {
 
   // Mix final noise value
   vec4 m = max(0.6 - vec4(dot(x0, x0), dot(x1, x1), dot(x2, x2), dot(x3, x3)), 0.0);
+
   m = m * m;
+  
   return 42.0 * dot(m * m, vec4(dot(p0, x0), dot(p1, x1), dot(p2, x2), dot(p3, x3)));
 }
 
 void main() {
-  vec2 noiseCoord = uv * vec2(3, 4);
+  vec2 noiseCoord = uv * vec2(2, 3);
 
   float tilt = -0.8 * uv.y;
   float incline = uv.x * 0.1;
   float torsion = incline * mix(-0.25, 0.25, uv.y);
 
-  float noise = snoise(vec3(noiseCoord.x + uTime * 3.0, noiseCoord.y, uTime * 10.0));
+  float noise = snoise(vec3(noiseCoord.x + uTime * 3.0, noiseCoord.y, uTime * 5.0));
 
   noise = max(0.0, noise);
 
-  vec3 pos = vec3(position.x, position.y, position.z + noise * 0.3 + tilt + incline + torsion);
+  vec3 pos = vec3(position.x, position.y, position.z + noise * 0.1 + tilt + incline + torsion);
 
-  vColor = uColor[3];
+  vColor = uColor[1];
 
-  for(int i = 0; i < 3; i++) {
+  for (int i = 0; i < 3; i++) {
     float noiseFlow = 5.0 + float(i) * 0.3;
     float noiseSpeed = 10.0 + float(i) * 0.3;
 
     float noiseSeed = 1.0 + float(i) * 1.0;
-    vec2 noiseFrequency = vec2(1, 1.4);
+    vec2 noiseFrequency = vec2(1, 3.14);
 
     float noise = snoise(vec3(noiseCoord.x * noiseFrequency.x + uTime * noiseFlow, noiseCoord.y * noiseFrequency.y, uTime * noiseSpeed + noiseSeed));
 

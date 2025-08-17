@@ -20,7 +20,7 @@
 
     .option {
       @apply opacity-60 hover:opacity-100 transition-opacity;
-      @apply text-3 3xl:text-3.5;
+      @apply ui-text-3;
 
       &.selected {
         @apply opacity-100;
