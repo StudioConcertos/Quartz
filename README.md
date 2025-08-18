@@ -27,9 +27,9 @@
 
 ### Screenshots
 
-![Landing](https://github.com/user-attachments/assets/00878b15-f52b-409b-a691-3a19d242b7e1)
-![Auth](https://github.com/user-attachments/assets/b4cef768-f3b5-414e-a6e1-522399ee74fc)
-![Atelier](https://github.com/user-attachments/assets/1e24009f-9f86-4b60-bb02-ecc0da917380)
+![Landing](https://github.com/user-attachments/assets/ba40a6fb-c76d-437a-ba4e-291f46c084fe)
+![Auth](https://github.com/user-attachments/assets/a771243b-58e1-4faf-a1fc-071e3a1d0f31)
+![Atelier](https://github.com/user-attachments/assets/0501f732-e923-4aaf-9db8-b5332de20530)
 
 <br />
 
