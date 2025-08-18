@@ -14,7 +14,7 @@ section {
   @apply h-screen px-12 py-24;
 
   h2 {
-    @apply uppercase font-100 text-9xl;
+    @apply uppercase font-100 text-8xl;
   }
 }
 </style>

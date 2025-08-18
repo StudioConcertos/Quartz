@@ -3,12 +3,6 @@
   <div class="auth">
     <section class="logo">
       <GradientShader class="border-rd-15" />
-      <NuxtImg
-        class="absolute-center opacity-40"
-        src="/images/quartz-transparent.svg"
-        alt="logo"
-        width="350"
-      />
     </section>
     <section class="form">
       <Transition name="fade" mode="out-in">

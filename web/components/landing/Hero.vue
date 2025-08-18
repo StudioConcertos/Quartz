@@ -1,29 +1,15 @@
 <template>
   <div class="hero">
     <GradientShader />
-    <div class="info">
-      <div class="whitespace"></div>
-      <div class="mb-12 md:mb-18">
-        <h1>Pitch ambitiously</h1>
-        <div class="whitespace"></div>
-        <p>
-          Quartz is a open source
-          <span class="font-bold italic">slides engine</span>; built for
-          ambitious presentations.
-        </p>
-        <p>Currently in heavy development.</p>
-      </div>
-      <div class="flex flex-col sm:flex-row gap-6 md:gap-12 justify-center">
-        <NuxtLink to="/auth" class="primaryButton text-2xl"
-          >Get Started</NuxtLink
-        >
-        <NuxtLink
-          to="https://github.com/StudioConcertos/Quartz"
-          target="_blank"
-          class="primaryButton text-2xl"
-          >Learn More</NuxtLink
-        >
-      </div>
+    <div class="title">
+      <h1>Pitch Ambitiously</h1>
+    </div>
+    <div class="scroll-down">
+      <p>
+        <span class="i-carbon-chevron-down"></span>
+        scroll down to learn more
+        <span class="i-carbon-chevron-down"></span>
+      </p>
     </div>
   </div>
 </template>
@@ -33,21 +19,22 @@
   @apply flex relative h-[95vh];
   @apply border-solid border-0 border-b-2 border-dark-200;
 
-  .info {
-    @apply absolute opacity-90 select-none;
+  .title {
+    @apply absolute select-none opacity-90;
     @apply top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
     @apply w-full text-center px-6;
 
     h1 {
-      @apply text-5xl md:text-6xl lg:text-8xl;
+      @apply text-5xl md:text-6xl lg:text-9xl font-400 tracking-tight;
     }
+  }
+
+  .scroll-down {
+    @apply absolute bottom-8 left-1/2 -translate-x-1/2;
+    @apply select-none opacity-90;
 
     p {
-      @apply text-sm md:text-lg;
-    }
-
-    a {
-      @apply text-sm md:text-xl;
+      @apply flex items-center gap-2 ui-text-3;
     }
   }
 }
