@@ -16,15 +16,6 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-resend",
   ],
-  content: {
-    build: {
-      markdown: {
-        remarkPlugins: {
-          "remark-mermaidjs": {},
-        },
-      },
-    },
-  },
   supabase: {
     redirectOptions: {
       login: "/auth",
