@@ -11,7 +11,7 @@ export const useDeckStore = defineStore("deck", () => {
 
   const components = ref<ComponentModel[][]>([]);
   const currentComponents = computed(
-    () => components.value[currentSlidesIndex.value]
+    () => components.value[currentSlidesIndex.value],
   );
 
   const currentSlidesIndex = ref<number>(0);
@@ -47,7 +47,7 @@ export const useDeckStore = defineStore("deck", () => {
 
   watch(currentTree, async () => {
     if (
-      currentTree.value.id ||
+      currentTree.value?.id ||
       slidesInLoading.value.has(currentSlidesIndex.value)
     )
       return;
@@ -68,11 +68,11 @@ export const useDeckStore = defineStore("deck", () => {
       if (!pendingNodes.length) return;
 
       trees.value[currentSlidesIndex.value] = buildTree([
-        ...flattenTree(currentTree.value),
+        ...(currentTree.value ? flattenTree(currentTree.value) : []),
         ...pendingNodes,
       ]);
     },
-    { deep: true }
+    { deep: true },
   );
 
   // Autosave nodes and components.
@@ -83,7 +83,7 @@ export const useDeckStore = defineStore("deck", () => {
 
       await saveChanges();
     },
-    { debounce: 5000, deep: true }
+    { debounce: 5000, deep: true },
   );
 
   async function fetchAllDecks() {
@@ -191,7 +191,7 @@ export const useDeckStore = defineStore("deck", () => {
 
   async function fetchAllNodes(
     index: number = currentSlidesIndex.value,
-    deck?: string
+    deck?: string,
   ) {
     const id = deck
       ? (await fetchSlides(deck, index))?.id
@@ -209,7 +209,7 @@ export const useDeckStore = defineStore("deck", () => {
 
     if (data) {
       const fetchedComponents = await Promise.all(
-        data.map((node) => fetchNodeComponents(node.id))
+        data.map((node) => fetchNodeComponents(node.id)),
       );
 
       components.value[index] = fetchedComponents.flat();
@@ -333,7 +333,8 @@ export const useDeckStore = defineStore("deck", () => {
     pendingChanges.value.nodes.push(node);
 
     pendingChanges.value.components.push(...defaultComponents);
-    components.value[currentSlidesIndex.value].push(...defaultComponents);
+
+    components.value[currentSlidesIndex.value]!.push(...defaultComponents);
 
     selectedNode.value = node as Tree;
   }
@@ -353,7 +354,7 @@ export const useDeckStore = defineStore("deck", () => {
     const { children, ...node } = tree;
 
     const index = pendingChanges.value.nodes.findIndex(
-      (pending) => pending.id === node.id
+      (pending) => pending.id === node.id,
     );
 
     if (index !== -1) {
@@ -377,7 +378,7 @@ export const useDeckStore = defineStore("deck", () => {
 
   async function updateNodeComponent(component: ComponentModel) {
     const index = pendingChanges.value.components.findIndex(
-      (c) => c.node === component.node && c.type === component.type
+      (c) => c.node === component.node && c.type === component.type,
     );
 
     if (index !== -1) {
@@ -387,7 +388,7 @@ export const useDeckStore = defineStore("deck", () => {
     }
   }
 
-  function buildTree(nodes: NodeModel[] | PendingNode[]) {
+  function buildTree(nodes: NodeModel[] | PendingNode[]): Tree {
     const lookup: Record<string, Tree> = {};
 
     // Process existing nodes.
@@ -421,19 +422,21 @@ export const useDeckStore = defineStore("deck", () => {
       }
     });
 
-    return lookup["root"];
+    return lookup["root"] || EMPTY_TREE;
   }
 
   // TODO: Too complex, find a better way to do this.
   async function saveChanges() {
+    if (!currentSlides.value) return;
+
     const nodesToUpsert = pendingChanges.value.nodes.filter(
-      (node) => node.id && !node._deleted
+      (node) => node.id && !node._deleted,
     );
     const nodesToInsert = pendingChanges.value.nodes.filter(
-      (node) => !node.id && !node._deleted
+      (node) => !node.id && !node._deleted,
     );
     const nodesToDelete = pendingChanges.value.nodes.filter(
-      (node) => node._deleted
+      (node) => node._deleted,
     );
 
     // Node insert.
@@ -474,14 +477,15 @@ export const useDeckStore = defineStore("deck", () => {
     // Component upsert.
     if (pendingChanges.value.components.length) {
       const validNodes = new Set(
-        flattenTree(trees.value[currentSlidesIndex.value]).map(
-          (node) => node.id
-        )
+        (trees.value[currentSlidesIndex.value]
+          ? flattenTree(trees.value[currentSlidesIndex.value]!)
+          : []
+        ).map((node) => node.id),
       );
 
       // Filter nodes that still exists.
       const componentsToUpsert = pendingChanges.value.components.filter(
-        (component) => validNodes.has(component.node)
+        (component) => validNodes.has(component.node),
       );
 
       const { error } = await client
@@ -512,7 +516,7 @@ export const useDeckStore = defineStore("deck", () => {
         (index) =>
           index !== currentSlidesIndex.value &&
           !trees.value[index]?.id &&
-          !slidesInLoading.value.has(index)
+          !slidesInLoading.value.has(index),
       );
 
     // Load all in parallel.
@@ -524,7 +528,7 @@ export const useDeckStore = defineStore("deck", () => {
         } finally {
           slidesInLoading.value.delete(index);
         }
-      })
+      }),
     );
   }
 

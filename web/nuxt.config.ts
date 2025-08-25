@@ -5,9 +5,6 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  imports: {
-    dirs: ["types/*.ts"],
-  },
   modules: [
     "@nuxt/content",
     "@nuxt/image",
@@ -19,7 +16,15 @@ export default defineNuxtConfig({
     "@vueuse/nuxt",
     "nuxt-resend",
   ],
-  extends: ["@d0rich/nuxt-content-mermaid"],
+  content: {
+    build: {
+      markdown: {
+        remarkPlugins: {
+          "remark-mermaidjs": {},
+        },
+      },
+    },
+  },
   supabase: {
     redirectOptions: {
       login: "/auth",
@@ -34,7 +39,7 @@ export default defineNuxtConfig({
     devtools: true,
     glsl: true,
   },
-  compatibilityDate: "2024-08-15",
+  compatibilityDate: "2025-08-25",
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,

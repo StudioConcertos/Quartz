@@ -10,12 +10,11 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
-    "@d0rich/nuxt-content-mermaid": "^1.0.0",
     "@iconify-json/carbon": "^1.2.13",
     "@nuxt/content": "^3.6.3",
     "@nuxt/image": "^1.11.0",
     "@nuxtjs/supabase": "^1.6.1",
-    "@pinia/nuxt": "^0.5.5",
+    "@pinia/nuxt": "^0.11.2",
     "@supabase/supabase-js": "^2.56.0",
     "@tresjs/cientos": "^4.3.1",
     "@tresjs/nuxt": "^3.0.8",
@@ -30,7 +29,8 @@
     "@vueuse/nuxt": "^10.11.1",
     "better-sqlite3": "^12.2.0",
     "html2canvas": "^1.4.1",
-    "nuxt": "^3.18.1",
+    "mermaid": "^11.10.1",
+    "nuxt": "^4.0.3",
     "nuxt-resend": "^0.0.2",
     "sortablejs": "^1.15.6",
     "supabase": "2.2.1",
