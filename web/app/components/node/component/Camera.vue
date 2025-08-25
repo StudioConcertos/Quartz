@@ -2,18 +2,18 @@
   <NodeComponent name="camera">
     <NodeComponentFieldNumber
       name="x"
-      :step="0.1"
       v-model:value="component.data.x"
+      :fields="{ label: 'x', value: component.data.x }"
     />
     <NodeComponentFieldNumber
       name="y"
-      :step="0.1"
       v-model:value="component.data.y"
+      :fields="{ label: 'y', value: component.data.y }"
     />
     <NodeComponentFieldNumber
       name="z"
-      :step="0.1"
       v-model:value="component.data.z"
+      :fields="{ label: 'z', value: component.data.z }"
     />
   </NodeComponent>
 </template>

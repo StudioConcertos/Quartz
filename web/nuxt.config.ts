@@ -5,11 +5,8 @@ export default defineNuxtConfig({
       enabled: true,
     },
   },
-  imports: {
-    dirs: ["types/*.ts"],
-  },
   modules: [
-    "nuxt-resend",
+    "@nuxt/content",
     "@nuxt/image",
     "@nuxtjs/supabase",
     "@pinia/nuxt",
@@ -17,7 +14,17 @@ export default defineNuxtConfig({
     "@unocss/nuxt",
     "@vee-validate/nuxt",
     "@vueuse/nuxt",
+    "nuxt-resend",
   ],
+  content: {
+    build: {
+      markdown: {
+        remarkPlugins: {
+          "remark-mermaidjs": {},
+        },
+      },
+    },
+  },
   supabase: {
     redirectOptions: {
       login: "/auth",
@@ -32,11 +39,16 @@ export default defineNuxtConfig({
     devtools: true,
     glsl: true,
   },
-  compatibilityDate: "2024-08-15",
+  compatibilityDate: "2025-08-25",
   runtimeConfig: {
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
+  vite: {
+    server: {
+      allowedHosts: ["*.trycloudflare.com"],
     },
   },
 });

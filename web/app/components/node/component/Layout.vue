@@ -7,6 +7,7 @@
     <NodeComponentFieldNumber
       name="spacing"
       v-model:value="props.component.data.margin"
+      :fields="{ label: 'spacing', value: props.component.data.margin }"
     />
     <NodeComponentFieldRadio
       name="align"
@@ -27,19 +28,16 @@
     />
     <NodeComponentFieldNumber
       name="columns"
-      label="Columns"
-      :min="1"
-      :max="12"
-      :value="1"
+      :fields="{ label: 'columns', value: props.component.data.columns }"
     />
     <NodeComponentFieldNumber
       name="rows"
-      label="Rows"
-      :min="1"
-      :max="12"
-      :value="1"
+      :fields="{ label: 'rows', value: props.component.data.rows }"
     />
-    <NodeComponentFieldNumber name="gap" :value="0" />
+    <NodeComponentFieldNumber
+      name="gap"
+      :fields="{ label: 'gap', value: props.component.data.gap }"
+    />
   </NodeComponent>
 </template>
 

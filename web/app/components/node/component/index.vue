@@ -45,7 +45,7 @@
     @apply px-6 pb-6;
 
     &:deep(.field) {
-      @apply flex;
+      @apply flex ui-text-3;
 
       &:not(:last-child) {
         @apply mb-6;
@@ -55,8 +55,16 @@
         @apply ui-text-3 w-1/3;
       }
 
+      .inputs {
+        @apply flex flex-1 gap-6;
+
+        > * {
+          @apply p-0 w-0 flex-1;
+        }
+      }
+
       > *:not(label) {
-        @apply p-0 flex-1 ui-text-3;
+        @apply p-0 flex-1;
       }
     }
   }

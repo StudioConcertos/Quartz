@@ -61,7 +61,7 @@ function animate() {
       child.rotation.x += 0.01;
       child.rotation.y += 0.01;
     });
-    
+
     context.renderer.render(context.scene, context.camera);
   });
 }
@@ -86,7 +86,7 @@ function updateMaterialColor(material: any, color: string) {
 function createModel(
   geometry: BufferGeometry | Group | null,
   color: string,
-  textureUrl?: string
+  textureUrl?: string,
 ) {
   if (!geometry) {
     return new Mesh(new BoxGeometry(0, 0, 0), new MeshBasicMaterial({ color }));
@@ -140,7 +140,7 @@ function getTextureUrl(texture: string | undefined): string | undefined {
   }
 
   const selectedTexture = useAssetsStore().images.find(
-    (img: { name: string; url: URL }) => img.name === texture
+    (img: { name: string; url: URL }) => img.name === texture,
   );
 
   if (selectedTexture) {
@@ -151,7 +151,7 @@ function getTextureUrl(texture: string | undefined): string | undefined {
 }
 
 function getCurrentTextureSrc(
-  material: MeshBasicMaterial | MeshPhongMaterial
+  material: MeshBasicMaterial | MeshPhongMaterial,
 ): string | undefined {
   return material.map?.image?.src || material.map?.source?.data?.src;
 }
@@ -159,7 +159,7 @@ function getCurrentTextureSrc(
 function hasTextureChanged(
   currentSrc: string | undefined,
   newTextureUrl: string | undefined,
-  hasMap: boolean
+  hasMap: boolean,
 ): boolean {
   if (!newTextureUrl && hasMap) {
     return true;
@@ -228,7 +228,7 @@ function getObjectModelType(object: Mesh | Group): string | undefined {
 async function instantiateObject(
   context: CanvasContext,
   node: Tree,
-  mesh: any
+  mesh: any,
 ) {
   const isPrimitive = primitiveTypes.includes(mesh.type);
   const textureUrl = getTextureUrl(mesh.texture);
@@ -236,7 +236,7 @@ async function instantiateObject(
   const newObject = isPrimitive
     ? createPrimitiveMesh(mesh.type, mesh.colour)
     : await loadModel(context, mesh.type, mesh.fallback).then((geometry) =>
-        createModel(geometry ?? null, mesh.colour, textureUrl)
+        createModel(geometry ?? null, mesh.colour, textureUrl),
       );
 
   if (!newObject) {
@@ -256,7 +256,7 @@ async function instantiateObject(
 
 function hasTypeConflict(
   existingObject: Mesh | Group,
-  isPrimitive: boolean
+  isPrimitive: boolean,
 ): boolean {
   return (
     (existingObject instanceof Mesh && !isPrimitive) ||
@@ -267,7 +267,7 @@ function hasTypeConflict(
 function hasPrimitiveGeometryChanged(
   existingObject: Mesh | Group,
   mesh: any,
-  isPrimitive: boolean
+  isPrimitive: boolean,
 ): boolean {
   return (
     existingObject instanceof Mesh &&
@@ -279,7 +279,7 @@ function hasPrimitiveGeometryChanged(
 function hasModelTypeChanged(
   existingObject: Mesh | Group,
   mesh: any,
-  isPrimitive: boolean
+  isPrimitive: boolean,
 ): boolean {
   return !isPrimitive && getObjectModelType(existingObject) !== mesh.type;
 }
@@ -287,7 +287,7 @@ function hasModelTypeChanged(
 function shouldRecreateObject(
   existingObject: Mesh | Group,
   mesh: any,
-  isPrimitive: boolean
+  isPrimitive: boolean,
 ): boolean {
   if (hasTypeConflict(existingObject, isPrimitive)) {
     return true;
@@ -325,12 +325,12 @@ export function useElementRenderer() {
 
   function findComponent(node: Tree, type: ComponentType) {
     return currentComponents.value.find(
-      (component) => component.type === type && component.node === node.id
+      (component) => component.type === type && component.node === node.id,
     );
   }
 
   const renderEl = ref<HTMLDivElement>(
-    document.querySelector(".render") as HTMLDivElement
+    document.querySelector(".render") as HTMLDivElement,
   );
 
   onMounted(() => {
@@ -365,8 +365,8 @@ export function useElementRenderer() {
         const typography = findComponent(node, "typography")!.data;
         const transform = findComponent(node, "transform")!.data;
 
-        const xPercent = (transform.x / 1920) * 100;
-        const yPercent = (transform.y / 1080) * 100;
+        const xPercent = (transform.position.x / 1920) * 100;
+        const yPercent = (transform.position.y / 1080) * 100;
 
         const textDecorations: string[] = [];
 
@@ -431,7 +431,7 @@ export function useElementRenderer() {
             context.camera.updateProjectionMatrix();
 
             context.renderer.setSize(transform.width, transform.height);
-          }
+          },
         );
 
         if (!contexts.has(node.id)) {
@@ -441,7 +441,7 @@ export function useElementRenderer() {
               75,
               transform.width / transform.height,
               0.1,
-              1000
+              1000,
             ),
             renderer: new WebGLRenderer({ antialias: true }),
             loaders: {
@@ -470,7 +470,7 @@ export function useElementRenderer() {
         context?.camera.position.set(
           cameraComponent.x,
           cameraComponent.y,
-          cameraComponent.z
+          cameraComponent.z,
         );
 
         return {
@@ -508,7 +508,7 @@ export function useElementRenderer() {
         const needsRecreation = shouldRecreateObject(
           existingObject,
           mesh,
-          isPrimitive
+          isPrimitive,
         );
 
         if (needsRecreation) {

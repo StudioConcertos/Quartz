@@ -6,16 +6,19 @@ import {
   transformerDirectives,
 } from "unocss";
 
-import { fonts } from "./utils/fonts";
+import { fonts } from "./app/utils/fonts";
 
 const createFontConfig = (fonts: readonly string[]) => {
-  return fonts.reduce((map, font) => {
-    const key = font.toLowerCase().replace(/\s+/g, "-");
+  return fonts.reduce(
+    (map, font) => {
+      const key = font.toLowerCase().replace(/\s+/g, "-");
 
-    map[key] = font;
+      map[key] = font;
 
-    return map;
-  }, {} as Record<string, string>);
+      return map;
+    },
+    {} as Record<string, string>,
+  );
 };
 
 export default defineConfig({
