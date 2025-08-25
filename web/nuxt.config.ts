@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     dirs: ["types/*.ts"],
   },
   modules: [
-    "nuxt-resend",
+    "@nuxt/content",
     "@nuxt/image",
     "@nuxtjs/supabase",
     "@pinia/nuxt",
@@ -17,7 +17,9 @@ export default defineNuxtConfig({
     "@unocss/nuxt",
     "@vee-validate/nuxt",
     "@vueuse/nuxt",
+    "nuxt-resend",
   ],
+  extends: ["@d0rich/nuxt-content-mermaid"],
   supabase: {
     redirectOptions: {
       login: "/auth",
@@ -37,6 +39,11 @@ export default defineNuxtConfig({
     public: {
       supabaseUrl: process.env.SUPABASE_URL,
       supabaseKey: process.env.SUPABASE_KEY,
+    },
+  },
+  vite: {
+    server: {
+      allowedHosts: ["*.trycloudflare.com"],
     },
   },
 });

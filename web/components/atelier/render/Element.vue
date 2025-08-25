@@ -157,7 +157,10 @@ watchThrottled(
     if (!transform) return;
 
     if (!startTransform.value || !startDrag.value) {
-      startTransform.value = { x: transform.data.x, y: transform.data.y };
+      startTransform.value = {
+        x: transform.data.position.x,
+        y: transform.data.position.y,
+      };
       startDrag.value = { x: newX, y: newY };
 
       return;
@@ -178,8 +181,8 @@ watchThrottled(
 
     const snappedPos = applySnapping(newPosX, newPosY);
 
-    transform.data.x = Math.round(snappedPos.x);
-    transform.data.y = Math.round(snappedPos.y);
+    transform.data.position.x = Math.round(snappedPos.x);
+    transform.data.position.y = Math.round(snappedPos.y);
   },
   { throttle }
 );

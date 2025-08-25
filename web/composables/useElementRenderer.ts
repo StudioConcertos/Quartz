@@ -61,7 +61,7 @@ function animate() {
       child.rotation.x += 0.01;
       child.rotation.y += 0.01;
     });
-    
+
     context.renderer.render(context.scene, context.camera);
   });
 }
@@ -365,8 +365,8 @@ export function useElementRenderer() {
         const typography = findComponent(node, "typography")!.data;
         const transform = findComponent(node, "transform")!.data;
 
-        const xPercent = (transform.x / 1920) * 100;
-        const yPercent = (transform.y / 1080) * 100;
+        const xPercent = (transform.position.x / 1920) * 100;
+        const yPercent = (transform.position.y / 1080) * 100;
 
         const textDecorations: string[] = [];
 

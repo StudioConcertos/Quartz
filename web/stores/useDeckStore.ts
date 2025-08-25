@@ -253,9 +253,11 @@ export const useDeckStore = defineStore("deck", () => {
         type: "transform",
         node: id,
         data: {
-          x: 0,
-          y: 0,
-          z: 0,
+          position: {
+            x: 0,
+            y: 0,
+            z: 0,
+          },
           scale: 1,
         },
       },

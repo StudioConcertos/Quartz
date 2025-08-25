@@ -10,7 +10,7 @@
       <NuxtLink>Product</NuxtLink>
       <NuxtLink>Community</NuxtLink>
       <NuxtLink>Pricing</NuxtLink>
-      <NuxtLink>Documentation</NuxtLink>
+      <NuxtLink to="/docs">Docs</NuxtLink>
       <NuxtLink>Blog</NuxtLink>
     </nav>
     <div class="actions">

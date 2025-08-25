@@ -18,13 +18,18 @@
     <NodeComponentFieldNumber
       name="size"
       v-model:value="props.component.data.size"
+      :fields="{ label: 'size', value: props.component.data.size }"
     />
     <NodeComponentFieldNumber
       name="weight"
-      :min="100"
-      :max="900"
-      :step="100"
       v-model:value="props.component.data.weight"
+      :fields="{
+        label: 'weight',
+        value: props.component.data.weight,
+        min: 100,
+        max: 900,
+        step: 100,
+      }"
     />
     <NodeComponentFieldColour
       name="colour"
