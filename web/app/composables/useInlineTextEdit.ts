@@ -1,3 +1,5 @@
+import type { Run } from "~/modules/core/components/typography/types";
+
 function caretFromPoint(x: number, y: number): Range | null {
   const pos = document.caretPositionFromPoint?.(x, y);
 
@@ -9,6 +11,53 @@ function caretFromPoint(x: number, y: number): Range | null {
   range.collapse(true);
 
   return range;
+}
+
+function caretAtEnd(el: HTMLElement): Range {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+
+  let last: Node | null = null;
+
+  while (walker.nextNode()) last = walker.currentNode;
+
+  if (last) range.setStart(last, (last.nodeValue ?? "").length);
+  else range.selectNodeContents(el);
+
+  range.collapse(true);
+
+  return range;
+}
+
+function readRuns(el: HTMLElement, runs: Run[]): Run[] {
+  const walker = document.createTreeWalker(
+    el,
+    NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT,
+  );
+  const out: Run[] = [];
+  let trailingBr = false;
+
+  for (let cursor = walker.nextNode(); cursor; cursor = walker.nextNode()) {
+    const br = cursor.nodeName === "BR";
+
+    if (cursor.nodeType === Node.ELEMENT_NODE && !br) continue;
+
+    const text = br ? "\n" : (cursor.nodeValue ?? "");
+
+    if (!text) continue;
+
+    const owner = cursor.parentElement?.closest("[data-run]");
+    const marks = owner
+      ? runs[Number(owner.getAttribute("data-run"))]?.marks
+      : undefined;
+
+    out.push(marks ? { text, marks: { ...marks } } : { text });
+    trailingBr = br;
+  }
+
+  if (trailingBr) out.pop();
+
+  return mergeRuns(out);
 }
 
 export function useInlineTextEdit(
@@ -24,8 +73,6 @@ export function useInlineTextEdit(
 
   const editable = () => !!typography();
 
-  // A bound `content` is re-resolved every render, so an inline edit would be
-  // invisible — and would quietly overwrite the literal kept as the fallback.
   const bound = () => isBound(typography()?.data, "content");
 
   function start(event?: MouseEvent) {
@@ -45,15 +92,37 @@ export function useInlineTextEdit(
 
       let range = event ? caretFromPoint(event.clientX, event.clientY) : null;
 
-      if (!range || !el.contains(range.startContainer)) {
-        range = document.createRange();
-        range.selectNodeContents(el);
-        range.collapse(false);
-      }
+      if (!range || !el.contains(range.startContainer)) range = caretAtEnd(el);
 
       selection.removeAllRanges();
       selection.addRange(range);
     });
+  }
+
+  function keydown(event: KeyboardEvent) {
+    if (!editing.value) return;
+
+    if (
+      (event.metaKey || event.ctrlKey) &&
+      ["b", "i", "u"].includes(event.key.toLowerCase())
+    ) {
+      event.preventDefault();
+    } else if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      document.execCommand("insertText", false, "\n");
+    }
+  }
+
+  function insert(event: ClipboardEvent | DragEvent) {
+    if (!editing.value) return;
+
+    event.preventDefault();
+
+    const source =
+      "clipboardData" in event ? event.clipboardData : event.dataTransfer;
+    const text = source?.getData("text/plain");
+
+    if (text) document.execCommand("insertText", false, text);
   }
 
   function save() {
@@ -66,9 +135,11 @@ export function useInlineTextEdit(
 
     if (!component || !el) return;
 
-    const content = el.innerText;
+    const runs = readRuns(el, toRuns(component.data.content));
 
-    if (content !== component.data.content) {
+    const content = fromRuns(runs);
+
+    if (!deepEqual(content, component.data.content)) {
       updateComponent({
         ...component,
         data: { ...component.data, content },
@@ -76,5 +147,5 @@ export function useInlineTextEdit(
     }
   }
 
-  return { editing, editable, start, save };
+  return { editing, editable, start, save, keydown, insert };
 }

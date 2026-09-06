@@ -11,8 +11,23 @@
 }
 
 * {
-  @apply m-0 p-0 box-border;
-  @apply font-azeret-mono outline-none;
+  @apply m-0 p-0 box-border outline-none;
+}
+
+body {
+  @apply font-azeret-mono;
+}
+
+button,
+code,
+input,
+kbd,
+optgroup,
+pre,
+samp,
+select,
+textarea {
+  @apply font-inherit;
 }
 
 a,

@@ -12,7 +12,8 @@
     >
       <NodeComponentRowFieldText
         isParagraph
-        :value="value"
+        :value="Array.isArray(value) ? runsText(value) : value"
+        :disabled="hasRuns"
         @update:value="update"
       />
     </NodeComponentRow>
@@ -126,6 +127,10 @@ const props = defineProps<{
 }>();
 
 const { set } = useMergedFields(() => props.components);
+
+const hasRuns = computed(() =>
+  props.components.some((component) => Array.isArray(component.data?.content)),
+);
 
 const fontAssets = computed(() =>
   useAssetsStore()

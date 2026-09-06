@@ -15,7 +15,7 @@
     ref="element"
     class="element"
     :tabindex="0"
-    :contenteditable="editing ? 'plaintext-only' : 'false'"
+    :contenteditable="editing ? 'true' : 'false'"
     @click="onClick"
     @mousedown="onSelect"
     @mouseenter="onHover"
@@ -26,9 +26,19 @@
     @blur="saveEditing"
     @click.right="clear"
     @keydown="onKeydown"
-  ><AtelierRenderPaint v-if="render.paint" :paint="render.paint" />{{
-      render.content
-    }}<AtelierRenderElement
+    @paste="editInsert"
+    @drop="editInsert"
+    ><AtelierRenderPaint v-if="render.paint" :paint="render.paint" /><template
+      v-if="Array.isArray(render.content)"
+      ><span
+        v-for="(span, index) in render.content"
+        :key="index"
+        :data-run="index"
+        :style="span.style"
+        >{{ span.text }}</span
+      ></template
+    ><template v-else>{{ render.content }}</template
+    ><AtelierRenderElement
       v-for="child in props.node.children"
       :key="child.id"
       :node="child"
@@ -80,6 +90,8 @@ const {
   editable,
   start: startEditing,
   save: saveEditing,
+  keydown: editKeydown,
+  insert: editInsert,
 } = useInlineTextEdit(
   () => props.node,
   () => element.value,
@@ -92,6 +104,10 @@ function onDoubleClick(event: MouseEvent) {
 }
 
 function onKeydown(event: KeyboardEvent) {
+  editKeydown(event);
+
+  if (event.defaultPrevented) return;
+
   switch (event.key) {
     case "Escape":
       if (editing.value) saveEditing();
@@ -313,7 +329,6 @@ const picked = ref<string | null>(null);
 
 let pickFrame = 0;
 
-// A locked node still resolves a pick; only the node itself is unhoverable.
 function hoverTarget() {
   return picked.value ?? (locked.value ? null : props.node.id);
 }
@@ -349,8 +364,6 @@ function clearHover() {
     pickFrame = 0;
   }
 
-  // Clears whatever this element could have set, lock or not: locking mid-hover
-  // would otherwise strand the outline on the node.
   const mine = picked.value ?? props.node.id;
 
   picked.value = null;
