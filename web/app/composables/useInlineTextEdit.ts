@@ -66,8 +66,13 @@ export function useInlineTextEdit(
 ) {
   const { getNodeComponent } = useNodeComponents();
   const { updateComponent } = useDeckStore();
+  const atelier = useAtelierStore();
 
-  const editing = ref(false);
+  const editing = computed(() => atelier.editingNodeId === node().id);
+
+  onScopeDispose(() => {
+    if (atelier.editingNodeId === node().id) atelier.editingNodeId = null;
+  });
 
   const typography = () => getNodeComponent(node().id, "core.typography");
 
@@ -78,7 +83,7 @@ export function useInlineTextEdit(
   function start(event?: MouseEvent) {
     if (!typography() || bound()) return;
 
-    editing.value = true;
+    atelier.editingNodeId = node().id;
 
     nextTick(() => {
       const el = element();
@@ -128,7 +133,7 @@ export function useInlineTextEdit(
   function save() {
     if (!editing.value) return;
 
-    editing.value = false;
+    atelier.editingNodeId = null;
 
     const component = typography();
     const el = element();

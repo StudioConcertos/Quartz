@@ -58,6 +58,8 @@ const assetDrag = useAssetDrag();
 
 const { scopeFor } = useVariableScope();
 
+useTextSelection();
+
 const rootLayout = computed(() => {
   const root = currentTree.value;
 

@@ -7,7 +7,7 @@
 
 <style lang="postcss">
 ::selection {
-  @apply bg-light-200 text-dark-900;
+  @apply bg-accent text-light-200;
 }
 
 * {

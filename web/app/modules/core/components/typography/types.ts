@@ -13,3 +13,14 @@ export interface Run {
   text: string;
   marks?: Partial<TypographyMarks>;
 }
+
+export const MARK_KEYS = [
+  "font",
+  "size",
+  "weight",
+  "letterSpacing",
+  "textTransform",
+  "opacity",
+  "colour",
+  "style",
+] as const satisfies readonly (keyof TypographyMarks)[];

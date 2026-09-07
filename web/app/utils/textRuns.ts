@@ -24,10 +24,10 @@ function cleanMarks(
 }
 
 export function toRuns(content: unknown): Run[] {
-  if (typeof content === "string") return [{ text: content }];
-  if (Array.isArray(content) && content.length) return content as Run[];
+  if (Array.isArray(content))
+    return content.length ? (content as Run[]) : [{ text: "" }];
 
-  return [{ text: "" }];
+  return [{ text: content == null ? "" : String(content) }];
 }
 
 export function runsText(runs: Run[]): string {
@@ -56,6 +56,22 @@ export function mergeRuns(runs: Run[]): Run[] {
   return out.length ? out : [{ text: "" }];
 }
 
+function sliceRuns(runs: Run[], start: number, end: number): Run[] {
+  const out: Run[] = [];
+  let at = 0;
+
+  for (const run of runs) {
+    const from = Math.max(start - at, 0);
+    const to = Math.min(end - at, run.text.length);
+
+    at += run.text.length;
+
+    if (to > from) out.push(copyRun(run, run.text.slice(from, to)));
+  }
+
+  return out;
+}
+
 export function applyMarks(
   runs: Run[],
   start: number,
@@ -65,39 +81,17 @@ export function applyMarks(
 ): Run[] {
   if (end <= start) return runs;
 
-  const out: Run[] = [];
-  let at = 0;
+  const marked = sliceRuns(runs, start, end).map((run) => {
+    const marks = cleanMarks({ ...run.marks, ...patch }, base);
 
-  for (const run of runs) {
-    const from = at;
-    const to = at + run.text.length;
+    return marks ? { text: run.text, marks } : { text: run.text };
+  });
 
-    at = to;
-
-    if (to <= start || from >= end) {
-      out.push(copyRun(run));
-      continue;
-    }
-
-    const head = run.text.slice(0, Math.max(0, start - from));
-    const body = run.text.slice(
-      Math.max(0, start - from),
-      Math.min(run.text.length, end - from),
-    );
-    const tail = run.text.slice(Math.min(run.text.length, end - from));
-
-    if (head) out.push(copyRun(run, head));
-
-    if (body) {
-      const marks = cleanMarks({ ...run.marks, ...patch }, base);
-
-      out.push(marks ? { text: body, marks } : { text: body });
-    }
-
-    if (tail) out.push(copyRun(run, tail));
-  }
-
-  return mergeRuns(out);
+  return mergeRuns([
+    ...sliceRuns(runs, 0, start),
+    ...marked,
+    ...sliceRuns(runs, end, Infinity),
+  ]);
 }
 
 export function selectionMark(
@@ -126,4 +120,35 @@ export function selectionMark(
   const first = values[0];
 
   return values.every((value) => deepEqual(value, first)) ? first : undefined;
+}
+
+export function spliceText(runs: Run[], next: string): Run[] {
+  const prev = runsText(runs);
+
+  if (prev === next) return runs;
+
+  let head = 0;
+
+  while (head < prev.length && head < next.length && prev[head] === next[head])
+    head++;
+
+  let tail = 0;
+
+  while (
+    tail < prev.length - head &&
+    tail < next.length - head &&
+    prev[prev.length - 1 - tail] === next[next.length - 1 - tail]
+  )
+    tail++;
+
+  const kept = sliceRuns(runs, 0, head);
+  const inserted = next.slice(head, next.length - tail);
+
+  const owner = kept[kept.length - 1];
+
+  return mergeRuns([
+    ...kept,
+    owner ? copyRun(owner, inserted) : { text: inserted },
+    ...sliceRuns(runs, prev.length - tail, Infinity),
+  ]);
 }

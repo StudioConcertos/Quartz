@@ -35,6 +35,7 @@
         :key="index"
         :data-run="index"
         :style="span.style"
+        class="text-run"
         >{{ span.text }}</span
       ></template
     ><template v-else>{{ render.content }}</template
@@ -50,6 +51,10 @@
 <style scoped lang="postcss">
 .element {
   @apply absolute transform-origin-top-left border-rd;
+}
+
+.element[contenteditable="false"] .text-run {
+  @apply pointer-events-none;
 }
 </style>
 
@@ -303,6 +308,8 @@ function onSelect(event: MouseEvent) {
 
     return;
   }
+
+  atelier.textSelection = null;
 
   const picked = getNodeType(props.node.type)?.pick?.(props.node, event);
 
