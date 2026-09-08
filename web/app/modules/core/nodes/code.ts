@@ -26,7 +26,7 @@ export default {
       const transform = ctx.data(node, "core.transform");
 
       const source = runsText(toRuns(typography.content));
-      const highlighted = highlight(source, syntax.language, syntax.theme);
+      const highlighted = highlight(node.id, source, syntax.language, syntax.theme);
 
       const background = coerceBackground(syntax.background);
 

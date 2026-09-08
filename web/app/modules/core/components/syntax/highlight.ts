@@ -10,8 +10,11 @@ const ITALIC = 1;
 const BOLD = 2;
 const UNDERLINE = 4;
 
+const DELAY = 200;
+
 const cache = shallowReactive(new Map<string, Highlighted>());
 const pending = new Set<string>();
+const timers = new Map<string, ReturnType<typeof setTimeout>>();
 
 function tokenStyle(token: { color?: string; fontStyle?: number }) {
   const style: Record<string, string | number> = {};
@@ -64,6 +67,7 @@ async function compute(
 }
 
 export function highlight(
+  id: string,
   source: string,
   language: string,
   theme: string,
@@ -74,9 +78,20 @@ export function highlight(
   if (hit) return hit;
 
   if (!pending.has(key)) {
-    pending.add(key);
+    clearTimeout(timers.get(id));
 
-    void compute(key, source, language, theme);
+    timers.set(
+      id,
+      setTimeout(() => {
+        timers.delete(id);
+
+        if (cache.has(key) || pending.has(key)) return;
+
+        pending.add(key);
+
+        void compute(key, source, language, theme);
+      }, DELAY),
+    );
   }
 
   return undefined;

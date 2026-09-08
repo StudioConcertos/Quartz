@@ -83,7 +83,6 @@
 </template>
 
 <script setup lang="ts">
-
 const props = defineProps<{
   components: ComponentModel[];
   nodes: Tree[];
@@ -134,8 +133,6 @@ watch(
   { immediate: true },
 );
 
-// `background.value` holds the colour and the image name, so a colour binding
-// left behind after a switch would overwrite the image name on the canvas.
 function clearColourBinding() {
   for (const c of props.components) {
     if (!c.data?.[BIND_KEY]?.["background.value"]) continue;
@@ -155,9 +152,6 @@ function setBackgroundType(next: string | string[]) {
   if (type === "colour") {
     set(["background"], { type: "colour", value: lastColour.value });
   } else if (type === "image") {
-    // Seed the first asset rather than "": the select has no empty placeholder,
-    // so a blank value would display the first option while holding nothing —
-    // and picking that option fires no change event, leaving it uncommittable.
     const value = lastImage.value.value || imageOptions.value[0] || "";
 
     set(["background"], { type: "image", ...lastImage.value, value });
@@ -170,10 +164,9 @@ function setFit(next: string | string[]) {
   set(["background"], { ...background.value, fit: one(next) });
 }
 
-// Anchor a group's transform to its children's top-left — mirrors the original
-// single-node behaviour on switch to grid.
 function anchorGroupToChildren(group: Tree) {
   const transform = getNodeComponent(group.id, "core.transform");
+
   if (!transform) return;
 
   let minX = Infinity;
@@ -192,6 +185,7 @@ function anchorGroupToChildren(group: Tree) {
   const data = setNested(
     setNested(transform.data, ["position", "x"], Math.round(minX)),
     ["position", "y"],
+
     Math.round(minY),
   );
 
