@@ -156,7 +156,8 @@ function onKeydown(e: KeyboardEvent) {
 
     e.preventDefault();
 
-    clear();
+    if (isEditableTarget(e.target)) (e.target as HTMLElement).blur();
+    else clear();
 
     return;
   }

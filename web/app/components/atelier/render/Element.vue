@@ -115,8 +115,13 @@ function onKeydown(event: KeyboardEvent) {
 
   switch (event.key) {
     case "Escape":
-      if (editing.value) saveEditing();
-      else clear();
+      event.preventDefault();
+
+      if (editing.value) {
+        saveEditing();
+
+        atelier.textSelection = null;
+      } else clear();
 
       return;
     case "ArrowUp":

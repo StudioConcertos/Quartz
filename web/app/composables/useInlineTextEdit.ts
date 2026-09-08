@@ -135,6 +135,8 @@ export function useInlineTextEdit(
 
     atelier.editingNodeId = null;
 
+    window.getSelection()?.removeAllRanges();
+
     const component = typography();
     const el = element();
 

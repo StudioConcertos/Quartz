@@ -15,7 +15,9 @@
         isParagraph
         :value="Array.isArray(value) ? runsText(value) : value"
         :disabled="hasRuns && !sole"
+        :highlight="selection"
         @update:value="update"
+        @update:highlight="selection = $event"
       />
     </NodeComponentRow>
     <NodeComponentRow
@@ -187,14 +189,24 @@ const text = computed(() => {
   };
 });
 
-// A mark can only be written to one component — a text selection belongs to one
-// node, unlike the merged fields the rest of the panel edits.
+const selection = computed<{ start: number; end: number } | null>({
+  get: () =>
+    textSelection.value?.nodeId === sole.value?.node
+      ? textSelection.value
+      : null,
+  set: (range) => {
+    const node = sole.value?.node;
+
+    if (node) textSelection.value = range ? { nodeId: node, ...range } : null;
+  },
+});
+
 const marks = computed(() => {
   const component = sole.value;
   const current = runs.value;
-  const active = textSelection.value;
+  const active = selection.value;
 
-  if (!component || active?.nodeId !== component.node) return undefined;
+  if (!component || !active) return undefined;
 
   const { start, end } = active;
 

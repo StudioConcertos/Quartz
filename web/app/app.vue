@@ -6,7 +6,8 @@
 </template>
 
 <style lang="postcss">
-::selection {
+::selection,
+::highlight(quartz-text) {
   @apply bg-accent text-light-200;
 }
 
