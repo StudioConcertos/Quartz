@@ -282,7 +282,7 @@ const elementStyle = computed(() => {
 
   const style =
     base && isGridChild.value
-      ? { ...base, position: "static", left: "", top: "", transform: "" }
+      ? { ...base, position: "relative", left: "", top: "", transform: "" }
       : base;
 
   const def = getNodeType(props.node.type);

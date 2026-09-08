@@ -14,6 +14,16 @@
         @update:value="(v) => setMode(v)"
       />
     </NodeComponentRow>
+    <NodeComponentRow name="direction">
+      <NodeComponentRowFieldRadio
+        :options="[
+          { value: 'vertical', icon: 'i-carbon-arrow-down' },
+          { value: 'horizontal', icon: 'i-carbon-arrow-right' },
+        ]"
+        :value="field(['direction'])"
+        @update:value="(v) => set(['direction'], v)"
+      />
+    </NodeComponentRow>
     <NodeComponentRow name="background">
       <NodeComponentRowFieldRadio
         :options="backgroundOptions"
@@ -56,7 +66,10 @@
         @update:value="(v) => set(['padding'], v)"
       />
     </NodeComponentRow>
-    <NodeComponentRow name="columns">
+    <NodeComponentRow
+      v-if="field(['direction']) !== 'horizontal'"
+      name="columns"
+    >
       <NodeComponentRowFieldNumber
         :value="field(['columns'])"
         @update:value="(v) => set(['columns'], v)"
@@ -77,6 +90,17 @@
         ]"
         :value="field(['align'])"
         @update:value="(v) => set(['align'], v)"
+      />
+    </NodeComponentRow>
+    <NodeComponentRow name="justify">
+      <NodeComponentRowFieldRadio
+        :options="[
+          { value: 'start', icon: 'i-carbon-align-horizontal-left' },
+          { value: 'center', icon: 'i-carbon-align-horizontal-center' },
+          { value: 'end', icon: 'i-carbon-align-horizontal-right' },
+        ]"
+        :value="field(['justify'])"
+        @update:value="(v) => set(['justify'], v)"
       />
     </NodeComponentRow>
   </NodeComponent>
