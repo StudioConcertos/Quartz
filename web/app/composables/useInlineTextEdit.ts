@@ -107,10 +107,7 @@ export function useInlineTextEdit(
   function keydown(event: KeyboardEvent) {
     if (!editing.value) return;
 
-    if (
-      (event.metaKey || event.ctrlKey) &&
-      ["b", "i", "u"].includes(event.key.toLowerCase())
-    ) {
+    if (["mod+b", "mod+i", "mod+u"].includes(eventToCombo(event))) {
       event.preventDefault();
     } else if (event.key === "Enter" && !event.shiftKey) {
       event.preventDefault();

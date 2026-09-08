@@ -83,7 +83,6 @@
 </template>
 
 <script setup lang="ts">
-import { coerceBackground, type BackgroundFit } from "~/utils/layoutStyle";
 
 const props = defineProps<{
   components: ComponentModel[];
@@ -92,9 +91,6 @@ const props = defineProps<{
 }>();
 
 const DEFAULT_COLOUR = "#FAFAFA";
-
-const one = (value: string | string[]) =>
-  Array.isArray(value) ? value[0]! : value;
 
 const { getNodeComponent } = useNodeComponents();
 const { updateComponent } = useDeckStore();
@@ -109,13 +105,11 @@ const backgroundOptions = computed(() => [
   { value: "image", icon: "i-carbon-image" },
 ]);
 
-const rawBackground = computed(() => field(["background"]));
-
-const mixed = computed(
-  () => props.components.length > 1 && rawBackground.value === undefined,
+const { mixed, paint: background } = usePaintField(
+  () => props.components,
+  field,
+  "background",
 );
-
-const background = computed(() => coerceBackground(rawBackground.value));
 
 const lastColour = ref(DEFAULT_COLOUR);
 const lastImage = ref<{ value: string; fit: BackgroundFit }>({
