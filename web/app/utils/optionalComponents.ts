@@ -12,6 +12,9 @@ export function optionalComponentsFor(nodeType: NodeType): ComponentTypeDef[] {
   );
 
   return allComponentTypes().filter(
-    (c) => c.optional && !guaranteed.has(c.type),
+    (c) =>
+      c.optional &&
+      !guaranteed.has(c.type) &&
+      (c.nodes?.includes(nodeType) ?? true),
   );
 }
