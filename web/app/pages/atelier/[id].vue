@@ -49,15 +49,15 @@ const flushOnHide = () => {
 };
 const flushOnPageHide = () => sync.flushBeacon();
 
-const { data: deck, refresh: refreshDeck } = await useAsyncData(
-  "deck",
-  async () => await fetchDeck(useRoute().params.id as string),
-);
-
-const { refresh: refreshSlides } = await useAsyncData(
-  "slides",
-  async () => await fetchAllSlides(useRoute().params.id as string),
-);
+const [{ data: deck, refresh: refreshDeck }, { refresh: refreshSlides }] =
+  await Promise.all([
+    useAsyncData("deck", async () =>
+      fetchDeck(useRoute().params.id as string),
+    ),
+    useAsyncData("slides", async () =>
+      fetchAllSlides(useRoute().params.id as string),
+    ),
+  ]);
 
 onMounted(async () => {
   snapshotScheduler.start();
@@ -109,10 +109,7 @@ onMounted(async () => {
     )
     .subscribe();
 
-  await Promise.all([
-    fetchAssets(deck.value?.id as string),
-    fetchSnapshots(deck.value?.id as string),
-  ]);
+  await Promise.all([fetchAssets(id), fetchSnapshots(id)]);
 });
 
 onUnmounted(() => {

@@ -32,14 +32,17 @@ export function useSnapshot() {
 
   const { currentSlides, trees } = storeToRefs(useDeckStore());
 
-  const { refreshSnapshot } = useSnapshotsStore();
+  const { refreshSnapshot, dropSnapshot } = useSnapshotsStore();
 
   const capture = async () => {
     const slides = currentSlides.value;
+
     if (!slides) return;
 
     const tree = trees.value.get(slides.id);
-    if (!tree || isEmptyTree(tree)) return;
+    if (!tree) return;
+
+    if (isEmptyTree(tree)) return await dropSnapshot(slides.deck, slides.id);
 
     const render = findRenderEl();
     if (!render) return;

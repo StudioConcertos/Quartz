@@ -15,29 +15,14 @@
 </style>
 
 <script setup lang="ts">
-const { fetchSlides } = useDeckStore();
-const { trees } = storeToRefs(useDeckStore());
-
-const { snapshotUrl } = useSnapshotsStore();
+const { snapshotUrl, coverUrl } = useSnapshotsStore();
 
 const props = defineProps<{
   deck: string;
   slides?: string;
 }>();
 
-const unlisted = asyncComputed(async () => {
-  if (props.slides) return undefined;
-
-  const id = (await fetchSlides(props.deck, 0)).id;
-
-  return await signStorageObject("snapshots", props.deck, `${id}.png`);
-});
-
-const url = computed(() => {
-  if (!props.slides) return unlisted.value;
-
-  const tree = trees.value.get(props.slides);
-
-  return tree && isEmptyTree(tree) ? undefined : snapshotUrl(props.slides);
-});
+const url = computed(() =>
+  props.slides ? snapshotUrl(props.slides) : coverUrl(props.deck),
+);
 </script>

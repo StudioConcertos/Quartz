@@ -1,44 +1,56 @@
-const LIST_LIMIT = 1000;
-
 export const useSnapshotsStore = defineStore("snapshots", () => {
   const client = useSupabaseClient();
 
-  const cached = useLocalStorage<{
-    deck: string;
-    at: number;
-    urls: Record<string, string>;
-  }>("quartz-snapshot-urls", { deck: "", at: 0, urls: {} });
+  const { cached, fresh, list, sign, store } = useSignedBucket("snapshots");
+
+  const covers = ref<Record<string, string>>({});
+
+  const objectName = (slides: string) => `${slides}.png`;
 
   function snapshotUrl(slides: string) {
-    return cached.value.urls[slides];
+    return cached.value.urls[objectName(slides)];
+  }
+
+  function coverUrl(deck: string) {
+    return covers.value[deck];
   }
 
   async function fetchSnapshots(deck: string) {
-    if (!deck) return;
-    if (deck === cached.value.deck && !signaturesStale(cached.value.at)) return;
+    if (!deck || fresh(deck)) return;
 
-    const { data, error } = await client.storage
-      .from("snapshots")
-      .list(deck, { limit: LIST_LIMIT });
+    const names = await list(deck);
 
-    if (error) console.error(error);
-    if (!data) return;
+    if (!names) return;
 
-    const names = data.flatMap((object) =>
-      object.name.endsWith(".png") ? [object.name] : [],
+    const urls = await sign(
+      deck,
+      names.filter((name) => name.endsWith(".png")),
     );
 
-    const signed = await signStorageObjects("snapshots", deck, names);
+    if (urls) store(deck, urls);
+  }
+
+  async function fetchCovers(decks: { id: string; cover: string | null }[]) {
+    const wanted = decks.flatMap((deck) =>
+      deck.cover
+        ? [[deck.id, `${deck.id}/${objectName(deck.cover)}`] as const]
+        : [],
+    );
+
+    const signed = await signStoragePaths(
+      "snapshots",
+      wanted.map(([, path]) => path),
+    );
 
     if (!signed) return;
 
-    cached.value = {
-      deck,
-      at: Date.now(),
-      urls: Object.fromEntries(
-        [...signed].map(([name, url]) => [name.replace(/\.png$/, ""), url]),
-      ),
-    };
+    covers.value = Object.fromEntries(
+      wanted.flatMap(([deck, path]) => {
+        const url = signed.get(path);
+
+        return url ? [[deck, url] as const] : [];
+      }),
+    );
   }
 
   async function refreshSnapshot(deck: string, slides: string) {
@@ -46,7 +58,7 @@ export const useSnapshotsStore = defineStore("snapshots", () => {
 
     const held =
       snapshotUrl(slides) ??
-      (await signStorageObject("snapshots", deck, `${slides}.png`));
+      (await signStorageObject("snapshots", deck, objectName(slides)));
 
     if (!held) return;
 
@@ -54,8 +66,25 @@ export const useSnapshotsStore = defineStore("snapshots", () => {
 
     url.searchParams.set("t", String(Date.now()));
 
-    cached.value.urls[slides] = url.toString();
+    cached.value.urls[objectName(slides)] = url.toString();
   }
 
-  return { snapshotUrl, fetchSnapshots, refreshSnapshot };
+  async function dropSnapshot(deck: string, slides: string) {
+    const { error } = await client.storage
+      .from("snapshots")
+      .remove([`${deck}/${objectName(slides)}`]);
+
+    if (error) return console.error(error);
+
+    delete cached.value.urls[objectName(slides)];
+  }
+
+  return {
+    snapshotUrl,
+    coverUrl,
+    fetchSnapshots,
+    fetchCovers,
+    refreshSnapshot,
+    dropSnapshot,
+  };
 });
