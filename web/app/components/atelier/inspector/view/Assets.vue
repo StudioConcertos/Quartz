@@ -93,7 +93,7 @@
       <p
         v-if="openModal === 'font' && selectedAsset"
         class="text-3xl"
-        :style="{ fontFamily: selectedAsset.name }"
+        :style="{ fontFamily: fontFamilyName(selectedAsset.name) }"
       >
         A lazy fox jumps over the lazy dog.
       </p>

@@ -130,7 +130,7 @@ export const useAssetsStore = defineStore("assets", () => {
     await Promise.all(
       pending.map(async (font) => {
         try {
-          const fontName = font.name.split(".")[0] ?? font.name;
+          const fontName = fontFamilyName(font.name);
           const fontFace = new FontFace(fontName, `url(${font.url})`);
 
           await fontFace.load();
