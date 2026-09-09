@@ -26,6 +26,20 @@
       class="handle rotate"
       @pointerdown.stop.prevent="startRotate($event)"
     ></div>
+    <svg
+      v-if="ratioGuide"
+      class="ratio-guide"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+    >
+      <line
+        x1="0"
+        y1="0"
+        x2="100"
+        y2="100"
+        vector-effect="non-scaling-stroke"
+      />
+    </svg>
     <Transition name="readout-fade">
       <div v-if="readout" class="readout">{{ readout }}</div>
     </Transition>
@@ -77,6 +91,14 @@
 
   .rotate {
     @apply left-1/2 -top-6 rounded-full;
+  }
+
+  .ratio-guide {
+    @apply w-full h-full;
+
+    line {
+      @apply stroke-accent stroke-width-[1] stroke-dash-6;
+    }
   }
 
   .readout {
@@ -183,6 +205,7 @@ const canRotate = computed(() => {
 });
 
 const readout = ref<string | null>(null);
+const ratioGuide = ref(false);
 
 const { start } = usePointerDrag();
 
@@ -196,6 +219,7 @@ const startPointerDrag = (
     onMove,
     () => {
       readout.value = null;
+      ratioGuide.value = false;
       onEnd?.();
     },
     computeBox,
@@ -205,6 +229,8 @@ function startResize(h: { dx: number; dy: number }, e: PointerEvent) {
   const node = soleSelected.value;
 
   if (!node) return;
+
+  if (e.ctrlKey && canRotate.value) return startRotate(e);
 
   if (handles.value?.resize && box.value) {
     const gesture = handles.value.resize(
@@ -282,7 +308,19 @@ function startResize(h: { dx: number; dy: number }, e: PointerEvent) {
           ? Math.max(1, Math.round(startH + (localY * h.dy) / u))
           : startH;
 
-      if (!rad) {
+      const keepRatio = ev.shiftKey && startW > 0 && startH > 0;
+
+      ratioGuide.value = keepRatio;
+
+      if (keepRatio) {
+        const byWidth =
+          h.dy === 0 || (h.dx !== 0 && sizeW / startW >= sizeH / startH);
+
+        if (byWidth) sizeH = Math.max(1, Math.round((sizeW * startH) / startW));
+        else sizeW = Math.max(1, Math.round((sizeH * startW) / startH));
+      }
+
+      if (!rad && !keepRatio) {
         const box = {
           left: anchorX + ((h.dx - 1) * sizeW * u) / 2,
           top: anchorY + ((h.dy - 1) * sizeH * u) / 2,
@@ -313,13 +351,16 @@ function startResize(h: { dx: number; dy: number }, e: PointerEvent) {
       const cx = anchorX - (nax * cos - nay * sin);
       const cy = anchorY - (nax * sin + nay * cos);
 
-      if (h.dx !== 0) transform.data.size.width = sizeW;
-      if (h.dy !== 0) transform.data.size.height = sizeH;
+      if (h.dx !== 0 || keepRatio) transform.data.size.width = sizeW;
+      if (h.dy !== 0 || keepRatio) transform.data.size.height = sizeH;
 
       transform.data.position.x = Math.round(cx - wc / 2);
       transform.data.position.y = Math.round(cy - hc / 2);
 
-      readout.value = [h.dx && sizeW, h.dy && sizeH]
+      readout.value = [
+        (h.dx || keepRatio) && sizeW,
+        (h.dy || keepRatio) && sizeH,
+      ]
         .filter(Boolean)
         .join(" x ");
 
