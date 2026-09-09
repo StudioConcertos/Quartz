@@ -31,7 +31,6 @@
     @apply flex-shrink-0;
   }
 
-  .list-move,
   .list-enter-active,
   .list-leave-active {
     @apply transition-all duration-300;
@@ -41,10 +40,6 @@
   .list-leave-to {
     @apply opacity-0;
     @apply translate-y-10;
-  }
-
-  .list-leave-active {
-    @apply absolute;
   }
 
   .frame:not(:last-child) {
