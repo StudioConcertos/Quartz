@@ -1,3 +1,5 @@
+// Too big but don't know really how to split it up cleanly lmao.
+
 const TODAY = new Date().toISOString().slice(0, 10);
 
 export const useDeckStore = defineStore("deck", () => {
@@ -1040,15 +1042,31 @@ export const useDeckStore = defineStore("deck", () => {
   function paste() {
     if (!clipboard.value?.length || !currentSlides.value) return;
 
-    const parent = soleSelected.value;
-    const destPath = parent?.path ?? ROOT_PATH;
-    const parentType: NodeType = parent?.type ?? "core.group";
+    const flat = currentFlat();
     const newIds: string[] = [];
+
+    const destination = (type: NodeType) => {
+      let node = soleSelected.value;
+
+      while (node && !canContain(node.type, type)) {
+        const above = parentPath(node.path);
+
+        node = flat.find((n) => n.path === above) ?? null;
+      }
+
+      if (node) return node.path;
+
+      return canContain("core.group", type) ? ROOT_PATH : undefined;
+    };
 
     for (const entry of clipboard.value) {
       const source = entry.nodes.find((n) => n.id === entry.rootId);
 
-      if (!source || !canContain(parentType, source.type)) continue;
+      if (!source) continue;
+
+      const destPath = destination(source.type);
+
+      if (!destPath) continue;
 
       const destKeys = new Set(
         currentFlat()
