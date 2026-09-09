@@ -1,5 +1,5 @@
 <template>
-  <dialog ref="modal" @close="emit('close')">
+  <dialog ref="modal" @transitionend.self="onTransitionEnd">
     <div class="modal-header">
       <h4>{{ props.title }}</h4>
       <UIButton variant="icon" @click="close" aria-label="Close">
@@ -71,6 +71,10 @@ const emit = defineEmits<{
 
 const close = () => {
   modal.value?.close();
+};
+
+const onTransitionEnd = (e: TransitionEvent) => {
+  if (e.propertyName === "opacity" && !modal.value?.open) emit("close");
 };
 
 defineExpose({
