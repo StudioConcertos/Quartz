@@ -1,20 +1,20 @@
+import type { BundledLanguage, Highlighter } from "shiki";
+
 export interface Highlighted {
   spans: RenderSpan[];
   bg: string;
   fg: string;
 }
 
-const LIMIT = 200;
-
 const ITALIC = 1;
 const BOLD = 2;
 const UNDERLINE = 4;
 
-const DELAY = 200;
+const pairs = shallowReactive(new Map<string, boolean>());
 
-const cache = shallowReactive(new Map<string, Highlighted>());
-const pending = new Set<string>();
-const timers = new Map<string, ReturnType<typeof setTimeout>>();
+const cache = new Map<string, { key: string; value: Highlighted }>();
+
+let highlighter: Highlighter | undefined;
 
 function tokenStyle(token: { color?: string; fontStyle?: number }) {
   const style: Record<string, string | number> = {};
@@ -30,40 +30,21 @@ function tokenStyle(token: { color?: string; fontStyle?: number }) {
   return style;
 }
 
-async function compute(
-  key: string,
-  source: string,
-  language: string,
-  theme: string,
-) {
-  try {
-    const { codeToTokens } = await import("shiki");
-    const result = await codeToTokens(source, {
-      lang: language as any,
-      theme: theme as any,
-    });
+function load(key: string, language: string, theme: string) {
+  if (pairs.has(key)) return;
 
-    const spans: RenderSpan[] = [];
+  pairs.set(key, false);
 
-    result.tokens.forEach((line, index) => {
-      if (index) spans.push({ text: "\n" });
+  import("shiki")
+    .then(({ getSingletonHighlighter }) =>
+      getSingletonHighlighter({ langs: [language], themes: [theme] }),
+    )
+    .then((loaded) => {
+      highlighter = loaded;
 
-      for (const token of line)
-        spans.push({ text: token.content, style: tokenStyle(token) });
-    });
-
-    cache.set(key, { spans, bg: result.bg ?? "", fg: result.fg ?? "" });
-  } catch {
-    cache.set(key, { spans: [{ text: source }], bg: "", fg: "" });
-  } finally {
-    pending.delete(key);
-
-    if (cache.size > LIMIT) {
-      const oldest = cache.keys().next().value;
-
-      if (oldest !== undefined) cache.delete(oldest);
-    }
-  }
+      pairs.set(key, true);
+    })
+    .catch(() => {});
 }
 
 export function highlight(
@@ -72,27 +53,36 @@ export function highlight(
   language: string,
   theme: string,
 ): Highlighted | undefined {
-  const key = `${language}\u0000${theme}\u0000${source}`;
-  const hit = cache.get(key);
+  const pair = `${language}\u0000${theme}`;
 
-  if (hit) return hit;
+  if (!pairs.get(pair) || !highlighter) {
+    load(pair, language, theme);
 
-  if (!pending.has(key)) {
-    clearTimeout(timers.get(id));
-
-    timers.set(
-      id,
-      setTimeout(() => {
-        timers.delete(id);
-
-        if (cache.has(key) || pending.has(key)) return;
-
-        pending.add(key);
-
-        void compute(key, source, language, theme);
-      }, DELAY),
-    );
+    return undefined;
   }
 
-  return undefined;
+  const key = `${pair}\u0000${source}`;
+  const hit = cache.get(id);
+
+  if (hit?.key === key) return hit.value;
+
+  const result = highlighter.codeToTokens(source, {
+    lang: language as BundledLanguage,
+    theme,
+  });
+
+  const spans: RenderSpan[] = [];
+
+  result.tokens.forEach((line, index) => {
+    if (index) spans.push({ text: "\n" });
+
+    for (const token of line)
+      spans.push({ text: token.content, style: tokenStyle(token) });
+  });
+
+  const value = { spans, bg: result.bg ?? "", fg: result.fg ?? "" };
+
+  cache.set(id, { key, value });
+
+  return value;
 }

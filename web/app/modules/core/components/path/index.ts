@@ -5,7 +5,7 @@ export default {
   icon: "i-carbon-pen",
   inspector: Panel,
   optional: true,
-  nodes: ["core.shape"],
+  only: ["core.shape"],
   defaultData: () => ({
     points: [],
     closed: false,

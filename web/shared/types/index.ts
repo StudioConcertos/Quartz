@@ -89,7 +89,8 @@ export interface ComponentTypeDef {
   inspector: Component;
   defaultData: () => Record<string, any>;
   optional?: boolean;
-  nodes?: NodeType[];
+  // Unlike accepts/parents, undeclared means every node type.
+  only?: NodeType[];
   migrate?: (data: Record<string, any>) => Record<string, any>;
   fonts?: (data: Record<string, any>) => (string | undefined)[];
 }

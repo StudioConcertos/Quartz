@@ -673,7 +673,7 @@ export const useDeckStore = defineStore("deck", () => {
       : undefined;
     if (opts.parentId && !explicitParent) return;
 
-    const parent = explicitParent ?? soleSelected.value;
+    const parent = explicitParent ?? nearestAccepting(soleSelected.value, type);
     const parentPath = parent?.path ?? ROOT_PATH;
     const parentType: NodeType = parent?.type ?? "core.group";
 
@@ -1042,19 +1042,12 @@ export const useDeckStore = defineStore("deck", () => {
   function paste() {
     if (!clipboard.value?.length || !currentSlides.value) return;
 
-    const flat = currentFlat();
     const newIds: string[] = [];
 
     const destination = (type: NodeType) => {
-      let node = soleSelected.value;
+      const parent = nearestAccepting(soleSelected.value, type);
 
-      while (node && !canContain(node.type, type)) {
-        const above = parentPath(node.path);
-
-        node = flat.find((n) => n.path === above) ?? null;
-      }
-
-      if (node) return node.path;
+      if (parent) return parent.path;
 
       return canContain("core.group", type) ? ROOT_PATH : undefined;
     };
@@ -1211,7 +1204,7 @@ export const useDeckStore = defineStore("deck", () => {
 
   function addComponent(nodeId: string, type: ComponentType) {
     const located = locateNode(nodeId);
-    if (!located) return;
+    if (!located || !canAttach(located.node.type, type)) return;
 
     const present = componentsAt(located.slideIndex)?.some(
       (c) => c.node === nodeId && c.type === type,

@@ -1,5 +1,7 @@
 export type Asset = { name: string; url: string };
 
+export type FontAsset = Asset & { family: string };
+
 export const useAssetsStore = defineStore("assets", () => {
   const client = useSupabaseClient();
 
@@ -25,9 +27,11 @@ export const useAssetsStore = defineStore("assets", () => {
     return imageUrls.value.get(name);
   }
 
-  const fonts = computed(() => {
-    return assets.value.filter((asset) => isFont(asset.name));
-  });
+  const fonts = computed<FontAsset[]>(() =>
+    assets.value
+      .filter((asset) => isFont(asset.name))
+      .map((asset) => ({ ...asset, family: assetStem(asset.name) })),
+  );
 
   const models = computed(() => {
     return assets.value.filter((asset) => isModel(asset.name));
@@ -66,17 +70,19 @@ export const useAssetsStore = defineStore("assets", () => {
       .from("assets")
       .list(deck, { limit: LIST_LIMIT });
 
-    const taken = new Set([
-      ...assets.value.map((a) => a.name),
-      ...(stored ?? []).map((a) => a.name),
-    ]);
+    const taken = new Set(
+      [
+        ...assets.value.map((a) => a.name),
+        ...(stored ?? []).map((a) => a.name),
+      ].map(assetKey),
+    );
 
     const planned = files.flatMap((file) => {
       if (!assetKind(file.name)) return [];
 
       const name = uniqueAssetName(file.name, taken);
 
-      taken.add(name);
+      taken.add(assetKey(name));
 
       return [{ file, name }];
     });
@@ -130,8 +136,7 @@ export const useAssetsStore = defineStore("assets", () => {
     await Promise.all(
       pending.map(async (font) => {
         try {
-          const fontName = fontFamilyName(font.name);
-          const fontFace = new FontFace(fontName, `url(${font.url})`);
+          const fontFace = new FontFace(font.family, `url(${font.url})`);
 
           await fontFace.load();
 

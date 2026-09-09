@@ -164,7 +164,7 @@ const sole = computed(() =>
 const runs = computed(() => toRuns(sole.value?.data.content));
 
 const fontAssets = computed(() =>
-  useAssetsStore().fonts.map((font) => fontFamilyName(font.name)),
+  useAssetsStore().fonts.map((font) => font.family),
 );
 
 // The field edits runs as plain text, so the edit is spliced in rather than

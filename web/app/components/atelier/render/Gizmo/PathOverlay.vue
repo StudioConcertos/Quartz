@@ -458,10 +458,6 @@ function startPath(event: PointerEvent) {
 
   if (!origin) return;
 
-  const parentType = soleSelected.value?.type ?? "core.group";
-
-  if (!canContain(parentType, "core.shape")) useNodeSelection().clear();
-
   const endCreate = history.begin("Draw path");
   const id = deck.createNode("Path", "core.shape", { position: origin });
 
