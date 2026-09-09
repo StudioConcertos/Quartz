@@ -9,23 +9,35 @@
   @apply relative w-full h-full border-rd overflow-hidden;
 
   img {
-    @apply absolute inset-0 w-full h-full object-cover;
+    @apply absolute w-full h-full object-cover;
   }
 }
 </style>
 
 <script setup lang="ts">
 const { fetchSlides } = useDeckStore();
+const { trees } = storeToRefs(useDeckStore());
+
+const { snapshotUrl } = useSnapshotsStore();
 
 const props = defineProps<{
   deck: string;
   slides?: string;
 }>();
 
-// TODO: Replace with useAsyncData.
-const url = asyncComputed(async () => {
-  const slideId = props.slides ?? (await fetchSlides(props.deck, 0)).id;
+const unlisted = asyncComputed(async () => {
+  if (props.slides) return undefined;
 
-  return await useSnapshot().fetch(props.deck, slideId);
+  const id = (await fetchSlides(props.deck, 0)).id;
+
+  return await signStorageObject("snapshots", props.deck, `${id}.png`);
+});
+
+const url = computed(() => {
+  if (!props.slides) return unlisted.value;
+
+  const tree = trees.value.get(props.slides);
+
+  return tree && isEmptyTree(tree) ? undefined : snapshotUrl(props.slides);
 });
 </script>

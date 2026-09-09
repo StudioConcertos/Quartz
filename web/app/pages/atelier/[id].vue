@@ -35,6 +35,7 @@ type RealtimeChannel = ReturnType<typeof client.channel>;
 const { fetchDeck, fetchAllSlides } = useDeckStore();
 const { slides, deckTitle } = storeToRefs(useDeckStore());
 const { fetchAssets } = useAssetsStore();
+const { fetchSnapshots } = useSnapshotsStore();
 const sync = useDeckSync();
 const atelier = useAtelierStore();
 useKeybindings();
@@ -108,7 +109,10 @@ onMounted(async () => {
     )
     .subscribe();
 
-  await fetchAssets(deck.value?.id as string);
+  await Promise.all([
+    fetchAssets(deck.value?.id as string),
+    fetchSnapshots(deck.value?.id as string),
+  ]);
 });
 
 onUnmounted(() => {
