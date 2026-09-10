@@ -12,18 +12,21 @@
 </style>
 
 <script setup lang="ts">
-const { currentComponents } = storeToRefs(useDeckStore());
+const { currentComponents, animationVersion } = storeToRefs(useDeckStore());
 const { duration } = usePlayhead();
 
-const slideDuration = computed(() =>
-  (currentComponents.value ?? [])
-    .filter((component) => component.type === "core.animation")
-    .reduce(
-      (longest, component) =>
-        Math.max(longest, tracksDuration(component.data?.tracks)),
-      0,
-    ),
-);
+const slideDuration = computed(() => {
+  animationVersion.value;
+
+  // Raw, so iterating does not subscribe to every component on the slide.
+  return toRaw(currentComponents.value ?? []).reduce(
+    (longest, component) =>
+      component.type === "core.animation"
+        ? Math.max(longest, tracksDuration(component.data.tracks))
+        : longest,
+    0,
+  );
+});
 
 watchEffect(() => (duration.value = slideDuration.value));
 </script>

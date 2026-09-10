@@ -71,6 +71,8 @@ export const useDeckStore = defineStore("deck", () => {
     componentsAt(currentSlidesIndex.value),
   );
 
+  const animationVersion = ref(0);
+
   const variablesByNode = computed(() => {
     const map = new Map<string, VariableDef[]>();
 
@@ -1155,6 +1157,8 @@ export const useDeckStore = defineStore("deck", () => {
     if (index !== -1) slideComponents[index] = component;
     else slideComponents.push(component);
 
+    if (component.type === "core.animation") animationVersion.value++;
+
     sync.enqueueComponent(component.node, component.type);
   }
 
@@ -1234,6 +1238,8 @@ export const useDeckStore = defineStore("deck", () => {
     );
     if (index !== -1) slideComponents.splice(index, 1);
 
+    if (type === "core.animation") animationVersion.value++;
+
     sync.enqueueComponentDelete(nodeId, type);
   }
 
@@ -1269,6 +1275,7 @@ export const useDeckStore = defineStore("deck", () => {
     currentTree,
     components,
     currentComponents,
+    animationVersion,
     variablesByNode,
     builtins,
     selectedNodeIds,

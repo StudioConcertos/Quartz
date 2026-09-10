@@ -1,44 +1,58 @@
-const time = ref(0);
+import { animate } from "motion";
+import type { AnimationPlaybackControls } from "motion";
+
+const state = reactive({ time: 0 });
+const time = toRef(state, "time");
 const playing = ref(false);
 const duration = ref(0);
 
-let frame = 0;
-let last = 0;
-
-function stop() {
-  cancelAnimationFrame(frame);
-  playing.value = false;
-}
-
-function step(now: number) {
-  const delta = now - last;
-
-  last = now;
-  time.value += delta;
-
-  if (time.value >= duration.value) {
-    time.value = duration.value;
-    stop();
-    return;
-  }
-
-  frame = requestAnimationFrame(step);
-}
-
 const canPlay = computed(() => duration.value > 0);
+
+let controls: AnimationPlaybackControls | null = null;
+let builtFor = -1;
+
+function dispose() {
+  controls?.stop();
+  controls = null;
+  builtFor = -1;
+}
+
+function timeline() {
+  if (controls && builtFor === duration.value) return controls;
+
+  const at = Math.min(state.time, duration.value);
+
+  dispose();
+
+  controls = animate(
+    state,
+    { time: [0, duration.value] },
+    {
+      duration: duration.value / 1000,
+      ease: "linear",
+      autoplay: false,
+      onComplete: () => (playing.value = false),
+    },
+  );
+
+  builtFor = duration.value;
+  controls.time = at / 1000;
+
+  return controls;
+}
 
 export function usePlayhead() {
   function play() {
     if (playing.value || !canPlay.value) return;
-    if (time.value >= duration.value) time.value = 0;
+    if (state.time >= duration.value) seek(0);
 
+    timeline().play();
     playing.value = true;
-    last = performance.now();
-    frame = requestAnimationFrame(step);
   }
 
   function pause() {
-    stop();
+    controls?.pause();
+    playing.value = false;
   }
 
   function toggle() {
@@ -46,13 +60,24 @@ export function usePlayhead() {
   }
 
   function seek(to: number) {
-    stop();
-    time.value = Math.min(Math.max(to, 0), duration.value);
+    playing.value = false;
+
+    if (!canPlay.value) {
+      dispose();
+      state.time = 0;
+      return;
+    }
+
+    const controls = timeline();
+
+    controls.pause();
+    controls.time = Math.min(Math.max(to, 0), duration.value) / 1000;
   }
 
   function reset() {
-    stop();
-    time.value = 0;
+    dispose();
+    state.time = 0;
+    playing.value = false;
   }
 
   return { time, playing, duration, canPlay, play, pause, toggle, seek, reset };
