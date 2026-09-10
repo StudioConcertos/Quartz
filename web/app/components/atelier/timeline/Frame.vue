@@ -1,5 +1,6 @@
 <template>
   <div
+    ref="frame"
     @click="!isSelected && (currentSlidesIndex = props.index)"
     @contextmenu.prevent="openMenu"
     :class="{
@@ -60,6 +61,18 @@ const props = defineProps<{
 const slide = computed(() => slides.value[props.index]);
 
 const isSelected = computed(() => currentSlidesIndex.value === props.index);
+
+const frame = useTemplateRef<HTMLDivElement>("frame");
+
+watch(isSelected, (selected) => {
+  if (!selected) return;
+
+  frame.value?.scrollIntoView({
+    behavior: "smooth",
+    inline: "nearest",
+    block: "nearest",
+  });
+});
 
 function openMenu(event: MouseEvent) {
   const target = slide.value;
