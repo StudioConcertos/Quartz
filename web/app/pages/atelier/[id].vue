@@ -14,6 +14,7 @@
           <AtelierCommandBar />
           <AtelierRender canEdit />
         </div>
+        <AtelierDopesheet />
         <AtelierTimeline />
       </div>
     </div>

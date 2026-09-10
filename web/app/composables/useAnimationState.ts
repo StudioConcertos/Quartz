@@ -122,6 +122,7 @@ export function useAnimationState() {
 
     active.clear();
     transitions.clear();
+    usePlayhead().reset();
   }
 
   return { activeState, transition, setState, animateTo, toggleState, reset };
