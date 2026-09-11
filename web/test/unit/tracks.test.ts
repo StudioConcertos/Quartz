@@ -42,3 +42,167 @@ describe("tracksDuration", () => {
     expect(tracksDuration(tracks)).toBe(500);
   });
 });
+
+describe("valueAt", () => {
+  const keys: TrackKey[] = [
+    { t: 0, value: 0 },
+    { t: 1000, value: 100 },
+  ];
+
+  it("holds the first key before the track starts, so a late track does not snap in from nowhere", () => {
+    expect(valueAt(keys, -50)).toBe(0);
+  });
+
+  it("holds the last key after the track ends", () => {
+    expect(valueAt(keys, 5000)).toBe(100);
+  });
+
+  it("returns the key's own value when the playhead sits exactly on it", () => {
+    expect(valueAt(keys, 1000)).toBe(100);
+  });
+
+  it("interpolates between the surrounding pair", () => {
+    expect(valueAt(keys, 250)).toBe(25);
+  });
+
+  it("interpolates colours, so a hex-valued track fades rather than stepping", () => {
+    const colours: TrackKey[] = [
+      { t: 0, value: "#000000" },
+      { t: 100, value: "#ffffff" },
+    ];
+
+    expect(valueAt(colours, 50)).toBe("#808080");
+  });
+
+  it("is undefined for an empty track rather than throwing", () => {
+    expect(valueAt([], 0)).toBeUndefined();
+  });
+});
+
+describe("sampleTracks", () => {
+  const tracks: Track[] = [
+    {
+      type: "core.transform",
+      path: ["position", "x"],
+      keys: [
+        { t: 0, value: 0 },
+        { t: 1000, value: 200 },
+      ],
+    },
+    {
+      type: "core.typography",
+      path: ["size"],
+      keys: [
+        { t: 0, value: 10 },
+        { t: 1000, value: 20 },
+      ],
+    },
+  ];
+
+  it("writes only the keyed field, leaving the rest of the component's data alone", () => {
+    const data = { position: { x: 999, y: 7 }, rotation: 45 };
+    const out = sampleTracks(tracks, 500, "core.transform", data);
+
+    expect(out.position.x).toBe(100);
+    expect(out.position.y).toBe(7);
+    expect(out.rotation).toBe(45);
+  });
+
+  it("ignores tracks belonging to another component type", () => {
+    const data = { size: 99 };
+
+    expect(sampleTracks(tracks, 500, "core.typography", data).size).toBe(15);
+  });
+
+  it("returns the data untouched when there are no tracks, so unanimated nodes cost nothing", () => {
+    const data = { position: { x: 1, y: 2 } };
+
+    expect(sampleTracks(undefined, 500, "core.transform", data)).toBe(data);
+  });
+});
+
+describe("states composed over tracks", () => {
+  // The rule the whole design rests on: sample first, then apply the state, so
+  // a hover tint still works on a node that is mid-move. Both halves are pure,
+  // so this asserts the ordering without a store.
+  const tracks: Track[] = [
+    {
+      type: "core.transform",
+      path: ["position", "x"],
+      keys: [
+        { t: 0, value: 0 },
+        { t: 1000, value: 200 },
+      ],
+    },
+  ];
+
+  it("lets a state override win for the field it names", () => {
+    const sampled = sampleTracks(tracks, 500, "core.transform", {
+      position: { x: 0, y: 0 },
+    });
+
+    expect(applyState(sampled, { position: { x: 999 } }).position.x).toBe(999);
+  });
+
+  it("leaves the sampled value in place for fields the state does not name", () => {
+    const sampled = sampleTracks(tracks, 500, "core.transform", {
+      position: { x: 0, y: 0 },
+      rotation: 0,
+    });
+
+    const out = applyState(sampled, { rotation: 90 });
+
+    expect(out.position.x).toBe(100);
+    expect(out.rotation).toBe(90);
+  });
+});
+
+describe("upsertKey", () => {
+  it("creates the track when the field has none yet", () => {
+    const out = upsertKey(
+      undefined,
+      "core.transform",
+      ["position", "x"],
+      500,
+      40,
+    );
+
+    expect(out).toHaveLength(1);
+    expect(out[0]!.keys).toEqual([{ t: 500, value: 40 }]);
+  });
+
+  it("keeps keys sorted by time, because valueAt scans them in order", () => {
+    let out = upsertKey(undefined, "core.transform", ["position", "x"], 900, 90);
+    out = upsertKey(out, "core.transform", ["position", "x"], 100, 10);
+
+    expect(out[0]!.keys.map((k) => k.t)).toEqual([100, 900]);
+  });
+
+  it("replaces the key already at that time rather than stacking a second one", () => {
+    let out = upsertKey(undefined, "core.transform", ["position", "x"], 500, 40);
+    out = upsertKey(out, "core.transform", ["position", "x"], 500, 75);
+
+    expect(out[0]!.keys).toEqual([{ t: 500, value: 75 }]);
+  });
+
+  it("keys a second field into its own track, not the first one", () => {
+    let out = upsertKey(undefined, "core.transform", ["position", "x"], 0, 1);
+    out = upsertKey(out, "core.transform", ["position", "y"], 0, 2);
+
+    expect(out).toHaveLength(2);
+  });
+
+  it("does not mutate the tracks it was given", () => {
+    const before: Track[] = [
+      {
+        type: "core.transform",
+        path: ["position", "x"],
+        keys: [{ t: 0, value: 0 }],
+      },
+    ];
+
+    upsertKey(before, "core.transform", ["position", "x"], 500, 40);
+
+    expect(before[0]!.keys).toHaveLength(1);
+  });
+});

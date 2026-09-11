@@ -2,6 +2,7 @@ export function useNodeComponents() {
   const { currentComponents } = storeToRefs(useDeckStore());
   const { scopeFor } = useVariableScope();
   const { activeState, transition } = useAnimationState();
+  const { time } = usePlayhead();
 
   function getStoredComponent(node: string, type: ComponentType) {
     return currentComponents.value?.find(
@@ -26,16 +27,21 @@ export function useNodeComponents() {
   }
 
   function stagedData(node: Tree, type: ComponentType) {
-    const raw =
+    const anim = getStoredComponent(node.id, "core.animation")?.data;
+
+    const raw = sampleTracks(
+      anim?.tracks,
+      time.value,
+      type,
       getStoredComponent(node.id, type)?.data ??
-      effectiveDefaults(node.type, type);
+        effectiveDefaults(node.type, type),
+    );
 
     const state = activeState(node.id);
     const move = transition(node.id);
 
     if (!move && !state) return raw;
 
-    const anim = getStoredComponent(node.id, "core.animation")?.data;
     const at = (name: string) =>
       applyState(raw, overridesFor(anim, name, type));
 
