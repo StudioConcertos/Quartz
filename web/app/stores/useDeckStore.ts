@@ -1188,6 +1188,29 @@ export const useDeckStore = defineStore("deck", () => {
       );
     }
 
+    const animated = getComponent(component.node, "core.animation");
+    const keyed = (animated?.data?.tracks ?? []).filter(
+      (track: Track) => track.type === component.type,
+    );
+
+    if (keyed.length) {
+      const now = usePlayhead().time.value;
+
+      let tracks = animated!.data.tracks;
+
+      for (const track of keyed) {
+        const value = at(component.data, track.path);
+
+        if (value !== undefined)
+          tracks = upsertKey(tracks, component.type, track.path, now, value);
+      }
+
+      updateComponent(
+        { ...animated!, data: { ...animated!.data, tracks } },
+        located,
+      );
+    }
+
     writeComponentAt(
       located?.slideIndex ?? currentSlidesIndex.value,
       component,

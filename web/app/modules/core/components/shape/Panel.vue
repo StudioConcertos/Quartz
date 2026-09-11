@@ -7,7 +7,7 @@
         @update:value="(v) => setKind(v, update)"
       />
     </NodeComponentRow>
-    <NodeComponentRow name="fill">
+    <NodeComponentRow name="fill" :paths="['fill.value']">
       <NodeComponentRowFieldRadio
         :options="paintOptions"
         :value="mixedFill ? undefined : fill.type"
@@ -25,7 +25,7 @@
         @update:value="(v) => set(['fill'], { type: 'colour', value: v })"
       />
     </NodeComponentRow>
-    <NodeComponentRow name="stroke">
+    <NodeComponentRow name="stroke" :paths="['stroke.value']">
       <NodeComponentRowFieldRadio
         :options="paintOptions"
         :value="mixedStroke ? undefined : stroke.type"

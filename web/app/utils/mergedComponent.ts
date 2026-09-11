@@ -1,7 +1,7 @@
 import type { ComponentModel } from "#shared/types";
 
 // Read a nested key path out of a component's data, tolerant of nulls.
-function at(data: any, path: string[]): any {
+export function at(data: any, path: string[]): any {
   return path.reduce((v, k) => (v == null ? v : v[k]), data);
 }
 
