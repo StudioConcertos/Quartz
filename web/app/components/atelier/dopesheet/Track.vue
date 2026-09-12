@@ -1,12 +1,15 @@
 <template>
   <div class="dopesheet-track">
-    <p class="dopesheet-track-label">{{ props.track.path.join(".") }}</p>
+    <p class="dopesheet-track-label" title="Double-click a key to remove it">
+      {{ props.track.path.join(".") }}
+    </p>
     <div class="dopesheet-track-lane">
       <div
         v-for="key in props.track.keys"
         :key="key.t"
         :style="{ left: `${(key.t / Math.max(props.duration, 1)) * 100}%` }"
         @pointerdown="startDrag($event, key)"
+        @dblclick="emit('remove', key.t)"
         class="dopesheet-key"
       />
     </div>
@@ -36,27 +39,11 @@
 
 <script setup lang="ts">
 const props = defineProps<{ track: Track; duration: number }>();
-const emit = defineEmits<{ move: [from: number, to: number] }>();
+const emit = defineEmits<{
+  move: [from: number, to: number];
+  remove: [t: number];
+}>();
 
-function startDrag(event: PointerEvent, key: TrackKey) {
-  event.preventDefault();
+const startDrag = useKeyDrag(() => props.duration, emit);
 
-  const lane = (event.target as HTMLElement).parentElement!;
-  const box = lane.getBoundingClientRect();
-  const from = key.t;
-
-  function move(e: PointerEvent) {
-    const ratio = Math.min(Math.max((e.clientX - box.left) / box.width, 0), 1);
-
-    emit("move", from, Math.round(ratio * props.duration));
-  }
-
-  function end() {
-    window.removeEventListener("pointermove", move);
-    window.removeEventListener("pointerup", end);
-  }
-
-  window.addEventListener("pointermove", move);
-  window.addEventListener("pointerup", end);
-}
 </script>

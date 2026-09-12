@@ -9,9 +9,9 @@
       v-if="keyPaths.length"
       type="button"
       class="row-key"
-      :class="{ 'row-key-active': keyed }"
-      title="Key this field"
-      @click="keyPaths.forEach((p) => key(p))"
+      :class="{ 'row-key-active': keyedHere, 'row-key-tracked': anyTracked }"
+      :title="keyedHere ? 'Remove this key' : 'Key this field'"
+      @click="keyPaths.forEach(keyedHere ? unkey : key)"
     />
     <NodeComponentRowBind v-if="path && kind" :path="path" :kind="kind" />
   </div>
@@ -31,6 +31,10 @@
     @apply opacity-100;
   }
 
+  &.row-key-tracked {
+    @apply border-accent opacity-100;
+  }
+
   &.row-key-active {
     @apply bg-accent border-accent opacity-100;
   }
@@ -47,8 +51,7 @@ const props = defineProps<{
 }>();
 
 const { components, source } = useBoundSource(() => props.path);
-const { field, set, key } = useMergedFields(components);
-const { getStoredComponent } = useNodeComponents();
+const { field, set, key, unkey, keyed, tracked } = useMergedFields(components);
 
 const segments = computed(() => props.path?.split(".") ?? []);
 
@@ -60,15 +63,9 @@ const keyPaths = computed<string[][]>(() =>
       : [],
 );
 
-const keyed = computed(() =>
-  keyPaths.value.some((p) =>
-    components.value.some((c) => {
-      const anim = getStoredComponent(c.node, "core.animation");
+const keyedHere = computed(() => keyPaths.value.every((p) => keyed(p)));
 
-      return !!anim && !!findTrack(anim.data?.tracks, c.type, p);
-    }),
-  ),
-);
+const anyTracked = computed(() => keyPaths.value.some((p) => tracked(p)));
 
 const value = computed(() => {
   if (props.override) return props.override.value;

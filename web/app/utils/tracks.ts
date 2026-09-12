@@ -100,3 +100,32 @@ export function sampleTracks(
 
   return out;
 }
+
+export function removeKey(
+  tracks: Track[] | undefined,
+  type: ComponentType,
+  path: string[],
+  t: number,
+): Track[] {
+  const existing = findTrack(tracks, type, path);
+
+  if (!existing) return tracks ?? [];
+
+  const keys = existing.keys.filter((key) => key.t !== t);
+
+  // A track with no keys still claims the field, so the value would stick.
+  return keys.length
+    ? (tracks ?? []).map((track) =>
+        track === existing ? { ...existing, keys } : track,
+      )
+    : (tracks ?? []).filter((track) => track !== existing);
+}
+
+export function keyedAt(
+  tracks: Track[] | undefined,
+  type: ComponentType,
+  path: string[],
+  t: number,
+): boolean {
+  return !!findTrack(tracks, type, path)?.keys.some((key) => key.t === t);
+}

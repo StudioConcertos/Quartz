@@ -206,3 +206,58 @@ describe("upsertKey", () => {
     expect(before[0]!.keys).toHaveLength(1);
   });
 });
+
+describe("removeKey", () => {
+  const tracks = [
+    {
+      type: "core.transform" as any,
+      path: ["position", "x"],
+      keys: [
+        { t: 0, value: 0 },
+        { t: 800, value: 50 },
+      ],
+    },
+    {
+      type: "core.typography" as any,
+      path: ["size"],
+      keys: [{ t: 0, value: 12 }],
+    },
+  ];
+
+  it("drops just the key at that time", () => {
+    const out = removeKey(tracks, "core.transform" as any, ["position", "x"], 0);
+
+    expect(out[0]!.keys).toEqual([{ t: 800, value: 50 }]);
+    expect(out).toHaveLength(2);
+  });
+
+  it("drops the whole track once its last key goes, so the field stops sticking", () => {
+    const out = removeKey(tracks, "core.typography" as any, ["size"], 0);
+
+    expect(out).toHaveLength(1);
+    expect(out[0]!.type).toBe("core.transform");
+  });
+
+  it("leaves everything alone when nothing matches", () => {
+    expect(
+      removeKey(tracks, "core.transform" as any, ["position", "x"], 999),
+    ).toHaveLength(2);
+    expect(removeKey(undefined, "core.transform" as any, ["x"], 0)).toEqual([]);
+  });
+});
+
+describe("keyedAt", () => {
+  const tracks = [
+    {
+      type: "core.transform" as any,
+      path: ["position", "x"],
+      keys: [{ t: 800, value: 50 }],
+    },
+  ];
+
+  it("is true only where a key actually sits", () => {
+    expect(keyedAt(tracks, "core.transform" as any, ["position", "x"], 800)).toBe(true);
+    expect(keyedAt(tracks, "core.transform" as any, ["position", "x"], 0)).toBe(false);
+    expect(keyedAt(undefined, "core.transform" as any, ["position", "x"], 800)).toBe(false);
+  });
+});

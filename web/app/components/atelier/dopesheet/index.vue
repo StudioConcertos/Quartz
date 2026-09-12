@@ -1,24 +1,31 @@
 <template>
-  <div class="dopesheet">
+  <div v-if="canPlay" class="dopesheet">
     <AtelierDopesheetTransport />
     <div
       v-if="rows.length"
-      :style="{ '--dopesheet-progress': slideDuration ? time / slideDuration : 0 }"
+      :style="{ '--dopesheet-progress': duration ? time / duration : 0 }"
       class="dopesheet-rows"
     >
       <div class="dopesheet-line" />
       <template v-for="row in rows" :key="row.node">
         <p class="dopesheet-node">{{ row.name }}</p>
+        <AtelierDopesheetStateLane
+          v-if="row.stateKeys.length"
+          :keys="row.stateKeys"
+          :duration="duration"
+          @move="(from, to) => moveStateKey(row.node, from, to)"
+          @remove="(t) => removeStateKey(row.node, t)"
+        />
         <AtelierDopesheetTrack
           v-for="(track, i) in row.tracks"
           :key="i"
           :track="track"
-          :duration="slideDuration"
+          :duration="duration"
           @move="(from, to) => moveKey(row.node, track, from, to)"
+          @remove="(t) => removeTrackKey(row.node, track, t)"
         />
       </template>
     </div>
-    <p v-else class="dopesheet-empty">{{ emptyMessage }}</p>
   </div>
 </template>
 
@@ -26,12 +33,13 @@
 .dopesheet {
   @apply bg-dark-800 w-full;
   @apply border-solid border-0 border-t-2 border-dark-200;
+
+  /* Line up by the transport's scrub and every lane */
+  --dopesheet-label: 16ch;
 }
 
 .dopesheet-rows {
   @apply relative px-[2.5ch] pb-2 max-h-[20vh] overflow-y-auto;
-
-  --dopesheet-label: 16ch;
 }
 
 .dopesheet-node {
@@ -46,73 +54,46 @@
       (100% - 5ch - var(--dopesheet-label) - 0.75rem)
   );
 }
-
-.dopesheet-empty {
-  @apply ui-text-5 opacity-40 px-[2.5ch] pb-2;
-}
 </style>
 
 <script setup lang="ts">
-const { currentComponents, animationVersion, currentTree, selectedNodeIds } =
+const { animatedComponents, currentTree, selectedNodeIds } =
   storeToRefs(useDeckStore());
-const { updateComponent } = useDeckStore();
+const { updateComponent, patchAnimation } = useDeckStore();
 const { getStoredComponent } = useNodeComponents();
-const { duration, time } = usePlayhead();
-
-// A first key always lands at t=0, so a purely derived length would be 0 and
-// the playhead could never leave the spot needed to place a second key.
-const MIN_SPAN = 5000;
-
-const slideDuration = computed(() => {
-  animationVersion.value;
-
-  // Raw, so iterating does not subscribe to every component on the slide.
-  const animated = toRaw(currentComponents.value ?? []).filter(
-    (component) =>
-      component.type === "core.animation" && component.data.tracks?.length,
-  );
-
-  if (!animated.length) return 0;
-
-  return Math.max(
-    MIN_SPAN,
-    animated.reduce(
-      (longest, component) =>
-        Math.max(longest, tracksDuration(component.data.tracks)),
-      0,
-    ),
-  );
-});
-
-watchEffect(() => (duration.value = slideDuration.value));
+const { duration, time, canPlay } = usePlayhead();
 
 const rows = computed(() => {
-  animationVersion.value;
-
   const tree = currentTree.value;
   const named = tree ? flattenTree(tree) : [];
 
   const selection = selectedNodeIds.value;
 
-  return toRaw(currentComponents.value ?? [])
+  return animatedComponents.value
     .filter(
       (component) =>
-        component.type === "core.animation" &&
-        component.data.tracks?.length &&
-        (!selection.length || selection.includes(component.node)),
+        (!selection.length || selection.includes(component.node)) &&
+        !isNodeLocked(named.find((n) => n.id === component.node)),
     )
     .map((component) => ({
       node: component.node,
       name: named.find((n) => n.id === component.node)?.name ?? "Node",
-      tracks: component.data.tracks as Track[],
+      tracks: (component.data.tracks ?? []) as Track[],
+      stateKeys: (component.data.stateKeys ?? []) as StateKey[],
     }));
 });
 
-const emptyMessage = computed(() =>
-  selectedNodeIds.value.length
-    ? "No animation on the selection."
-    : "No animation on this slide.",
-);
+function removeTrackKey(node: string, track: Track, t: number) {
+  patchAnimation(node, (data) => ({
+    tracks: removeKey(data.tracks, track.type, track.path, t),
+  }));
+}
+
+function removeStateKey(node: string, t: number) {
+  patchAnimation(node, (data) => ({
+    stateKeys: (data.stateKeys ?? []).filter((k: StateKey) => k.t !== t),
+  }));
+}
 
 function moveKey(node: string, track: Track, from: number, to: number) {
   if (from === to) return;
@@ -133,6 +114,27 @@ function moveKey(node: string, track: Track, from: number, to: number) {
     data: {
       ...anim.data,
       tracks: upsertKey(without, track.type, track.path, to, key.value),
+    },
+  });
+}
+
+function moveStateKey(node: string, from: number, to: number) {
+  if (from === to) return;
+
+  const anim = getStoredComponent(node, "core.animation");
+  const key = (anim?.data.stateKeys ?? []).find((k: StateKey) => k.t === from);
+
+  if (!anim || !key) return;
+
+  updateComponent({
+    ...anim,
+    data: {
+      ...anim.data,
+      stateKeys: upsertStateKey(
+        anim.data.stateKeys.filter((k: StateKey) => k.t !== from),
+        to,
+        key.name,
+      ),
     },
   });
 }

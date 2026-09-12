@@ -1,13 +1,24 @@
 <template>
   <div class="dopesheet-transport">
-    <UIButton
-      variant="icon"
-      :disabled="!canPlay"
-      :aria-label="playing ? 'Pause' : 'Play'"
-      @click="toggle"
-    >
-      <div :class="playing ? 'i-carbon-pause' : 'i-carbon-play'"></div>
-    </UIButton>
+    <div class="dopesheet-transport-controls">
+      <UIButton
+        variant="icon"
+        :disabled="!playable"
+        :aria-label="playing ? 'Pause' : 'Play'"
+        @click="toggle"
+      >
+        <div :class="playing ? 'i-carbon-pause' : 'i-carbon-play'"></div>
+      </UIButton>
+      <UIButton
+        variant="icon"
+        :disabled="!canPlay"
+        aria-label="Stop"
+        @click="reset"
+      >
+        <div class="i-carbon-stop"></div>
+      </UIButton>
+      <p class="dopesheet-readout">{{ (time / 1000).toFixed(2) }}s</p>
+    </div>
     <input
       type="range"
       min="0"
@@ -16,13 +27,18 @@
       :disabled="!canPlay"
       @input="seek(Number(($event.target as HTMLInputElement).value))"
     />
-    <p class="dopesheet-readout">{{ (time / 1000).toFixed(2) }}s</p>
   </div>
 </template>
 
 <style scoped lang="postcss">
 .dopesheet-transport {
-  @apply flex items-center gap-6 px-[2.5ch] py-2;
+  @apply flex items-center gap-3 px-[2.5ch] py-2;
+
+  .dopesheet-transport-controls {
+    @apply flex items-center gap-2 shrink-0;
+
+    width: var(--dopesheet-label);
+  }
 
   input[type="range"] {
     @apply flex-1 h-4 appearance-none bg-transparent cursor-pointer border-none;
@@ -54,11 +70,12 @@
   }
 
   .dopesheet-readout {
-    @apply ui-text-3 tabular-nums opacity-60 w-[6ch];
+    @apply ui-text-3 tabular-nums opacity-60 m-0;
   }
 }
 </style>
 
 <script setup lang="ts">
-const { time, playing, duration, canPlay, toggle, seek } = usePlayhead();
+const { time, playing, duration, canPlay, playable, toggle, seek, reset } =
+  usePlayhead();
 </script>
