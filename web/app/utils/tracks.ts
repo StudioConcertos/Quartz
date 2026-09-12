@@ -129,3 +129,23 @@ export function keyedAt(
 ): boolean {
   return !!findTrack(tracks, type, path)?.keys.some((key) => key.t === t);
 }
+
+export function moveTrackKey(
+  tracks: Track[] | undefined,
+  type: ComponentType,
+  path: string[],
+  from: number,
+  to: number,
+): Track[] {
+  const key = findTrack(tracks, type, path)?.keys.find((k) => k.t === from);
+
+  if (!key || from === to) return tracks ?? [];
+
+  const cleared = (tracks ?? []).map((track) =>
+    track.type === type && track.path.join(".") === path.join(".")
+      ? { ...track, keys: track.keys.filter((k) => k.t !== from) }
+      : track,
+  );
+
+  return upsertKey(cleared, type, path, to, key.value);
+}

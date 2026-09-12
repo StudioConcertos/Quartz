@@ -1,5 +1,9 @@
 <template>
-  <NodeComponent name="syntax" :icon="props.icon" :components="props.components">
+  <NodeComponent
+    name="syntax"
+    :icon="props.icon"
+    :components="props.components"
+  >
     <NodeComponentRow
       name="language"
       path="language"

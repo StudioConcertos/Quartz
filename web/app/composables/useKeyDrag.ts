@@ -1,4 +1,5 @@
 export function useKeyDrag(
+  lane: () => HTMLElement | null,
   duration: () => number,
   emit: (event: "move", from: number, to: number) => void,
 ) {
@@ -7,8 +8,9 @@ export function useKeyDrag(
   return function startDrag(event: PointerEvent, key: { t: number }) {
     event.preventDefault();
 
-    const lane = (event.currentTarget as HTMLElement).parentElement!;
-    const box = lane.getBoundingClientRect();
+    const box = lane()?.getBoundingClientRect();
+
+    if (!box) return;
 
     let current = key.t;
 

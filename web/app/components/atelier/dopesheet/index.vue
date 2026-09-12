@@ -9,20 +9,23 @@
       <div class="dopesheet-line" />
       <template v-for="row in rows" :key="row.node">
         <p class="dopesheet-node">{{ row.name }}</p>
-        <AtelierDopesheetStateLane
+        <AtelierDopesheetLane
           v-if="row.stateKeys.length"
+          state
+          label="state"
           :keys="row.stateKeys"
           :duration="duration"
-          @move="(from, to) => moveStateKey(row.node, from, to)"
-          @remove="(t) => removeStateKey(row.node, t)"
+          @move="(from, to) => onMoveState(row.node, from, to)"
+          @remove="(t) => onRemoveState(row.node, t)"
         />
-        <AtelierDopesheetTrack
+        <AtelierDopesheetLane
           v-for="(track, i) in row.tracks"
           :key="i"
-          :track="track"
+          :label="track.path.join('.')"
+          :keys="track.keys"
           :duration="duration"
-          @move="(from, to) => moveKey(row.node, track, from, to)"
-          @remove="(t) => removeTrackKey(row.node, track, t)"
+          @move="(from, to) => onMoveKey(row.node, track, from, to)"
+          @remove="(t) => onRemoveKey(row.node, track, t)"
         />
       </template>
     </div>
@@ -59,13 +62,14 @@
 <script setup lang="ts">
 const { animatedComponents, currentTree, selectedNodeIds } =
   storeToRefs(useDeckStore());
-const { updateComponent, patchAnimation } = useDeckStore();
-const { getStoredComponent } = useNodeComponents();
+const { patchAnimation } = useDeckStore();
 const { duration, time, canPlay } = usePlayhead();
 
 const rows = computed(() => {
   const tree = currentTree.value;
-  const named = tree ? flattenTree(tree) : [];
+  const named = new Map(
+    (tree ? flattenTree(tree) : []).map((node) => [node.id, node]),
+  );
 
   const selection = selectedNodeIds.value;
 
@@ -73,69 +77,37 @@ const rows = computed(() => {
     .filter(
       (component) =>
         (!selection.length || selection.includes(component.node)) &&
-        !isNodeLocked(named.find((n) => n.id === component.node)),
+        !isNodeLocked(named.get(component.node)),
     )
     .map((component) => ({
       node: component.node,
-      name: named.find((n) => n.id === component.node)?.name ?? "Node",
+      name: named.get(component.node)?.name ?? "Node",
       tracks: (component.data.tracks ?? []) as Track[],
       stateKeys: (component.data.stateKeys ?? []) as StateKey[],
     }));
 });
 
-function removeTrackKey(node: string, track: Track, t: number) {
+function onRemoveKey(node: string, track: Track, t: number) {
   patchAnimation(node, (data) => ({
     tracks: removeKey(data.tracks, track.type, track.path, t),
   }));
 }
 
-function removeStateKey(node: string, t: number) {
+function onRemoveState(node: string, t: number) {
   patchAnimation(node, (data) => ({
     stateKeys: (data.stateKeys ?? []).filter((k: StateKey) => k.t !== t),
   }));
 }
 
-function moveKey(node: string, track: Track, from: number, to: number) {
-  if (from === to) return;
-
-  const anim = getStoredComponent(node, "core.animation");
-  const key = track.keys.find((k) => k.t === from);
-
-  if (!anim || !key) return;
-
-  const without = anim.data.tracks.map((t: Track) =>
-    t.type === track.type && t.path.join(".") === track.path.join(".")
-      ? { ...t, keys: t.keys.filter((k: TrackKey) => k.t !== from) }
-      : t,
-  );
-
-  updateComponent({
-    ...anim,
-    data: {
-      ...anim.data,
-      tracks: upsertKey(without, track.type, track.path, to, key.value),
-    },
-  });
+function onMoveKey(node: string, track: Track, from: number, to: number) {
+  patchAnimation(node, (data) => ({
+    tracks: moveTrackKey(data.tracks, track.type, track.path, from, to),
+  }));
 }
 
-function moveStateKey(node: string, from: number, to: number) {
-  if (from === to) return;
-
-  const anim = getStoredComponent(node, "core.animation");
-  const key = (anim?.data.stateKeys ?? []).find((k: StateKey) => k.t === from);
-
-  if (!anim || !key) return;
-
-  updateComponent({
-    ...anim,
-    data: {
-      ...anim.data,
-      stateKeys: upsertStateKey(
-        anim.data.stateKeys.filter((k: StateKey) => k.t !== from),
-        to,
-        key.name,
-      ),
-    },
-  });
+function onMoveState(node: string, from: number, to: number) {
+  patchAnimation(node, (data) => ({
+    stateKeys: moveStateKey(data.stateKeys, from, to),
+  }));
 }
 </script>

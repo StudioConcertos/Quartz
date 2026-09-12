@@ -55,6 +55,8 @@ function relocateStates(
 
   const { states, tracks, stateKeys, ...timing } = anim.data;
 
+  if (!Object.keys(states).length) return;
+
   let base = kept.find((c) => c.type === "core.base");
 
   if (!base) {
@@ -106,26 +108,29 @@ function relocateStateTiming(
     }),
   );
 
+  if (deepEqual(base.data.states, states)) return;
+
   base.data = { ...base.data, states };
 
-  if (timings.size) relocated?.push(base);
+  relocated?.push(base);
 
   const events = kept.find((c) => c.type === "core.event");
 
   if (!timings.size || !Array.isArray(events?.data?.handlers)) return;
 
-  relocated?.push(events);
+  const handlers = events.data.handlers.map((handler: any) =>
+    handler.duration === undefined &&
+    (handler.action === "setState" || handler.action === "toggleState") &&
+    timings.has(handler.state)
+      ? { ...handler, duration: timings.get(handler.state) }
+      : handler,
+  );
 
-  events.data = {
-    ...events.data,
-    handlers: events.data.handlers.map((handler: any) =>
-      handler.duration === undefined &&
-      (handler.action === "setState" || handler.action === "toggleState") &&
-      timings.has(handler.state)
-        ? { ...handler, duration: timings.get(handler.state) }
-        : handler,
-    ),
-  };
+  if (deepEqual(handlers, events.data.handlers)) return;
+
+  events.data = { ...events.data, handlers };
+
+  relocated?.push(events);
 }
 
 export function normaliseComponents(

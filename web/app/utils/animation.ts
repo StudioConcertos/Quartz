@@ -10,6 +10,7 @@ import {
   easeIn,
   easeInOut,
   easeOut,
+  spring,
 } from "motion";
 
 export const BASE_STATE = "";
@@ -133,8 +134,35 @@ export function bezierPoints(
     : undefined;
 }
 
-export function ease(easing: string | undefined, t: number): number {
+export const SPRING_BOUNCE = 0.25;
+
+const springs = new Map<number, ReturnType<typeof spring>>();
+
+function springAt(t: number, duration: number): number {
+  if (duration <= 0) return t;
+
+  let generator = springs.get(duration);
+
+  if (!generator) {
+    generator = spring({
+      keyframes: [0, 1],
+      duration,
+      bounce: SPRING_BOUNCE,
+    });
+
+    springs.set(duration, generator);
+  }
+
+  return generator.next(t * duration).value;
+}
+
+export function ease(
+  easing: string | undefined,
+  t: number,
+  duration = 0,
+): number {
   if (!easing) return t;
+  if (easing === "spring") return springAt(t, duration);
 
   const points = bezierPoints(easing);
 
@@ -150,8 +178,9 @@ export function stateAt(keys: StateKey[] | undefined, time: number) {
   const first = sorted[0]!;
   const last = sorted[sorted.length - 1]!;
 
-  if (time <= first.t) return { from: first.name, to: first.name, t: 1 };
-  if (time >= last.t) return { from: last.name, to: last.name, t: 1 };
+  if (time <= first.t)
+    return { from: first.name, to: first.name, t: 1, span: 0 };
+  if (time >= last.t) return { from: last.name, to: last.name, t: 1, span: 0 };
 
   for (let i = 1; i < sorted.length; i++) {
     const b = sorted[i]!;
@@ -165,10 +194,11 @@ export function stateAt(keys: StateKey[] | undefined, time: number) {
       from: a.name,
       to: b.name,
       t: span <= 0 ? 1 : (time - a.t) / span,
+      span,
     };
   }
 
-  return { from: last.name, to: last.name, t: 1 };
+  return { from: last.name, to: last.name, t: 1, span: 0 };
 }
 
 export function scheduledData(
@@ -193,7 +223,7 @@ export function scheduledData(
   return blendData(
     from,
     to,
-    ease(stateTiming(baseData, at.to || at.from).easing, at.t),
+    ease(stateTiming(baseData, at.to || at.from).easing, at.t, at.span),
   );
 }
 
@@ -211,5 +241,21 @@ export function animationDuration(data: any): number {
   return (data?.stateKeys ?? []).reduce(
     (last: number, key: StateKey) => Math.max(last, key.t),
     tracksDuration(data?.tracks),
+  );
+}
+
+export function moveStateKey(
+  keys: StateKey[] | undefined,
+  from: number,
+  to: number,
+): StateKey[] {
+  const key = keys?.find((k) => k.t === from);
+
+  if (!key || from === to) return keys ?? [];
+
+  return upsertStateKey(
+    keys!.filter((k) => k.t !== from),
+    to,
+    key.name,
   );
 }

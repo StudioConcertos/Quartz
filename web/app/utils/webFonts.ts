@@ -28,7 +28,8 @@ export function fontsInComponents(
   components: readonly ComponentModel[],
 ): string[] {
   const fields = components.flatMap(
-    (component) => getComponentType(component.type)?.fonts?.(component.data) ?? [],
+    (component) =>
+      getComponentType(component.type)?.fonts?.(component.data) ?? [],
   );
 
   return [...new Set(fields)].filter(

@@ -59,11 +59,13 @@ export function useSignedBucket(bucket: string) {
 
     resigning = true;
 
-    const urls = await sign(deck, names);
+    try {
+      const urls = await sign(deck, names);
 
-    if (urls && cached.value.deck === deck) store(deck, urls);
-
-    resigning = false;
+      if (urls && cached.value.deck === deck) store(deck, urls);
+    } finally {
+      resigning = false;
+    }
   }
 
   watch(useDocumentVisibility(), (state) => {

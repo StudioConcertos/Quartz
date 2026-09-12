@@ -52,9 +52,7 @@ const flushOnPageHide = () => sync.flushBeacon();
 
 const [{ data: deck, refresh: refreshDeck }, { refresh: refreshSlides }] =
   await Promise.all([
-    useAsyncData("deck", async () =>
-      fetchDeck(useRoute().params.id as string),
-    ),
+    useAsyncData("deck", async () => fetchDeck(useRoute().params.id as string)),
     useAsyncData("slides", async () =>
       fetchAllSlides(useRoute().params.id as string),
     ),

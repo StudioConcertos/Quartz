@@ -56,7 +56,10 @@
               @update:value="(time: number) => patch(index, { time })"
             />
           </NodeComponentRow>
-          <NodeComponentRow v-if="isStateAction(handler.action)" name="duration">
+          <NodeComponentRow
+            v-if="isStateAction(handler.action)"
+            name="duration"
+          >
             <NodeComponentRowFieldNumber
               :value="handler.duration ?? DEFAULT_HANDLER_DURATION"
               :min="0"

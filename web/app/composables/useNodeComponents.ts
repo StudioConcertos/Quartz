@@ -42,13 +42,7 @@ export function useNodeComponents() {
 
     const base = getStoredComponent(node.id, "core.base")?.data;
 
-    const raw = scheduledData(
-      base,
-      anim?.stateKeys,
-      time.value,
-      type,
-      sampled,
-    );
+    const raw = scheduledData(base, anim?.stateKeys, time.value, type, sampled);
 
     if (!move && !state) return raw;
 

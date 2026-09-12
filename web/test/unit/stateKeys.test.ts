@@ -13,20 +13,36 @@ describe("stateAt", () => {
   });
 
   it("holds the first key before it, the way a track holds its first value", () => {
-    expect(stateAt(keys, -10)).toEqual({ from: "", to: "", t: 1 });
-    expect(stateAt(keys, 0)).toEqual({ from: "", to: "", t: 1 });
+    expect(stateAt(keys, -10)).toEqual({ from: "", to: "", t: 1, span: 0 });
+    expect(stateAt(keys, 0)).toEqual({ from: "", to: "", t: 1, span: 0 });
   });
 
   it("holds the last key after it", () => {
-    expect(stateAt(keys, 5000)).toEqual({ from: "cold", to: "cold", t: 1 });
+    expect(stateAt(keys, 5000)).toEqual({
+      from: "cold",
+      to: "cold",
+      t: 1,
+      span: 0,
+    });
   });
 
   it("lands exactly on a key, fully arrived at it", () => {
-    expect(stateAt(keys, 1000)).toEqual({ from: "", to: "hot", t: 1 });
+    expect(stateAt(keys, 1000)).toEqual({
+      from: "",
+      to: "hot",
+      t: 1,
+      span: 1000,
+    });
   });
 
   it("blends across the gap, which is what makes the gap the duration", () => {
-    expect(stateAt(keys, 1500)).toEqual({ from: "hot", to: "cold", t: 0.5 });
+    // span is the gap, and the gap is what a spring is timed against.
+    expect(stateAt(keys, 1500)).toEqual({
+      from: "hot",
+      to: "cold",
+      t: 0.5,
+      span: 1000,
+    });
   });
 
   it("sorts, so a key dragged past its neighbour still reads in time order", () => {
@@ -35,7 +51,12 @@ describe("stateAt", () => {
       { t: 0, name: "" },
     ];
 
-    expect(stateAt(shuffled, 1000)).toEqual({ from: "", to: "cold", t: 0.5 });
+    expect(stateAt(shuffled, 1000)).toEqual({
+      from: "",
+      to: "cold",
+      t: 0.5,
+      span: 2000,
+    });
   });
 });
 

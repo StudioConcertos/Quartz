@@ -172,14 +172,26 @@ describe("upsertKey", () => {
   });
 
   it("keeps keys sorted by time, because valueAt scans them in order", () => {
-    let out = upsertKey(undefined, "core.transform", ["position", "x"], 900, 90);
+    let out = upsertKey(
+      undefined,
+      "core.transform",
+      ["position", "x"],
+      900,
+      90,
+    );
     out = upsertKey(out, "core.transform", ["position", "x"], 100, 10);
 
     expect(out[0]!.keys.map((k) => k.t)).toEqual([100, 900]);
   });
 
   it("replaces the key already at that time rather than stacking a second one", () => {
-    let out = upsertKey(undefined, "core.transform", ["position", "x"], 500, 40);
+    let out = upsertKey(
+      undefined,
+      "core.transform",
+      ["position", "x"],
+      500,
+      40,
+    );
     out = upsertKey(out, "core.transform", ["position", "x"], 500, 75);
 
     expect(out[0]!.keys).toEqual([{ t: 500, value: 75 }]);
@@ -225,7 +237,12 @@ describe("removeKey", () => {
   ];
 
   it("drops just the key at that time", () => {
-    const out = removeKey(tracks, "core.transform" as any, ["position", "x"], 0);
+    const out = removeKey(
+      tracks,
+      "core.transform" as any,
+      ["position", "x"],
+      0,
+    );
 
     expect(out[0]!.keys).toEqual([{ t: 800, value: 50 }]);
     expect(out).toHaveLength(2);
@@ -256,8 +273,14 @@ describe("keyedAt", () => {
   ];
 
   it("is true only where a key actually sits", () => {
-    expect(keyedAt(tracks, "core.transform" as any, ["position", "x"], 800)).toBe(true);
-    expect(keyedAt(tracks, "core.transform" as any, ["position", "x"], 0)).toBe(false);
-    expect(keyedAt(undefined, "core.transform" as any, ["position", "x"], 800)).toBe(false);
+    expect(
+      keyedAt(tracks, "core.transform" as any, ["position", "x"], 800),
+    ).toBe(true);
+    expect(keyedAt(tracks, "core.transform" as any, ["position", "x"], 0)).toBe(
+      false,
+    );
+    expect(
+      keyedAt(undefined, "core.transform" as any, ["position", "x"], 800),
+    ).toBe(false);
   });
 });

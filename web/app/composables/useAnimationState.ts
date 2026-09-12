@@ -33,7 +33,7 @@ const motionEase = (easing: string) =>
 
 function easingOptions(easing?: string): Record<string, any> {
   if (!easing) return {};
-  if (easing === "spring") return { type: "spring", bounce: 0.25 };
+  if (easing === "spring") return { type: "spring", bounce: SPRING_BOUNCE };
 
   const points = bezierPoints(easing);
 

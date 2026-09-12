@@ -44,7 +44,7 @@ function load(key: string, language: string, theme: string) {
 
       pairs.set(key, true);
     })
-    .catch(() => {});
+    .catch((error) => console.error(error));
 }
 
 export function highlight(

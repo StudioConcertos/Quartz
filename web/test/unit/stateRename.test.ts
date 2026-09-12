@@ -7,7 +7,11 @@ function comp(node: string, type: string, data: any) {
 describe("renameState", () => {
   it("rewrites the key in place, so the state list keeps its order", () => {
     const base = comp("n1", "core.base", {
-      states: { a: { overrides: {} }, old: { overrides: {} }, z: { overrides: {} } },
+      states: {
+        a: { overrides: {} },
+        old: { overrides: {} },
+        z: { overrides: {} },
+      },
     });
 
     const [changed] = renameState([base], "old", "new");
