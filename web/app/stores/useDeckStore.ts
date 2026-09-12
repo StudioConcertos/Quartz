@@ -71,7 +71,42 @@ export const useDeckStore = defineStore("deck", () => {
     componentsAt(currentSlidesIndex.value),
   );
 
+  const componentIndex = computed(() => {
+    const index = new Map<string, ComponentModel>();
+
+    for (const component of currentComponents.value ?? []) {
+      const key = componentKey(component.node, component.type);
+
+      if (!index.has(key)) index.set(key, component);
+    }
+
+    return index;
+  });
+
   const animationVersion = ref(0);
+
+  const animatedComponents = computed(() => {
+    animationVersion.value;
+
+    return toRaw(currentComponents.value ?? []).filter(
+      (component) =>
+        component.type === "core.animation" && hasAnimationKeys(component.data),
+    );
+  });
+
+  const slideDuration = computed(() =>
+    animatedComponents.value.reduce(
+      (longest, component) =>
+        Math.max(longest, animationDuration(component.data)),
+      0,
+    ),
+  );
+
+  watch(
+    [slideDuration, () => animatedComponents.value.length > 0],
+    ([ms, armed]) => usePlayhead().setLength(ms as number, armed as boolean),
+    { immediate: true, flush: "sync" },
+  );
 
   const variablesByNode = computed(() => {
     const map = new Map<string, VariableDef[]>();
@@ -588,14 +623,21 @@ export const useDeckStore = defineStore("deck", () => {
     if (data) {
       if (!slides.value.some((s) => s.id === id)) return [];
 
+      const relocated: ComponentModel[] = [];
+
       const slideComponents = normaliseComponents(
         data,
         fetchedComponents ?? [],
+        relocated,
       );
       const tree = buildTree(data);
 
       components.value.set(id, slideComponents);
       trees.value.set(id, tree);
+
+      // Nothing else rewrites a migrated row, so an unsaved migration is lost
+      // on the next load.
+      for (const c of relocated) sync.enqueueComponent(c.node, c.type);
 
       ensureFonts(fontsInComponents(slideComponents));
 
@@ -1133,7 +1175,6 @@ export const useDeckStore = defineStore("deck", () => {
 
     walk(root, "", 0, true);
 
-    // Rebuild to restore parent refs and canonical sort_order-sorted children.
     setSlideNodes(slideId, stripTree(flattenTree(root)));
 
     for (const id of changed) sync.enqueueNode(id);
@@ -1145,9 +1186,6 @@ export const useDeckStore = defineStore("deck", () => {
 
     const slideId = slides.value[slideIndex]?.id;
 
-    // Rapid writes to one component coalesce: typing 240 into a width box is
-    // one entry, not three. A gesture has already opened its own transaction,
-    // so this key is ignored during a drag.
     if (slideId)
       history.capture(slideId, `component:${component.node}:${component.type}`);
 
@@ -1172,14 +1210,14 @@ export const useDeckStore = defineStore("deck", () => {
       ? BASE_STATE
       : useAnimationState().activeState(component.node);
 
-    const anim = state ? getComponent(component.node, "core.animation") : null;
+    const base = state ? getComponent(component.node, "core.base") : null;
 
-    if (anim && overridesFor(anim.data, state, component.type)) {
+    if (base && overridesFor(base.data, state, component.type)) {
       return updateComponent(
         {
-          ...anim,
+          ...base,
           data: setNested(
-            anim.data,
+            base.data,
             ["states", state, "overrides", component.type],
             component.data,
           ),
@@ -1194,7 +1232,7 @@ export const useDeckStore = defineStore("deck", () => {
     );
 
     if (keyed.length) {
-      const now = usePlayhead().time.value;
+      const now = Math.round(usePlayhead().time.value);
 
       let tracks = animated!.data.tracks;
 
@@ -1227,6 +1265,27 @@ export const useDeckStore = defineStore("deck", () => {
         data: JSON.parse(JSON.stringify(component.data)),
       });
     }
+  }
+
+  function pruneAnimation(nodeId: string) {
+    const anim = getComponent(nodeId, "core.animation");
+
+    if (!anim || hasAnimationKeys(anim.data)) return;
+
+    removeComponent(nodeId, "core.animation");
+  }
+
+  function patchAnimation(
+    nodeId: string,
+    mutate: (data: any) => Record<string, any>,
+  ) {
+    const anim = getComponent(nodeId, "core.animation");
+
+    if (!anim) return;
+
+    updateComponent({ ...anim, data: { ...anim.data, ...mutate(anim.data) } });
+
+    pruneAnimation(nodeId);
   }
 
   function addComponent(nodeId: string, type: ComponentType) {
@@ -1299,6 +1358,7 @@ export const useDeckStore = defineStore("deck", () => {
     components,
     currentComponents,
     animationVersion,
+    slideDuration,
     variablesByNode,
     builtins,
     selectedNodeIds,
@@ -1345,6 +1405,10 @@ export const useDeckStore = defineStore("deck", () => {
     reorderNodes,
     updateComponent,
     addComponent,
+    pruneAnimation,
+    patchAnimation,
+    animatedComponents,
+    componentIndex,
     removeComponent,
     nextSlides,
     prevSlides,

@@ -1,12 +1,23 @@
 import { animate } from "motion";
 import type { AnimationPlaybackControls } from "motion";
 
+const MIN_SPAN = 5000;
+
 const state = reactive({ time: 0 });
 const time = toRef(state, "time");
 const playing = ref(false);
-const duration = ref(0);
+const end = ref(0);
+const canPlay = ref(false);
 
-const canPlay = computed(() => duration.value > 0);
+const duration = computed(() =>
+  canPlay.value ? Math.max(end.value, MIN_SPAN) : 0,
+);
+
+const playable = computed(() => end.value > 0);
+
+watch(time, (t) => {
+  if (playing.value && t >= end.value) pause();
+});
 
 let controls: AnimationPlaybackControls | null = null;
 let builtFor = -1;
@@ -41,37 +52,42 @@ function timeline() {
   return controls;
 }
 
+function pause() {
+  controls?.pause();
+  playing.value = false;
+}
+
+function play() {
+  if (playing.value || !playable.value) return;
+  if (state.time >= end.value) seek(0);
+
+  timeline().play();
+  playing.value = true;
+}
+
+function seek(to: number) {
+  playing.value = false;
+
+  if (!canPlay.value) {
+    dispose();
+    state.time = 0;
+    return;
+  }
+
+  timeline();
+
+  controls!.pause();
+  controls!.time = Math.min(Math.max(to, 0), duration.value) / 1000;
+}
+
+function setLength(ms: number, hasKeys: boolean) {
+  end.value = ms;
+  canPlay.value = hasKeys;
+}
+
 export function usePlayhead() {
-  function play() {
-    if (playing.value || !canPlay.value) return;
-    if (state.time >= duration.value) seek(0);
-
-    timeline().play();
-    playing.value = true;
-  }
-
-  function pause() {
-    controls?.pause();
-    playing.value = false;
-  }
-
   function toggle() {
     playing.value ? pause() : play();
-  }
-
-  function seek(to: number) {
-    playing.value = false;
-
-    if (!canPlay.value) {
-      dispose();
-      state.time = 0;
-      return;
-    }
-
-    const controls = timeline();
-
-    controls.pause();
-    controls.time = Math.min(Math.max(to, 0), duration.value) / 1000;
   }
 
   function reset() {
@@ -80,5 +96,17 @@ export function usePlayhead() {
     playing.value = false;
   }
 
-  return { time, playing, duration, canPlay, play, pause, toggle, seek, reset };
+  return {
+    time,
+    playing,
+    duration,
+    canPlay,
+    playable,
+    setLength,
+    play,
+    pause,
+    toggle,
+    seek,
+    reset,
+  };
 }

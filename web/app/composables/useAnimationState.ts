@@ -5,13 +5,8 @@ type Transition = { from: string; to: string; t: number };
 
 export type Timing = {
   duration?: number;
-  delay?: number;
   easing?: string;
-  repeat?: number;
-  repeatType?: "loop" | "reverse" | "mirror";
 };
-
-export const REPEAT_TYPES = ["loop", "reverse", "mirror"];
 
 const active = reactive(new Map<string, string>());
 
@@ -40,14 +35,9 @@ function easingOptions(easing?: string): Record<string, any> {
   if (!easing) return {};
   if (easing === "spring") return { type: "spring", bounce: 0.25 };
 
-  const bezier = easing.match(/cubic-bezier\(([^)]+)\)/);
+  const points = bezierPoints(easing);
 
-  if (bezier) {
-    const points = bezier[1]!.split(",").map((n) => Number(n.trim()));
-
-    if (points.length === 4 && points.every(Number.isFinite))
-      return { ease: points };
-  }
+  if (points) return { ease: points };
 
   return { ease: motionEase(easing) };
 }
@@ -76,13 +66,7 @@ export function useAnimationState() {
     if (activeState(nodeId) === name) return;
 
     const from = activeState(nodeId);
-    const {
-      duration = 0,
-      delay = 0,
-      easing,
-      repeat = 0,
-      repeatType = "loop",
-    } = timing;
+    const { duration = 0, easing } = timing;
 
     halt(nodeId);
     active.set(nodeId, name);
@@ -100,11 +84,7 @@ export function useAnimationState() {
         { t: 1 },
         {
           duration: duration / 1000,
-          ...(delay ? { delay: delay / 1000 } : {}),
           ...easingOptions(easing),
-          ...(repeat
-            ? { repeat: repeat < 0 ? Infinity : repeat, repeatType }
-            : {}),
           onComplete: () => halt(nodeId),
         },
       ),

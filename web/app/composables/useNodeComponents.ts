@@ -1,23 +1,21 @@
 export function useNodeComponents() {
-  const { currentComponents } = storeToRefs(useDeckStore());
+  const { currentComponents, componentIndex } = storeToRefs(useDeckStore());
   const { scopeFor } = useVariableScope();
   const { activeState, transition } = useAnimationState();
   const { time } = usePlayhead();
 
   function getStoredComponent(node: string, type: ComponentType) {
-    return currentComponents.value?.find(
-      (component) => component.type === type && component.node === node,
-    );
+    return componentIndex.value.get(componentKey(node, type));
   }
 
   function stateComponent(
     node: string,
     type: ComponentType,
-    anim = getStoredComponent(node, "core.animation")?.data,
+    base = getStoredComponent(node, "core.base")?.data,
   ) {
     if (isStateless(type)) return undefined;
 
-    const data = overridesFor(anim, activeState(node), type);
+    const data = overridesFor(base, activeState(node), type);
 
     return data ? ({ node, type, data } as ComponentModel) : undefined;
   }
@@ -29,7 +27,7 @@ export function useNodeComponents() {
   function stagedData(node: Tree, type: ComponentType) {
     const anim = getStoredComponent(node.id, "core.animation")?.data;
 
-    const raw = sampleTracks(
+    const sampled = sampleTracks(
       anim?.tracks,
       time.value,
       type,
@@ -40,10 +38,22 @@ export function useNodeComponents() {
     const state = activeState(node.id);
     const move = transition(node.id);
 
+    if (!anim?.stateKeys?.length && !move && !state) return sampled;
+
+    const base = getStoredComponent(node.id, "core.base")?.data;
+
+    const raw = scheduledData(
+      base,
+      anim?.stateKeys,
+      time.value,
+      type,
+      sampled,
+    );
+
     if (!move && !state) return raw;
 
     const at = (name: string) =>
-      applyState(raw, overridesFor(anim, name, type));
+      applyState(raw, overridesFor(base, name, type));
 
     if (!move) return at(state);
 
@@ -60,12 +70,12 @@ export function useNodeComponents() {
   function getNodeComponents(node: string): ComponentModel[] {
     if (!currentComponents.value) return [];
 
-    const anim = getStoredComponent(node, "core.animation")?.data;
+    const base = getStoredComponent(node, "core.base")?.data;
 
     return currentComponents.value
       .filter((component) => component.node === node)
       .map(
-        (component) => stateComponent(node, component.type, anim) ?? component,
+        (component) => stateComponent(node, component.type, base) ?? component,
       )
       .sort((a, b) => a.type.localeCompare(b.type));
   }

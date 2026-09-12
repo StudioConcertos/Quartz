@@ -49,6 +49,20 @@
               @update:value="(state: string) => patch(index, { state })"
             />
           </NodeComponentRow>
+          <NodeComponentRow v-if="handler.action === 'seek'" name="time">
+            <NodeComponentRowFieldNumber
+              :value="handler.time ?? 0"
+              :min="0"
+              @update:value="(time: number) => patch(index, { time })"
+            />
+          </NodeComponentRow>
+          <NodeComponentRow v-if="isStateAction(handler.action)" name="duration">
+            <NodeComponentRowFieldNumber
+              :value="handler.duration ?? DEFAULT_HANDLER_DURATION"
+              :min="0"
+              @update:value="(duration: number) => patch(index, { duration })"
+            />
+          </NodeComponentRow>
           <NodeComponentRow v-if="handler.action === 'goToSlide'" name="slide">
             <NodeComponentRowFieldNumber
               :value="handler.slide ?? 0"
@@ -84,11 +98,9 @@ const handlers = computed<EventHandler[]>(() => {
 
 const stateNames = computed(() => {
   const node = component.value?.node;
-  const anim = node
-    ? getNodeComponent(node, "core.animation")?.data
-    : undefined;
+  const base = node ? getNodeComponent(node, "core.base")?.data : undefined;
 
-  return Object.keys(anim?.states ?? {});
+  return Object.keys(base?.states ?? {});
 });
 
 const isStateAction = (action: string) =>
@@ -99,6 +111,7 @@ const title = (handler: EventHandler) =>
 
 function summary(handler: EventHandler) {
   if (handler.action === "goToSlide") return `goToSlide ${handler.slide ?? 0}`;
+  if (handler.action === "seek") return `seek ${handler.time ?? 0}ms`;
 
   if (isStateAction(handler.action))
     return `${handler.action} ${handler.state || "base"}`;
@@ -123,7 +136,15 @@ function patch(index: number, changes: Partial<EventHandler>) {
 }
 
 function add() {
-  write([...handlers.value, { on: "click", action: "toggleState", state: "" }]);
+  write([
+    ...handlers.value,
+    {
+      on: "click",
+      action: "toggleState",
+      state: "",
+      duration: DEFAULT_HANDLER_DURATION,
+    },
+  ]);
 }
 
 function remove(index: number) {
